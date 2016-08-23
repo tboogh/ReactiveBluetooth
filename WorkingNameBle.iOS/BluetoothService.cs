@@ -2,6 +2,7 @@ using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreBluetooth;
 using CoreFoundation;
@@ -13,9 +14,8 @@ namespace WorkingNameBle.iOS
     public class BluetoothService : IBluetoothService
     {
         private DispatchQueue _dispatchQueue;
-        private CBCentralManager _peripheralManager;
+        private CBCentralManager _centralManager;
         private IObservable<EventPattern<object>> _updateStateObservable;
-        private IObservable<Device> _disoverDeviceObservable;
         private IDisposable _updateStateDisposable;
         private TaskCompletionSource<bool> _readyTaskCompletionSource;
         private bool _initialized;
@@ -28,15 +28,15 @@ namespace WorkingNameBle.iOS
             }
 
             _dispatchQueue = new DispatchQueue("com.workingble.periperhalmanager.queue");
-            _peripheralManager = new CBCentralManager(_dispatchQueue);
+            _centralManager = new CBCentralManager(_dispatchQueue);
 
             if (_updateStateObservable != null)
             {
-                _updateStateObservable = Observable.FromEventPattern(eh => _peripheralManager.UpdatedState += eh, eh => _peripheralManager.UpdatedState -= eh);
+                _updateStateObservable = Observable.FromEventPattern(eh => _centralManager.UpdatedState += eh, eh => _centralManager.UpdatedState -= eh);
                 _readyTaskCompletionSource = new TaskCompletionSource<bool>();
                 _updateStateDisposable = _updateStateObservable.Subscribe(pattern =>
                 {
-                    switch (_peripheralManager.State)
+                    switch (_centralManager.State)
                     {
                         case CBCentralManagerState.Unknown:
                         case CBCentralManagerState.PoweredOff:
@@ -78,14 +78,14 @@ namespace WorkingNameBle.iOS
 
         public IObservable<IDevice> ScanForDevices()
         {
-            if (_peripheralManager.State != CBCentralManagerState.PoweredOn)
+            if (_centralManager.State != CBCentralManagerState.PoweredOn)
             {
                 // Throw? return null? handle...
             }
-            if (!_peripheralManager.IsScanning)
-                _peripheralManager.ScanForPeripherals((CBUUID[])null);
+            if (!_centralManager.IsScanning)
+                _centralManager.ScanForPeripherals((CBUUID[])null);
 
-            return Observable.FromEventPattern<EventHandler<CBDiscoveredPeripheralEventArgs>, CBDiscoveredPeripheralEventArgs>(eh => _peripheralManager.DiscoveredPeripheral += eh, eh => _peripheralManager.DiscoveredPeripheral -= eh)
+            return Observable.FromEventPattern<EventHandler<CBDiscoveredPeripheralEventArgs>, CBDiscoveredPeripheralEventArgs>(eh => _centralManager.DiscoveredPeripheral += eh, eh => _centralManager.DiscoveredPeripheral -= eh)
                 .Select(x =>
                 {
                     Device device = new Device(x.EventArgs.Peripheral);
@@ -95,7 +95,24 @@ namespace WorkingNameBle.iOS
 
         public Task<bool> ConnectToDevice(IDevice device)
         {
-            throw new NotImplementedException();
+            var nativeDevice = ((Device) device).NativeDevice;
+            
+            var connectedObservable = Observable.FromEventPattern<EventHandler<CBPeripheralEventArgs>, CBPeripheralEventArgs>(eh => _centralManager.ConnectedPeripheral += eh, eh => _centralManager.ConnectedPeripheral -= eh)
+                .Select(x => true);
+            var connectionErrorObservable = Observable.FromEventPattern<EventHandler<CBPeripheralErrorEventArgs>, CBPeripheralErrorEventArgs>(eh => _centralManager.FailedToConnectPeripheral += eh, eh => _centralManager.FailedToConnectPeripheral -= eh)
+                .Select(x => false);
+
+            var merged = connectionErrorObservable.Merge(connectedObservable);
+            _centralManager.ConnectPeripheral(nativeDevice);
+
+            return merged.FirstAsync().ToTask();
+        }
+
+        public Task DisconnectDevice(IDevice device)
+        {
+            var nativeDevice = ((Device)device).NativeDevice;
+            _centralManager.CancelPeripheralConnection(nativeDevice);
+            return Task.FromResult(true);
         }
     }
 }

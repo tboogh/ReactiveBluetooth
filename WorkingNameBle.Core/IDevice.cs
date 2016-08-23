@@ -8,5 +8,6 @@ namespace WorkingNameBle.Core
 {
     public interface IDevice
     {
+        string Name { get;  }
     }
 }

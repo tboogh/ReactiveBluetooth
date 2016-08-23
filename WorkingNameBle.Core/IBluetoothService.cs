@@ -21,5 +21,7 @@ namespace WorkingNameBle.Core
         IObservable<IDevice> ScanForDevices();
 
         Task<bool> ConnectToDevice(IDevice device);
+
+        Task DisconnectDevice(IDevice device);
     }
 }

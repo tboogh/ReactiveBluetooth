@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Bluetooth;
@@ -67,11 +68,56 @@ namespace WorkingNameBle.Android
 
         public Task<bool> ConnectToDevice(IDevice device)
         {
-            var nativeDevice = ((Device)device).NativeDevice;
+            var androidDevice = (Device)device;
+            var nativeDevice = androidDevice.NativeDevice;
             var context = Application.Context;
 
-            var callback = new BleGattCallback();
-            nativeDevice.ConnectGatt(context, true, callback);
+            var connectionObservable = Observable.Create<bool>(observer =>
+            {
+                var callback = new BleGattCallback((gatt, status, newState) =>
+                {
+                    switch (status)
+                    {
+                        case GattStatus.ConnectionCongested:
+                        case GattStatus.Failure:
+                        case GattStatus.InsufficientAuthentication:
+                        case GattStatus.InsufficientEncryption:
+                        case GattStatus.InvalidAttributeLength:
+                        case GattStatus.InvalidOffset:
+                        case GattStatus.WriteNotPermitted:
+                        case GattStatus.ReadNotPermitted:
+                        case GattStatus.RequestNotSupported:
+                            observer.OnError(new Exception($"Connection failed {status.ToString()}"));
+                            break;
+                        case GattStatus.Success:
+                            androidDevice.Gatt = gatt;
+                            observer.OnNext(true);
+                            observer.OnCompleted();
+                            break;
+                        
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(status), status, null);
+                    }
+                });
+
+                nativeDevice.ConnectGatt(context, false, callback);
+
+                return Disposable.Create(() =>
+                {
+                    
+                });
+            });
+
+
+            return connectionObservable.ToTask();
+        }
+
+        public Task DisconnectDevice(IDevice device)
+        {
+            var androidDevice = (Device)device;
+            
+            androidDevice.Gatt?.Close();
+            return Task.FromResult(true);
         }
 
         private void CheckInitialized()

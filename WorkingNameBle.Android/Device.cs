@@ -16,11 +16,14 @@ namespace WorkingNameBle.Android
 {
     public class Device : IDevice
     {
-        public BluetoothDevice NativeDevice { get; private set; }
-
         public Device(BluetoothDevice device)
         {
             NativeDevice = device;
+            Name = device.Name;
         }
+
+        public BluetoothDevice NativeDevice { get; private set; }
+        public BluetoothGatt Gatt { get; set; }
+        public string Name { get; }
     }
 }

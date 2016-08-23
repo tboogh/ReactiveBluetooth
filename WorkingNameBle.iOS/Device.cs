@@ -8,11 +8,14 @@ namespace WorkingNameBle.iOS
 {
     public class Device : IDevice
     {
-        private readonly CBPeripheral _peripheral;
-
-        public Device(CBPeripheral peripheral)
+        public Device(CBPeripheral nativeDevice)
         {
-            _peripheral = peripheral;
+            NativeDevice = nativeDevice;
+            Name = nativeDevice.Name;
         }
+
+        public CBPeripheral NativeDevice { get; }
+
+        public string Name { get; }
     }
 }
