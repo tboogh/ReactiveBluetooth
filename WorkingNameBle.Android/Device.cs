@@ -16,11 +16,11 @@ namespace WorkingNameBle.Android
 {
     public class Device : IDevice
     {
-        private readonly BluetoothDevice _device;
+        public BluetoothDevice NativeDevice { get; private set; }
 
         public Device(BluetoothDevice device)
         {
-            _device = device;
+            NativeDevice = device;
         }
     }
 }

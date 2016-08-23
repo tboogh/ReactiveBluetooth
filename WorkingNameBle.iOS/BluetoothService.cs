@@ -44,6 +44,8 @@ namespace WorkingNameBle.iOS
                             // Ignore therse
                             break;
                         case CBCentralManagerState.Unsupported:
+                            _readyTaskCompletionSource.SetResult(false);
+                            throw new DiscoverDeviceException("BLE mode not authorized");
                         case CBCentralManagerState.Unauthorized:
                             _readyTaskCompletionSource.SetResult(false);
                             throw new DiscoverDeviceException("BLE mode not supported");
@@ -70,6 +72,7 @@ namespace WorkingNameBle.iOS
 
         public Task<bool> ReadyToDiscover()
         {
+            // Add timeout
             return _readyTaskCompletionSource.Task;
         }
 
@@ -88,6 +91,11 @@ namespace WorkingNameBle.iOS
                     Device device = new Device(x.EventArgs.Peripheral);
                     return device;
                 });
+        }
+
+        public Task<bool> ConnectToDevice(IDevice device)
+        {
+            throw new NotImplementedException();
         }
     }
 }
