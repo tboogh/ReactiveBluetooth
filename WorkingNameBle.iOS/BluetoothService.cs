@@ -72,12 +72,14 @@ namespace WorkingNameBle.iOS
 
         public Task<bool> ReadyToDiscover()
         {
+            CheckInitialized();
             // Add timeout
             return _readyTaskCompletionSource.Task;
         }
 
         public IObservable<IDevice> ScanForDevices()
         {
+            CheckInitialized();
             if (_centralManager.State != CBCentralManagerState.PoweredOn)
             {
                 // Throw? return null? handle...
@@ -95,6 +97,7 @@ namespace WorkingNameBle.iOS
 
         public Task<bool> ConnectToDevice(IDevice device)
         {
+            CheckInitialized();
             var nativeDevice = ((Device) device).NativeDevice;
             
             var connectedObservable = Observable.FromEventPattern<EventHandler<CBPeripheralEventArgs>, CBPeripheralEventArgs>(eh => _centralManager.ConnectedPeripheral += eh, eh => _centralManager.ConnectedPeripheral -= eh)
@@ -113,6 +116,21 @@ namespace WorkingNameBle.iOS
             var nativeDevice = ((Device)device).NativeDevice;
             _centralManager.CancelPeripheralConnection(nativeDevice);
             return Task.FromResult(true);
+        }
+
+        public IObservable<IService> DiscoverServices(IDevice device)
+        {
+            var nativeDevice = ((Device)device).NativeDevice;
+            nativeDevice.DiscoverServices();
+            throw new NotImplementedException();
+        }
+
+        private void CheckInitialized()
+        {
+            if (!_initialized)
+            {
+                throw new Exception("Service not initialized");
+            }
         }
     }
 }
