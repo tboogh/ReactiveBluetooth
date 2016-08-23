@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using CoreBluetooth;
@@ -28,13 +29,9 @@ namespace WorkingNameBle.iOS
             NativeDevice.DiscoverServices();
             return observable.Select(x =>
             {
-                List<IService> services = new List<IService>();
-                foreach (var cbService in NativeDevice.Services)
-                {
-                    var service = new Service(cbService);
-                    services.Add(service);
-                }
-                return services;
+                return NativeDevice.Services.Select(cbService => new Service(cbService, NativeDevice))
+                    .Cast<IService>()
+                    .ToList();
             });
         }
     }

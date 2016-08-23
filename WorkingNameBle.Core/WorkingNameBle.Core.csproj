@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
     <Compile Include="IBluetoothService.cs" />
+    <Compile Include="ICharacteristic.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

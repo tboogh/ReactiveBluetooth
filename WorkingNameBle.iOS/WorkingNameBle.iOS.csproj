@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BluetoothService.cs" />
+    <Compile Include="Characteristic.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.cs" />

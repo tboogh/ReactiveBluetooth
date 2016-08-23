@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace WorkingNameBle.Core
 {
-    public interface IService
+    public interface ICharacteristic
     {
         Guid Id { get; }
-
-        IObservable<IList<ICharacteristic>> DiscoverCharacteristics();
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 
 using Android.App;
@@ -30,6 +31,12 @@ namespace WorkingNameBle.Android
                 var uuid = _service.Uuid.ToString();
                 return Guid.Parse(uuid);
             }
+        }
+
+        public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
+        {
+            return Observable.Return(_service.Characteristics.Select(characteristic => new Characteristic(characteristic)))
+                .Cast<ICharacteristic>().ToList();
         }
     }
 }

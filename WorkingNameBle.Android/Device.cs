@@ -35,7 +35,6 @@ namespace WorkingNameBle.Android
             {
                 var manager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
                 return (ConnectionState) manager.GetConnectionState(NativeDevice, ProfileType.Gatt);
-                ;
             }
         }
 
@@ -54,7 +53,7 @@ namespace WorkingNameBle.Android
                 };
 
                 Gatt.DiscoverServices();
-
+                
                 return Disposable.Create(() => { Callback.ServicesDiscovered = null; });
             });
             return discoverObservable;
