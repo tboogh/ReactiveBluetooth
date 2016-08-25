@@ -6,35 +6,56 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Bluetooth;
-using Android.Bluetooth.LE;
-using WorkingNameBle.Core;
+using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Exceptions;
 
-namespace WorkingNameBle.Android
+namespace WorkingNameBle.Android.Central
 {
-    public class BluetoothService : IBluetoothService
+    public class CentralManager : ICentralManager
     {
         private BluetoothAdapter _bluetoothAdapter;
         private bool _initialized;
         private IObservable<IDevice> _discoverObservable;
 
-        public void Init(IScheduler scheduler = null)
+        public ManagerState State
+        {
+            get
+            {
+                switch (_bluetoothAdapter.State)
+                {
+                    case global::Android.Bluetooth.State.Connected:
+                    case global::Android.Bluetooth.State.Connecting:
+                    case global::Android.Bluetooth.State.Disconnected:
+                    case global::Android.Bluetooth.State.Disconnecting:
+                    case global::Android.Bluetooth.State.On:
+                        return ManagerState.PoweredOn;
+                    case global::Android.Bluetooth.State.Off:
+                        return ManagerState.PoweredOff;
+                    case global::Android.Bluetooth.State.TurningOff:
+                    case global::Android.Bluetooth.State.TurningOn:
+                        return ManagerState.Resetting;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
             if (!_initialized)
             {
                 _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             }
             _initialized = true;
+
+            return Observable
+                .Timer(TimeSpan.FromSeconds(0.5))
+                .Select(x => State);
         }
 
         public void Shutdown()
         {
             _initialized = false;
-        }
-
-        public Task<bool> ReadyToDiscover()
-        {
-            return Task.FromResult(_initialized);
         }
 
         public IObservable<IDevice> ScanForDevices()

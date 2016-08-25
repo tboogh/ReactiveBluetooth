@@ -119,10 +119,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BluetoothServiceTests.cs" />
+    <Compile Include="Tests\Central\CentralManagerTests.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\Peripheral\PeripheralManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorkingNameBle.Core
+namespace WorkingNameBle.Core.Peripheral
 {
-    public interface ICharacteristic
+    public interface IService : Core.IService
     {
-        Guid Id { get; }
     }
 }

@@ -1,13 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CoreBluetooth;
-using WorkingNameBle.Core;
+using WorkingNameBle.Core.Central;
 
-namespace WorkingNameBle.iOS
+namespace WorkingNameBle.iOS.Central
 {
     public class Service : IService
     {

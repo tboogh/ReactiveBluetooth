@@ -36,16 +36,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Central\IService.cs" />
+    <Compile Include="Central\ManagerState.cs" />
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
-    <Compile Include="IBluetoothService.cs" />
-    <Compile Include="ICharacteristic.cs" />
-    <Compile Include="IDevice.cs" />
+    <Compile Include="Peripheral\AdvertisingOptions.cs" />
+    <Compile Include="Peripheral\IBluetoothAbstractFactory.cs" />
+    <Compile Include="Central\ICentralManager.cs" />
+    <Compile Include="Central\ICharacteristic.cs" />
+    <Compile Include="Central\IDevice.cs" />
     <Compile Include="IService.cs" />
+    <Compile Include="Peripheral\IPeripheralManager.cs" />
+    <Compile Include="Peripheral\IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

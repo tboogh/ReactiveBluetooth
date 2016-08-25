@@ -58,7 +58,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BluetoothServiceTests.cs" />
+    <Compile Include="CentralManagerTests.cs" />
+    <Compile Include="PeripheralManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

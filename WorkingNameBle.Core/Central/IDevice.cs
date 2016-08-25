@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace WorkingNameBle.Core
+namespace WorkingNameBle.Core.Central
 {
     public enum ConnectionState
     {

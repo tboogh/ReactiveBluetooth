@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Bluetooth.LE;
 
-namespace WorkingNameBle.Android
+namespace WorkingNameBle.Android.Central
 {
     public class BleScanCallback : ScanCallback
     {

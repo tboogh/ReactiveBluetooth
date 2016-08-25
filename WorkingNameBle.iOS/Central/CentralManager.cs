@@ -1,82 +1,44 @@
 using System;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreBluetooth;
 using CoreFoundation;
-using WorkingNameBle.Core;
-using WorkingNameBle.Core.Exceptions;
+using WorkingNameBle.Core.Central;
 
-namespace WorkingNameBle.iOS
+namespace WorkingNameBle.iOS.Central
 {
-    public class BluetoothService : IBluetoothService
+    public class CentralManager : ICentralManager
     {
         private DispatchQueue _dispatchQueue;
         private CBCentralManager _centralManager;
-        private IObservable<EventPattern<object>> _updateStateObservable;
-        private IDisposable _updateStateDisposable;
-        private TaskCompletionSource<bool> _readyTaskCompletionSource;
         private bool _initialized;
 
-        public void Init(IScheduler scheduler = null)
+        public ManagerState State => _initialized ?  ManagerState.PoweredOn : ManagerState.PoweredOff;
+
+        public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
             if (_initialized)
             {
-                return;
+                throw new NotSupportedException("Manager already initialized");
             }
 
             _dispatchQueue = new DispatchQueue("com.workingble.periperhalmanager.queue");
             _centralManager = new CBCentralManager(_dispatchQueue);
 
-            if (_updateStateObservable != null)
-            {
-                _updateStateObservable = Observable.FromEventPattern(eh => _centralManager.UpdatedState += eh, eh => _centralManager.UpdatedState -= eh);
-                _readyTaskCompletionSource = new TaskCompletionSource<bool>();
-                _updateStateDisposable = _updateStateObservable.Subscribe(pattern =>
-                {
-                    switch (_centralManager.State)
-                    {
-                        case CBCentralManagerState.Unknown:
-                        case CBCentralManagerState.PoweredOff:
-                        case CBCentralManagerState.Resetting:
-                            // Ignore therse
-                            break;
-                        case CBCentralManagerState.Unsupported:
-                            _readyTaskCompletionSource.SetResult(false);
-                            throw new DiscoverDeviceException("BLE mode not authorized");
-                        case CBCentralManagerState.Unauthorized:
-                            _readyTaskCompletionSource.SetResult(false);
-                            throw new DiscoverDeviceException("BLE mode not supported");
-                        case CBCentralManagerState.PoweredOn:
-                            _readyTaskCompletionSource?.SetResult(true);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                });
-            }
-
             _initialized = true;
+            return Observable.FromEventPattern(eh => _centralManager.UpdatedState += eh, eh => _centralManager.UpdatedState -= eh)
+                .Select(x => (ManagerState)_centralManager.State)
+                .StartWith((ManagerState)_centralManager.State);
+            ;
         }
 
         public void Shutdown()
         {
-            _updateStateDisposable?.Dispose();
-            _updateStateObservable = null;
-            _readyTaskCompletionSource?.SetResult(false);
-            _readyTaskCompletionSource = null;
             _initialized = false;
         }
-
-        public Task<bool> ReadyToDiscover()
-        {
-            CheckInitialized();
-            // Add timeout
-            return _readyTaskCompletionSource.Task;
-        }
-
+        
         public IObservable<IDevice> ScanForDevices()
         {
             CheckInitialized();

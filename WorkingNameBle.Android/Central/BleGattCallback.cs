@@ -1,7 +1,7 @@
 using System;
 using Android.Bluetooth;
 
-namespace WorkingNameBle.Android
+namespace WorkingNameBle.Android.Central
 {
     public class BleGattCallback : BluetoothGattCallback
     {

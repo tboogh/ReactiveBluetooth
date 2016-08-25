@@ -59,14 +59,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BleGattCallback.cs" />
-    <Compile Include="BleScanCallback.cs" />
-    <Compile Include="BluetoothService.cs" />
-    <Compile Include="Characteristic.cs" />
-    <Compile Include="Device.cs" />
+    <Compile Include="Central\BleGattCallback.cs" />
+    <Compile Include="Central\BleScanCallback.cs" />
+    <Compile Include="Central\CentralManager.cs" />
+    <Compile Include="Central\Characteristic.cs" />
+    <Compile Include="Central\Device.cs" />
+    <Compile Include="Peripheral\PeripheralManager.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service.cs" />
+    <Compile Include="Central\Service.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -82,6 +83,7 @@
       <Name>WorkingNameBle.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

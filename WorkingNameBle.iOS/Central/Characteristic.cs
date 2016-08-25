@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using CoreBluetooth;
-using WorkingNameBle.Core;
+using WorkingNameBle.Core.Central;
 
-namespace WorkingNameBle.iOS
+namespace WorkingNameBle.iOS.Central
 {
     public class Characteristic : ICharacteristic
     {
