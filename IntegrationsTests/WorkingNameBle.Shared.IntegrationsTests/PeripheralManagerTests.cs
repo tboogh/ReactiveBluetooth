@@ -15,6 +15,7 @@ namespace WorkingNameBle.Shared.IntegrationsTests
     [TestFixture]
     public abstract class PeripheralManagerTests
     {
+        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
         private IPeripheralManager _manager;
         public abstract IPeripheralManager GetPeripheralManager();
 
@@ -32,6 +33,30 @@ namespace WorkingNameBle.Shared.IntegrationsTests
         public void State_PoweredOn()
         {
             Assert.AreEqual(ManagerState.PoweredOn, _manager.State);
+        }
+
+        [Test]
+        public async Task StartAdvertising_StartsWithoutError()
+        {
+            var result = await _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}})
+                .Timeout(Timeout)
+                .FirstAsync();
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task StartAdvertising_KeepAlive()
+        {
+            var dispose = _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}})
+                .Subscribe(b =>
+                {
+                    
+                });
+
+            await Task.Delay(5000);
+
+            dispose.Dispose();
         }
     }
 }

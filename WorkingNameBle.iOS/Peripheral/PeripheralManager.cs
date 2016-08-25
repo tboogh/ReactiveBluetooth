@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
 using System.Text;
@@ -13,15 +14,24 @@ namespace WorkingNameBle.iOS.Peripheral
 {
     public class PeripheralManagerDelegate : CBPeripheralManagerDelegate
     {
-        public Subject<ManagerState> StateUpdatedObservable;
-        
+        public Subject<ManagerState> StateUpdatedSubject;
+        public Subject<bool> AdvertisingStartedSubject;
         public PeripheralManagerDelegate()
         {
-            StateUpdatedObservable = new Subject<ManagerState>();
+            StateUpdatedSubject = new Subject<ManagerState>();
+            AdvertisingStartedSubject = new Subject<bool>();
         }
 
         public override void AdvertisingStarted(CBPeripheralManager peripheral, NSError error)
         {
+            if (error != null)
+            {
+                AdvertisingStartedSubject.OnError(new Exception(error.LocalizedDescription));
+            }
+            else
+            {
+                AdvertisingStartedSubject.OnNext(true);
+            }
             
         }
 
@@ -57,7 +67,7 @@ namespace WorkingNameBle.iOS.Peripheral
 
         public override void StateUpdated(CBPeripheralManager peripheral)
         {
-            StateUpdatedObservable.OnNext((ManagerState)peripheral.State);
+            StateUpdatedSubject.OnNext((ManagerState)peripheral.State);
         }
     }
 
@@ -81,7 +91,7 @@ namespace WorkingNameBle.iOS.Peripheral
             _peripheralDelegate = new PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedObservable;
+            return _peripheralDelegate.StateUpdatedSubject;
         }
 
         public void Shutdown()
@@ -89,9 +99,22 @@ namespace WorkingNameBle.iOS.Peripheral
             throw new NotImplementedException();
         }
 
-        public void StartAdvertising(AdvertisingOptions advertisingOptions)
+        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions)
         {
-            throw new NotImplementedException();
+            // Check state
+            StartAdvertisingOptions options = CreateAdvertisementOptions(advertisingOptions);
+            _peripheralManager.StartAdvertising(options);
+
+            return _peripheralDelegate.AdvertisingStartedSubject;
+        }
+
+        public StartAdvertisingOptions CreateAdvertisementOptions(AdvertisingOptions advertisingOptions)
+        {
+            return new StartAdvertisingOptions
+            {
+                LocalName = advertisingOptions.LocalName,
+                ServicesUUID = advertisingOptions.ServiceUuids.Select(x => CBUUID.FromString(x.ToString())).ToArray()
+            };
         }
     }
 }

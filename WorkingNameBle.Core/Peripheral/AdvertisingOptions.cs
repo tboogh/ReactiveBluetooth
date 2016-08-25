@@ -8,13 +8,11 @@ namespace WorkingNameBle.Core.Peripheral
 {
     public class AdvertisingOptions
     {
-        public List<Guid> ServiceUuids { get;  }
-        public string LocalName { get; }
-
-        public AdvertisingOptions(string localName, List<Guid> serviceUuids)
-        {
-            ServiceUuids = serviceUuids;
-            LocalName = localName;
-        }
+        public List<Guid> ServiceUuids { get; set; }
+        /// <summary>
+        /// The localname of the device to be included in the advertisment data
+        /// Warning: Android has issues with splitting the name into multiple packets so setting this often causes a data too large error
+        /// </summary>
+        public string LocalName { get; set; }
     }
 }

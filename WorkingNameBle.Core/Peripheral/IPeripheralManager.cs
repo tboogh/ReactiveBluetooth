@@ -16,6 +16,6 @@ namespace WorkingNameBle.Core.Peripheral
 
         void Shutdown();
 
-        void StartAdvertising(AdvertisingOptions advertisingOptions);
+        IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions);
     }
 }
