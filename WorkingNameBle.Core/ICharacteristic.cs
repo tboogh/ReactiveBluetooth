@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WorkingNameBle.Core.Central
+namespace WorkingNameBle.Core
 {
     public interface ICharacteristic
     {

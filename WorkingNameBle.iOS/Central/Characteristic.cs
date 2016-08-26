@@ -1,5 +1,6 @@
 using System;
 using CoreBluetooth;
+using WorkingNameBle.Core;
 using WorkingNameBle.Core.Central;
 
 namespace WorkingNameBle.iOS.Central

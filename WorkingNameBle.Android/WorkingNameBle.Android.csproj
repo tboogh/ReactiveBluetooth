@@ -64,7 +64,10 @@
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
+    <Compile Include="Peripheral\AbstractFactory.cs" />
+    <Compile Include="Peripheral\Characteristic.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
+    <Compile Include="Peripheral\Service.cs" />
     <Compile Include="Peripheral\StartAdvertiseCallback.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

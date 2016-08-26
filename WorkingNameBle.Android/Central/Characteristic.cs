@@ -1,5 +1,6 @@
 using System;
 using Android.Bluetooth;
+using WorkingNameBle.Core;
 using WorkingNameBle.Core.Central;
 
 namespace WorkingNameBle.Android.Central

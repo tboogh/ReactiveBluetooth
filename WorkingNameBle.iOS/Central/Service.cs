@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using CoreBluetooth;
-using WorkingNameBle.Core.Central;
+using WorkingNameBle.Core;
+using IService = WorkingNameBle.Core.Central.IService;
 
 namespace WorkingNameBle.iOS.Central
 {
@@ -19,6 +20,7 @@ namespace WorkingNameBle.iOS.Central
         }
 
         public Guid Id => Guid.Parse(_service.UUID.ToString());
+        public ServiceType ServiceType => _service.Primary ? ServiceType.Primary : ServiceType.Secondary;
 
         public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
         {

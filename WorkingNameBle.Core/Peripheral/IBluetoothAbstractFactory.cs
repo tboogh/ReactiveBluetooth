@@ -1,10 +1,11 @@
-﻿using WorkingNameBle.Core.Central;
+﻿using System;
+using WorkingNameBle.Core.Central;
 
 namespace WorkingNameBle.Core.Peripheral
 {
     public interface IBluetoothAbstractFactory
     {
-        Central.IService CreateService();
+        IService CreateService(Guid id, ServiceType type);
         ICharacteristic CreateCharacteristic();
     }
 }

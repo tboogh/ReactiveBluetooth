@@ -12,6 +12,7 @@ using CoreFoundation;
 using Foundation;
 using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
+using IService = WorkingNameBle.Core.Peripheral.IService;
 
 namespace WorkingNameBle.iOS.Peripheral
 {
@@ -130,6 +131,23 @@ namespace WorkingNameBle.iOS.Peripheral
                 LocalName = advertisingOptions.LocalName,
                 ServicesUUID = advertisingOptions.ServiceUuids.Select(x => CBUUID.FromString(x.ToString())).ToArray()
             };
+        }
+
+        public void AddService(IService service)
+        {
+            var nativeService = ((Service) service).MutableService;
+            _peripheralManager.AddService(nativeService);
+        }
+
+        public void RemoveSerivce(IService service)
+        {
+            var nativeService = ((Service)service).MutableService;
+            _peripheralManager.RemoveService(nativeService);
+        }
+
+        public void RemoveAllServices()
+        {
+            _peripheralManager.RemoveAllServices();
         }
     }
 }
