@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using CoreBluetooth;
@@ -91,7 +94,7 @@ namespace WorkingNameBle.iOS.Peripheral
             _peripheralDelegate = new PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedSubject;
+            return _peripheralDelegate.StateUpdatedSubject.StartWith(State);
         }
 
         public void Shutdown()
@@ -101,11 +104,23 @@ namespace WorkingNameBle.iOS.Peripheral
 
         public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions)
         {
-            // Check state
-            StartAdvertisingOptions options = CreateAdvertisementOptions(advertisingOptions);
-            _peripheralManager.StartAdvertising(options);
 
-            return _peripheralDelegate.AdvertisingStartedSubject;
+            var advertiseObservable = Observable.Create<bool>(observer =>
+            {
+                IDisposable started = _peripheralDelegate.AdvertisingStartedSubject.Subscribe(o =>
+                {
+                    observer.OnNext(o);
+                } );
+
+                StartAdvertisingOptions options = CreateAdvertisementOptions(advertisingOptions);
+                _peripheralManager.StartAdvertising(options);
+                return Disposable.Create(() =>
+                {
+                    _peripheralManager.StopAdvertising();
+                    started.Dispose();
+                });
+            });
+            return advertiseObservable.StartWith(_peripheralManager.Advertising);
         }
 
         public StartAdvertisingOptions CreateAdvertisementOptions(AdvertisingOptions advertisingOptions)

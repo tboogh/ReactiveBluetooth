@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -42,19 +43,23 @@ namespace WorkingNameBle.iOS.Central
         public IObservable<IDevice> ScanForDevices()
         {
             CheckInitialized();
-            if (_centralManager.State != CBCentralManagerState.PoweredOn)
-            {
-                // Throw? return null? handle...
-            }
-            if (!_centralManager.IsScanning)
-                _centralManager.ScanForPeripherals((CBUUID[])null);
 
-            return Observable.FromEventPattern<EventHandler<CBDiscoveredPeripheralEventArgs>, CBDiscoveredPeripheralEventArgs>(eh => _centralManager.DiscoveredPeripheral += eh, eh => _centralManager.DiscoveredPeripheral -= eh)
-                .Select(x =>
+            return Observable.Create<IDevice>(observer =>
+            {
+                Observable.FromEventPattern<EventHandler<CBDiscoveredPeripheralEventArgs>, CBDiscoveredPeripheralEventArgs>(eh => _centralManager.DiscoveredPeripheral += eh, eh => _centralManager.DiscoveredPeripheral -= eh)
+                    .Select(x =>
+                    {
+                        Device device = new Device(x.EventArgs.Peripheral);
+                        return device;
+                    }).Subscribe(observer);
+
+                if (!_centralManager.IsScanning)
+                    _centralManager.ScanForPeripherals((CBUUID[])null);
+                return Disposable.Create(() =>
                 {
-                    Device device = new Device(x.EventArgs.Peripheral);
-                    return device;
+                    _centralManager.StopScan();
                 });
+            });
         }
 
         public Task<bool> ConnectToDevice(IDevice device)
