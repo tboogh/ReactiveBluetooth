@@ -26,7 +26,7 @@ namespace WorkingNameBle.Shared.IntegrationsTests
 
             var result = await _manager.Init()
                 .FirstAsync(x => x == ManagerState.PoweredOn)
-                .Timeout(TimeSpan.FromSeconds(5))
+                .Timeout(TimeSpan.FromSeconds(2))
                 .ToTask();
             Assert.AreEqual(ManagerState.PoweredOn, result);
         }

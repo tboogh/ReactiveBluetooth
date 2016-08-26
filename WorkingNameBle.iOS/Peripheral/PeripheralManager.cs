@@ -17,12 +17,12 @@ namespace WorkingNameBle.iOS.Peripheral
 {
     public class PeripheralManagerDelegate : CBPeripheralManagerDelegate
     {
-        public Subject<ManagerState> StateUpdatedSubject;
-        public Subject<bool> AdvertisingStartedSubject;
+        public ReplaySubject<ManagerState> StateUpdatedSubject;
+        public ReplaySubject<bool> AdvertisingStartedSubject;
         public PeripheralManagerDelegate()
         {
-            StateUpdatedSubject = new Subject<ManagerState>();
-            AdvertisingStartedSubject = new Subject<bool>();
+            StateUpdatedSubject = new ReplaySubject<ManagerState>();
+            AdvertisingStartedSubject = new ReplaySubject<bool>();
         }
 
         public override void AdvertisingStarted(CBPeripheralManager peripheral, NSError error)
@@ -94,7 +94,7 @@ namespace WorkingNameBle.iOS.Peripheral
             _peripheralDelegate = new PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedSubject.StartWith(State);
+            return _peripheralDelegate.StateUpdatedSubject;
         }
 
         public void Shutdown()
