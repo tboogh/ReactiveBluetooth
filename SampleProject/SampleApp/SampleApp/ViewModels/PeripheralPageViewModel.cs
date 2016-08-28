@@ -3,8 +3,10 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using Prism.Common;
 using Prism.Navigation;
+using WorkingNameBle.Core;
 using WorkingNameBle.Core.Peripheral;
 using Xamarin.Forms;
 
@@ -49,7 +51,10 @@ namespace SampleApp.ViewModels
             if (_advertiseDisposable != null)
                 return;
 
-            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }).Subscribe(b =>
+            var testService = _peripheralManager.Factory.CreateService(Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb"), ServiceType.Primary);
+            _peripheralManager.AddService(testService);
+
+            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() /*{ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }*/).Catch(Observable.Return(false)).Subscribe(b =>
             { Advertising = b; });
         }
 

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework.Internal;
 using NUnit.Framework;
+using WorkingNameBle.Core;
 using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
 
@@ -45,6 +46,29 @@ namespace WorkingNameBle.Shared.IntegrationsTests
                 .Timeout(Timeout);
 
             Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void AddService_DoesNotThrow()
+        {
+            var service = _manager.Factory.CreateService(Guid.NewGuid(), ServiceType.Primary);
+            Assert.DoesNotThrow(() => _manager.AddService(service));
+        }
+
+        [Test]
+        public void RemoveService_DoesNotThrow()
+        {
+            var service = _manager.Factory.CreateService(Guid.NewGuid(), ServiceType.Primary);
+            _manager.AddService(service);
+            Assert.DoesNotThrow(() => _manager.RemoveService(service));
+        }
+
+        [Test]
+        public void RemoveAllService_DoesNotThrow()
+        {
+            var service = _manager.Factory.CreateService(Guid.NewGuid(), ServiceType.Primary);
+            _manager.AddService(service);
+            Assert.DoesNotThrow(() => _manager.RemoveAllServices());
         }
     }
 }

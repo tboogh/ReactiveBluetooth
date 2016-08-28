@@ -17,23 +17,26 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Javax.Security.Auth;
+using WorkingNameBle.Android.Peripheral.GattServer;
 using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
 using IService = WorkingNameBle.Core.Peripheral.IService;
 
 namespace WorkingNameBle.Android.Peripheral
 {
-    public class ServerCallback : BluetoothGattServerCallback
-    {
-        
-    }
-
     public class PeripheralManager : IPeripheralManager
     {
         private BluetoothAdapter _bluetoothAdapter;
         private BluetoothLeAdvertiser _bluetoothLeAdvertiser;
         private ServerCallback _serverCallback;
         private BluetoothGattServer _gattServer;
+
+        public PeripheralManager()
+        {
+            Factory = new AbstractFactory();
+        }
+
+        public IBluetoothAbstractFactory Factory { get; }
 
         public ManagerState State
         {
@@ -60,11 +63,19 @@ namespace WorkingNameBle.Android.Peripheral
 
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
-            _serverCallback = new ServerCallback();
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
-            var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
-            _gattServer = bluetoothManager.OpenGattServer(Application.Context, _serverCallback);
+
+            if (_serverCallback == null)
+            {
+                _serverCallback = new ServerCallback();
+            }
+            if (_gattServer == null)
+            {
+                var bluetoothManager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
+                _gattServer = bluetoothManager.OpenGattServer(Application.Context, _serverCallback);
+            }
+
 
             return Observable
                 .Timer(TimeSpan.FromSeconds(0.5))
@@ -73,7 +84,7 @@ namespace WorkingNameBle.Android.Peripheral
 
         public void Shutdown()
         {
-            
+            _gattServer.Close();
         }
 
         public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions)
@@ -93,6 +104,7 @@ namespace WorkingNameBle.Android.Peripheral
                     observer.OnNext(b);
                     observer.OnCompleted();
                 }};
+
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
                 return Disposable.Create(() =>
                 {
@@ -104,12 +116,15 @@ namespace WorkingNameBle.Android.Peripheral
 
         public AdvertiseData CreateAdvertiseData(AdvertisingOptions advertisingOptions)
         {
-            var parcelUuids = advertisingOptions.ServiceUuids.Select(x => ParcelUuid.FromString(x.ToString()));
+            
             var dataBuilder = new AdvertiseData.Builder();
-
-            foreach (var parcelUuid in parcelUuids)
+            if (advertisingOptions.ServiceUuids != null)
             {
-                dataBuilder.AddServiceUuid(parcelUuid);
+                var parcelUuids = advertisingOptions.ServiceUuids.Select(x => ParcelUuid.FromString(x.ToString()));
+                foreach (var parcelUuid in parcelUuids)
+                {
+                    dataBuilder.AddServiceUuid(parcelUuid);
+                }
             }
             dataBuilder.SetIncludeDeviceName(advertisingOptions.LocalName != null);
 
@@ -119,31 +134,31 @@ namespace WorkingNameBle.Android.Peripheral
 
         public AdvertiseSettings CreateAdvertiseSettings()
         {
-            AdvertiseSettings settings;
             AdvertiseSettings.Builder settingsBuilder = new AdvertiseSettings.Builder();
             settingsBuilder.SetAdvertiseMode(AdvertiseMode.Balanced);
             settingsBuilder.SetConnectable(true);
             settingsBuilder.SetTxPowerLevel(AdvertiseTx.PowerMedium);
             settingsBuilder.SetTimeout(5000);
-            settings = settingsBuilder.Build();
+            var settings = settingsBuilder.Build();
             return settings;
         }
 
         public void AddService(IService service)
         {
             var nativeService = ((Service) service).GattService;
-            _gattServer.AddService(nativeService);
+            _gattServer?.AddService(nativeService);
         }
 
-        public void RemoveSerivce(IService service)
+        public void RemoveService(IService service)
         {
             var nativeService = ((Service)service).GattService;
-            _gattServer.RemoveService(nativeService);
+            _gattServer?.RemoveService(nativeService);
         }
 
         public void RemoveAllServices()
         {
-            _gattServer.ClearServices();
+            _gattServer?.ClearServices();
         }
+        
     }
 }

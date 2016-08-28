@@ -11,7 +11,7 @@ namespace WorkingNameBle.Core.Peripheral
     public interface IPeripheralManager
     {
         ManagerState State { get; }
-
+        IBluetoothAbstractFactory Factory { get; }
         IObservable<ManagerState> Init(IScheduler scheduler = null);
 
         void Shutdown();
@@ -19,7 +19,7 @@ namespace WorkingNameBle.Core.Peripheral
         IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions);
 
         void AddService(IService service);
-        void RemoveSerivce(IService service);
+        void RemoveService(IService service);
         void RemoveAllServices();
     }
 }
