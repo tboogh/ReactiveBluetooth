@@ -66,16 +66,6 @@ namespace WorkingNameBle.Android.Peripheral
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
 
-            if (_serverCallback == null)
-            {
-                _serverCallback = new ServerCallback();
-            }
-            if (_gattServer == null)
-            {
-                var bluetoothManager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
-                _gattServer = bluetoothManager.OpenGattServer(Application.Context, _serverCallback);
-            }
-
             return Observable
                 .Timer(TimeSpan.FromSeconds(0.5))
                 .Select(x => State).StartWith(State);
@@ -86,7 +76,7 @@ namespace WorkingNameBle.Android.Peripheral
             _gattServer.Close();
         }
 
-        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions)
+        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
             if (advertisingOptions.LocalName != null)
             {
@@ -103,6 +93,21 @@ namespace WorkingNameBle.Android.Peripheral
                     observer.OnNext(b);
                     observer.OnCompleted();
                 }};
+
+                if (_serverCallback == null)
+                {
+                    _serverCallback = new ServerCallback();
+                }
+                if (_gattServer == null)
+                {
+                    var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
+                    _gattServer = bluetoothManager.OpenGattServer(Application.Context, _serverCallback);
+                }
+
+                foreach (var service in services)
+                {
+                    AddService(service);
+                }
 
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
                 return Disposable.Create(() =>

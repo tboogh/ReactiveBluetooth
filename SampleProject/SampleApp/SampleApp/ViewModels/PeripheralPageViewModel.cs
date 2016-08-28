@@ -10,6 +10,7 @@ using Prism.Navigation;
 using WorkingNameBle.Core;
 using WorkingNameBle.Core.Peripheral;
 using Xamarin.Forms;
+using IService = WorkingNameBle.Core.Peripheral.IService;
 
 namespace SampleApp.ViewModels
 {
@@ -53,13 +54,13 @@ namespace SampleApp.ViewModels
                 return;
 
             var testService = _peripheralManager.Factory.CreateService(Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb"), ServiceType.Primary);
-            var result = await _peripheralManager.AddService(testService).FirstAsync();
-            if (result == false)
-            {
-                throw new Exception("Cant add service");
-            }
+            //var result = await _peripheralManager.AddService(testService).FirstAsync();
+            //if (result == false)
+            //{
+            //    throw new Exception("Cant add service");
+            //}
 
-            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }).Catch(Observable.Return(false)).Subscribe(b =>
+            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }, new List<IService> {testService}).Catch(Observable.Return(false)).Subscribe(b =>
             { Advertising = b; });
         }
 

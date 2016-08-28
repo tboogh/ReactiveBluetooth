@@ -49,7 +49,7 @@ namespace WorkingNameBle.iOS.Peripheral
             _peripheralManager.StopAdvertising();
         }
 
-        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions)
+        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
 
             var advertiseObservable = Observable.Create<bool>(observer =>
