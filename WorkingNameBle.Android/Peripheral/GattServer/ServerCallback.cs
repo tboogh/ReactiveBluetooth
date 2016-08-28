@@ -1,5 +1,6 @@
 using System.Reactive.Subjects;
 using Android.Bluetooth;
+using WorkingNameBle.Core.Exceptions;
 
 namespace WorkingNameBle.Android.Peripheral.GattServer
 {
@@ -70,6 +71,10 @@ namespace WorkingNameBle.Android.Peripheral.GattServer
 
         public override void OnServiceAdded(ProfileState status, BluetoothGattService service)
         {
+            if (status != 0)
+            {
+                ServiceAddedSubject?.OnError(new AddServiceException($"Could not add server. Error Code: {status}"));
+            }
             ServiceAddedSubject?.OnNext(new ServiceAdded(status, service));
         }
     }

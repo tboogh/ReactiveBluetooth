@@ -76,7 +76,6 @@ namespace WorkingNameBle.Android.Peripheral
                 _gattServer = bluetoothManager.OpenGattServer(Application.Context, _serverCallback);
             }
 
-
             return Observable
                 .Timer(TimeSpan.FromSeconds(0.5))
                 .Select(x => State).StartWith(State);
@@ -143,10 +142,11 @@ namespace WorkingNameBle.Android.Peripheral
             return settings;
         }
 
-        public void AddService(IService service)
+        public IObservable<bool> AddService(IService service)
         {
             var nativeService = ((Service) service).GattService;
-            _gattServer?.AddService(nativeService);
+            var result = _gattServer?.AddService(nativeService);
+            return Observable.Return(result ?? false);
         }
 
         public void RemoveService(IService service)

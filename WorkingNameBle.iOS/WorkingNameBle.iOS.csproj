@@ -62,7 +62,11 @@
     <Compile Include="Peripheral\AbstractFactory.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
-    <Compile Include="Peripheral\PeripheralManagerDelegate.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\CharacteristicSubscriptionChange.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\PeripheralManagerDelegate.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\ReadRequestReceived.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\ServiceAdded.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\WriteRequestsReceived.cs" />
     <Compile Include="Peripheral\Service.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Central\Service.cs" />

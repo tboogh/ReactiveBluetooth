@@ -17,7 +17,7 @@ namespace WorkingNameBle.iOS.Peripheral
     public class PeripheralManager : IPeripheralManager
     {
         private CBPeripheralManager _peripheralManager;
-        private PeripheralManagerDelegate _peripheralDelegate;
+        private PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
 
         public PeripheralManager()
         {
@@ -38,10 +38,10 @@ namespace WorkingNameBle.iOS.Peripheral
 
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
-            _peripheralDelegate = new PeripheralManagerDelegate();
+            _peripheralDelegate = new PeripheralManagerDelegate.PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedSubject;
+            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x.State);
         }
 
         public void Shutdown()
@@ -82,10 +82,12 @@ namespace WorkingNameBle.iOS.Peripheral
             return options;
         }
 
-        public void AddService(IService service)
+        public IObservable<bool> AddService(IService service)
         {
             var nativeService = ((Service) service).MutableService;
             _peripheralManager.AddService(nativeService);
+            return _peripheralDelegate.ServiceAddedSubject.Select(added => true)
+                .Catch(Observable.Return(false));
         }
 
         public void RemoveService(IService service)

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Prism.Common;
 using Prism.Navigation;
 using WorkingNameBle.Core;
@@ -23,7 +24,7 @@ namespace SampleApp.ViewModels
         public PeripheralPageViewModel(IPeripheralManager peripheralManager)
         {
             _peripheralManager = peripheralManager;
-            AdvertiseCommand = new DelegateCommand(StartAdvertise);
+            AdvertiseCommand = DelegateCommand.FromAsyncHandler(StartAdvertise);
             StopAdvertiseCommand = new DelegateCommand(StopAdvertise);
             _stateDisposable = _peripheralManager.Init().Subscribe(state =>
             {
@@ -46,13 +47,17 @@ namespace SampleApp.ViewModels
         public DelegateCommand AdvertiseCommand { get; }
         public DelegateCommand StopAdvertiseCommand { get; }
 
-        public void StartAdvertise()
+        public async Task StartAdvertise()
         {
             if (_advertiseDisposable != null)
                 return;
 
             var testService = _peripheralManager.Factory.CreateService(Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb"), ServiceType.Primary);
-            _peripheralManager.AddService(testService);
+            var result = await _peripheralManager.AddService(testService);
+            if (result == false)
+            {
+                throw new Exception("Cant add service");
+            }
 
             _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() /*{ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }*/).Catch(Observable.Return(false)).Subscribe(b =>
             { Advertising = b; });

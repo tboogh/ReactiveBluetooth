@@ -18,7 +18,7 @@ namespace WorkingNameBle.Core.Peripheral
 
         IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions);
 
-        void AddService(IService service);
+        IObservable<bool> AddService(IService service);
         void RemoveService(IService service);
         void RemoveAllServices();
     }
