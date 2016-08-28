@@ -59,7 +59,7 @@ namespace SampleApp.ViewModels
                 throw new Exception("Cant add service");
             }
 
-            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() /*{ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }*/).Catch(Observable.Return(false)).Subscribe(b =>
+            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }).Catch(Observable.Return(false)).Subscribe(b =>
             { Advertising = b; });
         }
 
