@@ -41,7 +41,7 @@ namespace WorkingNameBle.iOS.Peripheral
             _peripheralDelegate = new PeripheralManagerDelegate.PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x.State);
+            return _peripheralDelegate.StateUpdatedSubject.Select(x => x != null ? (ManagerState)x.State : ManagerState.Unknown);
         }
 
         public void Shutdown()
@@ -54,7 +54,10 @@ namespace WorkingNameBle.iOS.Peripheral
 
             var advertiseObservable = Observable.Create<bool>(observer =>
             {
-                IDisposable started = _peripheralDelegate.AdvertisingStartedSubject.Subscribe(observer.OnNext );
+                IDisposable started = _peripheralDelegate.AdvertisingStartedSubject.Subscribe(o =>
+                {
+                    observer.OnNext(o);
+                });
 
                 StartAdvertisingOptions options = CreateAdvertisementOptions(advertisingOptions);
                 _peripheralManager.StartAdvertising(options);
@@ -86,7 +89,10 @@ namespace WorkingNameBle.iOS.Peripheral
         {
             var nativeService = ((Service) service).MutableService;
             _peripheralManager.AddService(nativeService);
-            return _peripheralDelegate.ServiceAddedSubject.Select(added => true)
+            return _peripheralDelegate.ServiceAddedSubject.Select(x =>
+            {
+                return x.Service.UUID == nativeService.UUID;
+            })
                 .Catch(Observable.Return(false));
         }
 

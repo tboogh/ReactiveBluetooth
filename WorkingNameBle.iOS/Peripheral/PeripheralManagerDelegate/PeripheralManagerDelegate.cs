@@ -12,23 +12,23 @@ namespace WorkingNameBle.iOS.Peripheral.PeripheralManagerDelegate
         public PeripheralManagerDelegate()
         {
             StateUpdatedSubject = new BehaviorSubject<CBPeripheralManager>(null);
-            AdvertisingStartedSubject = new BehaviorSubject<bool>(false);
-            CharacteristicSubscribedSubject = new BehaviorSubject<CharacteristicSubscriptionChange>(null);
-            CharacteristicUnsubscribedSubject = new BehaviorSubject<CharacteristicSubscriptionChange>(null);
-            ReadyToUpdateSubsciberSubject = new BehaviorSubject<CBPeripheralManager>(null);
-            ReadRequestReceivedSubject = new BehaviorSubject<ReadRequestReceived>(null);
-            ServiceAddedSubject = new BehaviorSubject<ServiceAdded>(null);
-            WriteRequestsReceivedSubject = new BehaviorSubject<WriteRequestsReceived>(null);
+            AdvertisingStartedSubject = new Subject<bool>();
+            CharacteristicSubscribedSubject = new Subject<CharacteristicSubscriptionChange>();
+            CharacteristicUnsubscribedSubject = new Subject<CharacteristicSubscriptionChange>();
+            ReadyToUpdateSubsciberSubject = new Subject<CBPeripheralManager>();
+            ReadRequestReceivedSubject = new Subject<ReadRequestReceived>();
+            ServiceAddedSubject = new Subject<ServiceAdded>();
+            WriteRequestsReceivedSubject = new Subject<WriteRequestsReceived>();
         }
 
         public BehaviorSubject<CBPeripheralManager> StateUpdatedSubject { get; }
-        public BehaviorSubject<bool> AdvertisingStartedSubject { get; }
-        public  BehaviorSubject<CharacteristicSubscriptionChange> CharacteristicSubscribedSubject { get; }
-        public BehaviorSubject<CharacteristicSubscriptionChange> CharacteristicUnsubscribedSubject { get; }
-        public BehaviorSubject<ReadRequestReceived> ReadRequestReceivedSubject { get; }
-        public BehaviorSubject<CBPeripheralManager> ReadyToUpdateSubsciberSubject { get; }
-        public BehaviorSubject<ServiceAdded> ServiceAddedSubject { get; }
-        public BehaviorSubject<WriteRequestsReceived> WriteRequestsReceivedSubject { get; }
+        public Subject<bool> AdvertisingStartedSubject { get; }
+        public Subject<CharacteristicSubscriptionChange> CharacteristicSubscribedSubject { get; }
+        public Subject<CharacteristicSubscriptionChange> CharacteristicUnsubscribedSubject { get; }
+        public Subject<ReadRequestReceived> ReadRequestReceivedSubject { get; }
+        public Subject<CBPeripheralManager> ReadyToUpdateSubsciberSubject { get; }
+        public Subject<ServiceAdded> ServiceAddedSubject { get; }
+        public Subject<WriteRequestsReceived> WriteRequestsReceivedSubject { get; }
 
         public override void AdvertisingStarted(CBPeripheralManager peripheral, NSError error)
         {

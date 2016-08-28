@@ -53,7 +53,7 @@ namespace SampleApp.ViewModels
                 return;
 
             var testService = _peripheralManager.Factory.CreateService(Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb"), ServiceType.Primary);
-            var result = await _peripheralManager.AddService(testService);
+            var result = await _peripheralManager.AddService(testService).FirstAsync();
             if (result == false)
             {
                 throw new Exception("Cant add service");
