@@ -91,7 +91,6 @@ namespace WorkingNameBle.Android.Peripheral
                 var callback = new StartAdvertiseCallback {StartFailure = failure => observer.OnError(new Exception($"Advertise start failed: {Enum.GetName(typeof(AdvertiseFailure), failure)}")), StartSuccess = b =>
                 {
                     observer.OnNext(b);
-                    observer.OnCompleted();
                 }};
 
                 if (_serverCallback == null)
@@ -112,6 +111,7 @@ namespace WorkingNameBle.Android.Peripheral
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
                 return Disposable.Create(() =>
                 {
+                    _gattServer.Close();
                     _bluetoothLeAdvertiser.StopAdvertising(callback);
                 });
             });

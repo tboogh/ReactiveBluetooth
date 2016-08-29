@@ -25,12 +25,10 @@ namespace SampleApp.ViewModels
         public PeripheralPageViewModel(IPeripheralManager peripheralManager)
         {
             _peripheralManager = peripheralManager;
-            AdvertiseCommand = DelegateCommand.FromAsyncHandler(StartAdvertise);
+            AdvertiseCommand = new DelegateCommand(StartAdvertise);
             StopAdvertiseCommand = new DelegateCommand(StopAdvertise);
-            _stateDisposable = _peripheralManager.Init().Subscribe(state =>
-            {
-                State = state.ToString();
-            });
+            _stateDisposable = _peripheralManager.Init()
+                .Subscribe(state => { State = state.ToString(); });
         }
 
         public string State
@@ -48,7 +46,7 @@ namespace SampleApp.ViewModels
         public DelegateCommand AdvertiseCommand { get; }
         public DelegateCommand StopAdvertiseCommand { get; }
 
-        public async Task StartAdvertise()
+        public void StartAdvertise()
         {
             if (_advertiseDisposable != null)
                 return;
@@ -60,8 +58,9 @@ namespace SampleApp.ViewModels
             //    throw new Exception("Cant add service");
             //}
 
-            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {ServiceUuids = new List<Guid>() { Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")} }, new List<IService> {testService}).Catch(Observable.Return(false)).Subscribe(b =>
-            { Advertising = b; });
+            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {testService})
+                //.Catch(Observable.Return(false))
+                .Subscribe(b => { Advertising = b; });
         }
 
         public void StopAdvertise()
@@ -78,7 +77,6 @@ namespace SampleApp.ViewModels
 
         public void OnNavigatedTo(NavigationParameters parameters)
         {
-            
         }
     }
 }
