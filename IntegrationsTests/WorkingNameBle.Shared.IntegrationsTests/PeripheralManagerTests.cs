@@ -10,6 +10,7 @@ using NUnit.Framework;
 using WorkingNameBle.Core;
 using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
+using IService = WorkingNameBle.Core.Peripheral.IService;
 
 namespace WorkingNameBle.Shared.IntegrationsTests
 {
@@ -41,7 +42,7 @@ namespace WorkingNameBle.Shared.IntegrationsTests
         [Test]
         public async Task StartAdvertising_StartsWithoutError()
         {
-            var result = await _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}})
+            var result = await _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
                 .FirstAsync(b => b)
                 .Timeout(Timeout);
 

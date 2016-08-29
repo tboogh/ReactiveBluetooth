@@ -17,7 +17,7 @@ namespace WorkingNameBle.Android.Central
             _service = service;
         }
 
-        public Guid Id
+        public Guid Uuid
         {
             get
             {

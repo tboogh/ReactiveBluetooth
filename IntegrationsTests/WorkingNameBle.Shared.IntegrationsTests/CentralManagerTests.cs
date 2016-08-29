@@ -139,7 +139,7 @@ namespace WorkingNameBle.Shared.IntegrationsTests
 
             var testService = services.First();
 
-            Assert.NotNull(testService.Id);
+            Assert.NotNull(testService.Uuid);
         }
 
         [Test]

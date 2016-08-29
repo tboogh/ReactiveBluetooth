@@ -51,15 +51,12 @@ namespace SampleApp.ViewModels
             if (_advertiseDisposable != null)
                 return;
 
-            var testService = _peripheralManager.Factory.CreateService(Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb"), ServiceType.Primary);
-            //var result = await _peripheralManager.AddService(testService).FirstAsync();
-            //if (result == false)
-            //{
-            //    throw new Exception("Cant add service");
-            //}
+            var testService = _peripheralManager.Factory.CreateService(Guid.Parse("DAECB5C3-0234-49D9-8439-39100D7EBD62"), ServiceType.Primary);
+            var testCharactersitic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B368BED8-12C1-4118-8B4A-BEAAC1BA2730"), new byte[] {0xB0, 0x06}, CharacteristicPermissions.Read, CharacteristicProperties.Read);
+            var result = testService.AddCharacteristic(testCharactersitic);
 
             _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {testService})
-                //.Catch(Observable.Return(false))
+                .Catch(Observable.Return(false))
                 .Subscribe(b => { Advertising = b; });
         }
 

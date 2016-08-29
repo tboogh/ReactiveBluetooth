@@ -14,6 +14,6 @@ namespace WorkingNameBle.Android.Central
             _characteristic = characteristic;
         }
 
-        public Guid Id => Guid.Parse(_characteristic.Uuid.ToString());
+        public Guid Uuid => Guid.Parse(_characteristic.Uuid.ToString());
     }
 } 

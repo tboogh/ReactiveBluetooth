@@ -1,7 +1,6 @@
 using System;
 using Android.Bluetooth;
-using WorkingNameBle.Core;
-using IService = WorkingNameBle.Core.Peripheral.IService;
+using WorkingNameBle.Core.Peripheral;
 
 namespace WorkingNameBle.Android.Peripheral
 {
@@ -14,7 +13,14 @@ namespace WorkingNameBle.Android.Peripheral
             GattService = gattService;
         }
 
-        public Guid Id => Guid.Parse(GattService.Uuid.ToString());
-        public ServiceType ServiceType => (ServiceType) GattService.Type;
+        public Guid Uuid => Guid.Parse(GattService.Uuid.ToString());
+        public Core.ServiceType ServiceType => (Core.ServiceType) GattService.Type;
+        
+        bool IService.AddCharacteristic(ICharacteristic characteristic)
+        {
+            var nativeCharacteristic = (Characteristic) characteristic;
+
+            return GattService.AddCharacteristic(nativeCharacteristic.GattCharacteristic);
+        }
     }
 }

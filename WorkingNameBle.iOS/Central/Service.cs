@@ -19,7 +19,7 @@ namespace WorkingNameBle.iOS.Central
             _nativeDevice = nativeDevice;
         }
 
-        public Guid Id => Guid.Parse(_service.UUID.ToString());
+        public Guid Uuid => Guid.Parse(_service.UUID.ToString());
         public ServiceType ServiceType => _service.Primary ? ServiceType.Primary : ServiceType.Secondary;
 
         public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
