@@ -33,7 +33,11 @@ namespace WorkingNameBle.Android.Peripheral
 
         public PeripheralManager()
         {
-            Factory = new AbstractFactory();
+            if (_serverCallback == null)
+            {
+                _serverCallback = new ServerCallback();
+            }
+            Factory = new AbstractFactory(_serverCallback);
         }
 
         public IBluetoothAbstractFactory Factory { get; }
@@ -92,11 +96,6 @@ namespace WorkingNameBle.Android.Peripheral
                 {
                     observer.OnNext(b);
                 }};
-
-                if (_serverCallback == null)
-                {
-                    _serverCallback = new ServerCallback();
-                }
                 if (_gattServer == null)
                 {
                     var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);

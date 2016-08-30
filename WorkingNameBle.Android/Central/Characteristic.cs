@@ -1,5 +1,6 @@
 using System;
 using Android.Bluetooth;
+using WorkingNameBle.Android.Extensions;
 using WorkingNameBle.Core;
 using WorkingNameBle.Core.Central;
 
@@ -15,5 +16,7 @@ namespace WorkingNameBle.Android.Central
         }
 
         public Guid Uuid => Guid.Parse(_characteristic.Uuid.ToString());
+        public CharacteristicProperty Properties => _characteristic.Properties.ToCharacteristicProperty();
+        public CharacteristicPermission Permissions => _characteristic.Permissions.ToCharacteristicPermission();
     }
 } 

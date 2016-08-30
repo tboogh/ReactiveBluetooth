@@ -13,16 +13,23 @@ namespace WorkingNameBle.iOS.Peripheral
 {
     public class AbstractFactory : IBluetoothAbstractFactory
     {
+        private readonly PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
+
+        public AbstractFactory(PeripheralManagerDelegate.PeripheralManagerDelegate peripheralDelegate)
+        {
+            _peripheralDelegate = peripheralDelegate;
+        }
+
         public IService CreateService(Guid id, Core.ServiceType type)
         {
             CBMutableService mutableService = new CBMutableService(CBUUID.FromString(id.ToString()), type == ServiceType.Primary);
             return new Service(mutableService);
         }
 
-        public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermissions permissions, CharacteristicProperties properties)
+        public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property)
         {
-            var nativePermissions = ConvertPermissions(permissions);
-            var nativeProperties = ConvertProperties(properties);
+            var nativePermissions = ConvertPermissions(permission);
+            var nativeProperties = ConvertProperties(property);
 
             var nsData = NSData.FromArray(value);
 
@@ -30,22 +37,22 @@ namespace WorkingNameBle.iOS.Peripheral
             return new Characteristic(mutableCharacteristic);
         }
 
-        public CBAttributePermissions ConvertPermissions(CharacteristicPermissions permissions)
+        public CBAttributePermissions ConvertPermissions(CharacteristicPermission permission)
         {
             CBAttributePermissions nativePermissions= 0;
-            if (permissions.HasFlag(CharacteristicPermissions.Read))
+            if (permission.HasFlag(CharacteristicPermission.Read))
             {
                 nativePermissions |= CBAttributePermissions.Readable;
             }
-            if (permissions.HasFlag(CharacteristicPermissions.ReadEncrypted))
+            if (permission.HasFlag(CharacteristicPermission.ReadEncrypted))
             {
                 nativePermissions |= CBAttributePermissions.ReadEncryptionRequired;
             }
-            if (permissions.HasFlag(CharacteristicPermissions.Write))
+            if (permission.HasFlag(CharacteristicPermission.Write))
             {
                 nativePermissions |= CBAttributePermissions.Writeable;
             }
-            if (permissions.HasFlag(CharacteristicPermissions.WriteEncrypted))
+            if (permission.HasFlag(CharacteristicPermission.WriteEncrypted))
             {
                 nativePermissions |= CBAttributePermissions.WriteEncryptionRequired;
             }
@@ -53,39 +60,39 @@ namespace WorkingNameBle.iOS.Peripheral
             return nativePermissions;
         }
 
-        public CBCharacteristicProperties ConvertProperties(CharacteristicProperties properties)
+        public CBCharacteristicProperties ConvertProperties(CharacteristicProperty property)
         {
             CBCharacteristicProperties nativeProperties = 0;
 
-            if (properties.HasFlag(CharacteristicProperties.Broadcast))
+            if (property.HasFlag(CharacteristicProperty.Broadcast))
             {
                 nativeProperties |= CBCharacteristicProperties.Broadcast;
             }
-            if (properties.HasFlag(CharacteristicProperties.Read))
+            if (property.HasFlag(CharacteristicProperty.Read))
             {
                 nativeProperties |= CBCharacteristicProperties.Read;
             }
-            if (properties.HasFlag(CharacteristicProperties.WriteWithoutResponse))
+            if (property.HasFlag(CharacteristicProperty.WriteWithoutResponse))
             {
                 nativeProperties |= CBCharacteristicProperties.WriteWithoutResponse;
             }
-            if (properties.HasFlag(CharacteristicProperties.Write))
+            if (property.HasFlag(CharacteristicProperty.Write))
             {
                 nativeProperties |= CBCharacteristicProperties.Write;
             }
-            if (properties.HasFlag(CharacteristicProperties.Notify))
+            if (property.HasFlag(CharacteristicProperty.Notify))
             {
                 nativeProperties |= CBCharacteristicProperties.Notify;
             }
-            if (properties.HasFlag(CharacteristicProperties.Indicate))
+            if (property.HasFlag(CharacteristicProperty.Indicate))
             {
                 nativeProperties |= CBCharacteristicProperties.Indicate;
             }
-            if (properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites))
+            if (property.HasFlag(CharacteristicProperty.AuthenticatedSignedWrites))
             {
                 nativeProperties |= CBCharacteristicProperties.AuthenticatedSignedWrites;
             }
-            if (properties.HasFlag(CharacteristicProperties.ExtendedProperties))
+            if (property.HasFlag(CharacteristicProperty.ExtendedProperties))
             {
                 nativeProperties |= CBCharacteristicProperties.ExtendedProperties;
             }

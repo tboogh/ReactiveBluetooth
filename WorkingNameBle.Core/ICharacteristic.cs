@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace WorkingNameBle.Core
 {
     [Flags]
-    public enum CharacteristicProperties
+    public enum CharacteristicProperty
     {
         Broadcast = 1,
         Read,
@@ -15,7 +16,7 @@ namespace WorkingNameBle.Core
         ExtendedProperties
     }
     [Flags]
-    public enum CharacteristicPermissions
+    public enum CharacteristicPermission
     {
         Read = 1,
         ReadEncrypted,
@@ -27,5 +28,8 @@ namespace WorkingNameBle.Core
     public interface ICharacteristic
     {
         Guid Uuid { get; }
+
+        CharacteristicProperty Properties { get; }
+        CharacteristicPermission Permissions { get; }
     }
 }

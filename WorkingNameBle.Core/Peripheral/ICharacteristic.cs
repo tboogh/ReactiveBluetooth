@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace WorkingNameBle.Core.Peripheral
 {
-    public interface ICharacteristic : Core.ICharacteristic
+    public interface ICharacteristic : Core.ICharacteristic, IDisposable
     {
+        IObservable<IAttRequest> ReadRequestObservable { get; }
+        IObservable<IAttRequest> WriteRequestObservable { get; }
     }
 }

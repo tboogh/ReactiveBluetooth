@@ -21,7 +21,7 @@ namespace WorkingNameBle.iOS.Peripheral
 
         public PeripheralManager()
         {
-            Factory = new AbstractFactory();
+            Factory = new AbstractFactory(_peripheralDelegate);
         }
 
         public ManagerState State

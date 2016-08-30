@@ -42,6 +42,7 @@
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
     <Compile Include="Exceptions\StartAdvertisingException.cs" />
     <Compile Include="Peripheral\AdvertisingOptions.cs" />
+    <Compile Include="Peripheral\IAttRequest.cs" />
     <Compile Include="Peripheral\IBluetoothAbstractFactory.cs" />
     <Compile Include="Central\ICentralManager.cs" />
     <Compile Include="ICharacteristic.cs" />

@@ -64,7 +64,12 @@
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
+    <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
+    <Compile Include="Extensions\CharacteristicPropertiesExtensions.cs" />
+    <Compile Include="Extensions\GattPermissionExtensions.cs" />
+    <Compile Include="Extensions\GattPropertyExtensions.cs" />
     <Compile Include="Peripheral\AbstractFactory.cs" />
+    <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
     <Compile Include="Peripheral\GattServer\CharacteristicReadRequest.cs" />
     <Compile Include="Peripheral\GattServer\CharacteristicWriteRequest.cs" />

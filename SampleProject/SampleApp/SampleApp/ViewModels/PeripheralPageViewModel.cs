@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -51,11 +52,30 @@ namespace SampleApp.ViewModels
             if (_advertiseDisposable != null)
                 return;
 
-            var testService = _peripheralManager.Factory.CreateService(Guid.Parse("DAECB5C3-0234-49D9-8439-39100D7EBD62"), ServiceType.Primary);
-            var testCharactersitic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B368BED8-12C1-4118-8B4A-BEAAC1BA2730"), new byte[] {0xB0, 0x06}, CharacteristicPermissions.Read, CharacteristicProperties.Read);
-            var result = testService.AddCharacteristic(testCharactersitic);
+            var service = _peripheralManager.Factory.CreateService(Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"), ServiceType.Primary);
+            var readCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"), new byte[] {0xB0, 0x06}, CharacteristicPermission.Read, CharacteristicProperty.Read);
 
-            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {testService})
+            readCharacterstic.ReadRequestObservable.Subscribe(request =>
+            {
+                Debug.WriteLine("Read request");
+            });
+
+            var writeCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.Write);
+
+            writeCharacterstic.WriteRequestObservable.Subscribe(request =>
+            {
+                Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
+            });
+            if (!service.AddCharacteristic(writeCharacterstic))
+            {
+                throw new Exception("Failed to add write characteristic");
+            }
+            if (!service.AddCharacteristic(readCharacterstic))
+            {
+                throw new Exception("Failed to add read characteristic");
+            }
+
+            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {service})
                 .Catch(Observable.Return(false))
                 .Subscribe(b => { Advertising = b; });
         }
