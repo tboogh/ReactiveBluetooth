@@ -44,8 +44,6 @@ namespace WorkingNameBle.Android.Peripheral
 
             Characteristic characteristic = new Characteristic(bluetoothGattCharacteristic, _serverCallback);
 
-            
-
             if (!bluetoothGattCharacteristic.SetValue(value))
             {
                 throw new Exception("Failed to set characteristic value");

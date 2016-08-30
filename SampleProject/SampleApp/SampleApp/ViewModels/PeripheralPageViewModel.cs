@@ -58,6 +58,7 @@ namespace SampleApp.ViewModels
             readCharacterstic.ReadRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine("Read request");
+                _peripheralManager.SendResponse(request, 0, new byte[] {0xB0, 0x0B});
             });
 
             var writeCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.Write);
@@ -66,10 +67,10 @@ namespace SampleApp.ViewModels
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
             });
-            if (!service.AddCharacteristic(writeCharacterstic))
-            {
-                throw new Exception("Failed to add write characteristic");
-            }
+            //if (!service.AddCharacteristic(writeCharacterstic))
+            //{
+            //    throw new Exception("Failed to add write characteristic");
+            //}
             if (!service.AddCharacteristic(readCharacterstic))
             {
                 throw new Exception("Failed to add read characteristic");

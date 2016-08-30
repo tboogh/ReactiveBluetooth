@@ -21,5 +21,7 @@ namespace WorkingNameBle.Core.Peripheral
         IObservable<bool> AddService(IService service);
         void RemoveService(IService service);
         void RemoveAllServices();
+
+        bool SendResponse(IAttRequest request, int offset, byte[] value);
     }
 }

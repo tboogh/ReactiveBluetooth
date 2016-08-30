@@ -111,6 +111,7 @@ namespace WorkingNameBle.Android.Peripheral
                 return Disposable.Create(() =>
                 {
                     _gattServer.Close();
+                    _gattServer = null;
                     _bluetoothLeAdvertiser.StopAdvertising(callback);
                 });
             });
@@ -163,6 +164,11 @@ namespace WorkingNameBle.Android.Peripheral
         {
             _gattServer?.ClearServices();
         }
-        
+
+        public bool SendResponse(IAttRequest request, int offset, byte[] value)
+        {
+            AttRequest attRequest = (AttRequest) request;
+            return _gattServer.SendResponse(attRequest.BluetoothDevice, attRequest.RequestId, GattStatus.Success, offset, value);
+        }
     }
 }

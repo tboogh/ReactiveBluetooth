@@ -106,5 +106,10 @@ namespace WorkingNameBle.iOS.Peripheral
         {
             _peripheralManager.RemoveAllServices();
         }
+
+        public bool SendResponse(IAttRequest request, int offset, byte[] value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
