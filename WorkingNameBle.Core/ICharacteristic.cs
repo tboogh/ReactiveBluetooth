@@ -7,21 +7,22 @@ namespace WorkingNameBle.Core
     public enum CharacteristicProperty
     {
         Broadcast = 1,
-        Read,
-        WriteWithoutResponse,
-        Write,
-        Notify,
-        Indicate,
-        AuthenticatedSignedWrites,
-        ExtendedProperties
+        Read = 2,
+        WriteWithoutResponse = 4,
+        Write = 8,
+        Notify = 16,
+        Indicate = 32,
+        AuthenticatedSignedWrites = 64,
+        ExtendedProperties = 128
     }
+
     [Flags]
     public enum CharacteristicPermission
     {
         Read = 1,
-        ReadEncrypted,
-        Write,
-        WriteEncrypted
+        ReadEncrypted = 2,
+        Write = 4,
+        WriteEncrypted = 8
     }
 
 

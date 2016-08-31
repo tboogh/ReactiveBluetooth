@@ -67,10 +67,10 @@ namespace SampleApp.ViewModels
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
             });
-            //if (!service.AddCharacteristic(writeCharacterstic))
-            //{
-            //    throw new Exception("Failed to add write characteristic");
-            //}
+            if (!service.AddCharacteristic(writeCharacterstic))
+            {
+                throw new Exception("Failed to add write characteristic");
+            }
             if (!service.AddCharacteristic(readCharacterstic))
             {
                 throw new Exception("Failed to add read characteristic");
