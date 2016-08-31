@@ -22,6 +22,7 @@ namespace SampleApp.ViewModels
         private bool _advertising;
         private IDisposable _stateDisposable;
         private IDisposable _advertiseDisposable;
+        private byte[] _writeValue = new byte[] {0xB0, 0x0B};
 
         public PeripheralPageViewModel(IPeripheralManager peripheralManager)
         {
@@ -66,7 +67,14 @@ namespace SampleApp.ViewModels
             writeCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
+                _writeValue = request.Value;
+                _peripheralManager.SendResponse(request, 0, _writeValue);
             });
+            writeCharacterstic.ReadRequestObservable.Subscribe(request =>
+            {
+                _peripheralManager.SendResponse(request, 0, _writeValue);
+            });
+
             if (!service.AddCharacteristic(writeCharacterstic))
             {
                 throw new Exception("Failed to add write characteristic");
