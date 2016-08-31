@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Text;
 using CoreBluetooth;
 using CoreFoundation;
+using Foundation;
 using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
 using IService = WorkingNameBle.Core.Peripheral.IService;
@@ -17,10 +18,11 @@ namespace WorkingNameBle.iOS.Peripheral
     public class PeripheralManager : IPeripheralManager
     {
         private CBPeripheralManager _peripheralManager;
-        private PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
+        private readonly PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
 
         public PeripheralManager()
         {
+            _peripheralDelegate = new PeripheralManagerDelegate.PeripheralManagerDelegate();
             Factory = new AbstractFactory(_peripheralDelegate);
         }
 
@@ -38,7 +40,6 @@ namespace WorkingNameBle.iOS.Peripheral
 
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
-            _peripheralDelegate = new PeripheralManagerDelegate.PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
             return _peripheralDelegate.StateUpdatedSubject.Select(x => x != null ? (ManagerState)x.State : ManagerState.Unknown);
@@ -58,6 +59,12 @@ namespace WorkingNameBle.iOS.Peripheral
                 {
                     observer.OnNext(o);
                 });
+
+                foreach (var service in services)
+                {
+                    var nativeService = (Service) service;
+                    _peripheralManager.AddService(nativeService.MutableService);
+                }
 
                 StartAdvertisingOptions options = CreateAdvertisementOptions(advertisingOptions);
                 _peripheralManager.StartAdvertising(options);
@@ -109,7 +116,12 @@ namespace WorkingNameBle.iOS.Peripheral
 
         public bool SendResponse(IAttRequest request, int offset, byte[] value)
         {
-            throw new NotImplementedException();
+            var attRequest = (AttRequest) request;
+            var r = attRequest.CBAttRequest;
+            r.Value = NSData.FromArray(value);
+            
+            _peripheralManager.RespondToRequest(r, CBATTError.Success);
+            return true;
         }
     }
 }

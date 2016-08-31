@@ -9,7 +9,7 @@ namespace WorkingNameBle.iOS.Peripheral.PeripheralManagerDelegate
             PeripheralManager = peripheralManager;
             Requests = requests;
         }
-
+        
         public CBPeripheralManager PeripheralManager { get; }
         public CBATTRequest[] Requests { get; }
     }

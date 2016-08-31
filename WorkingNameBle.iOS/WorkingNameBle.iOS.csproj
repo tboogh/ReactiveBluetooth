@@ -59,7 +59,12 @@
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
+    <Compile Include="Extensions\CBAttributePermissionsExtensions.cs" />
+    <Compile Include="Extensions\CBCharacteristicPropertiesExtensions.cs" />
+    <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
+    <Compile Include="Extensions\CharacteristicPropertyExtensions.cs" />
     <Compile Include="Peripheral\AbstractFactory.cs" />
+    <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
     <Compile Include="Peripheral\PeripheralManagerDelegate\CharacteristicSubscriptionChange.cs" />
