@@ -1,4 +1,4 @@
-# RxBluetooth.Net
+# Reactive Bluetooth
 
 Bluetooth Smart library built for Xamarin using Reactive
 
