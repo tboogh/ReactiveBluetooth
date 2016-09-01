@@ -65,7 +65,7 @@ namespace WorkingNameBle.iOS.Central
         public Task<bool> ConnectToDevice(IDevice device)
         {
             CheckInitialized();
-            var nativeDevice = ((Device) device).NativeDevice;
+            var nativeDevice = ((Device) device).Peripheral;
 
             var connectedObservable = _centralManagerDelegate.ConnectedPeripheralSubject
                 .Select(x => true);
@@ -80,14 +80,14 @@ namespace WorkingNameBle.iOS.Central
 
         public Task DisconnectDevice(IDevice device)
         {
-            var nativeDevice = ((Device) device).NativeDevice;
-            _centralManager.CancelPeripheralConnection(nativeDevice);
-            return Task.FromResult(true);
+            var peripheral = ((Device) device).Peripheral;
+            _centralManager.CancelPeripheralConnection(peripheral);
+            return _centralManagerDelegate.DisconnectedPeripheralSubject.FirstAsync(x => x.Peripheral.UUID == peripheral.UUID).ToTask();
         }
 
         public IObservable<IService> DiscoverServices(IDevice device)
         {
-            var nativeDevice = ((Device) device).NativeDevice;
+            var nativeDevice = ((Device) device).Peripheral;
             nativeDevice.DiscoverServices();
             throw new NotImplementedException();
         }
