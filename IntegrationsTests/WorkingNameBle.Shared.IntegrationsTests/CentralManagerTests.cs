@@ -14,7 +14,7 @@ namespace WorkingNameBle.Shared.IntegrationsTests
     [TestFixture]
     public abstract class CentralManagerTests
     {
-        private static readonly string TestDeviceName = "BleTest";
+        private static readonly string TestDeviceName = "TestPeripheral";
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
         private ICentralManager _centralManager;

@@ -47,7 +47,7 @@ namespace WorkingNameBle.Android.Central
                 _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             }
             _initialized = true;
-
+            
             return Observable
                 .Timer(TimeSpan.FromSeconds(0.5))
                 .Select(x => State);
@@ -74,7 +74,6 @@ namespace WorkingNameBle.Android.Central
                     }, failure => { observer.OnError(new DiscoverDeviceException(failure.ToString())); });
 
                     _bluetoothAdapter.BluetoothLeScanner.StartScan(bleScanCallback);
-
                     return Disposable.Create(() => { _bluetoothAdapter.BluetoothLeScanner.StopScan(bleScanCallback); });
                 });
             }

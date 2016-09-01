@@ -57,6 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Central\CentralManager.cs" />
+    <Compile Include="Central\CentralManagerDelegate\CentralManagerDelegate.cs" />
+    <Compile Include="Central\CentralManagerDelegate\ConnectedPeripheral.cs" />
+    <Compile Include="Central\CentralManagerDelegate\ConnectionStatePeripheral.cs" />
+    <Compile Include="Central\CentralManagerDelegate\DiscoveredPeripheral.cs" />
+    <Compile Include="Central\CentralManagerDelegate\RetrievedPeripherals.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
     <Compile Include="Extensions\CBAttributePermissionsExtensions.cs" />
