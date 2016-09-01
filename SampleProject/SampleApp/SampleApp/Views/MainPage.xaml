@@ -5,6 +5,7 @@
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="SampleApp.Views.MainPage">
   <StackLayout>
+    <Button Text="Central Mode" Command="{Binding DisplayCentralPageCommand}"></Button>
     <Button Text="Peripheral Mode" Command="{Binding DisplayPeripheralPageCommand}"></Button>
   </StackLayout>
 </ContentPage>

@@ -8,10 +8,10 @@ using Android.Widget;
 using Android.OS;
 using Microsoft.Practices.Unity;
 using Prism.Unity;
-using WorkingNameBle.Android.Central;
-using WorkingNameBle.Android.Peripheral;
-using WorkingNameBle.Core.Central;
-using WorkingNameBle.Core.Peripheral;
+using ReactiveBluetooth.Android.Central;
+using ReactiveBluetooth.Android.Peripheral;
+using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Peripheral;
 
 namespace SampleApp.Droid
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Prism.Unity;
+using SampleApp.ViewModels;
 using SampleApp.Views;
 using Xamarin.Forms;
 
@@ -23,7 +24,8 @@ namespace SampleApp
         {
             Container.RegisterTypeForNavigation<NavigationPage>();
             Container.RegisterTypeForNavigation<MainPage>();
-            Container.RegisterTypeForNavigation<PeripheralPage>();
+            Container.RegisterTypeForNavigation<PeripheralPage, PeripheralModeViewModel>();
+            Container.RegisterTypeForNavigation<CentralPage, CentralModeViewModel>();
         }
     }
 }

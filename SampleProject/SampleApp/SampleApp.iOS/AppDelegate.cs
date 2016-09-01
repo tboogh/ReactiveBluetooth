@@ -6,10 +6,10 @@ using Foundation;
 using Microsoft.Practices.Unity;
 using Prism.Unity;
 using UIKit;
-using WorkingNameBle.Core.Central;
-using WorkingNameBle.Core.Peripheral;
-using WorkingNameBle.iOS.Central;
-using WorkingNameBle.iOS.Peripheral;
+using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.iOS.Central;
+using ReactiveBluetooth.iOS.Peripheral;
 
 namespace SampleApp.iOS
 {

@@ -17,13 +17,20 @@ namespace SampleApp.ViewModels
         {
             _navigationService = navigationService;
             DisplayPeripheralPageCommand = DelegateCommand.FromAsyncHandler(DisplayPeripheralPage);
+            DisplayCentralPageCommand = DelegateCommand.FromAsyncHandler(DisplayCentralPage);
         }
 
         public DelegateCommand DisplayPeripheralPageCommand { get; }
+        public DelegateCommand DisplayCentralPageCommand { get; }
 
         private async Task DisplayPeripheralPage()
         {
             await _navigationService.NavigateAsync($"{nameof(PeripheralPage)}");
+        }
+
+        private async Task DisplayCentralPage()
+        {
+            await _navigationService.NavigateAsync($"{nameof(CentralPage)}");
         }
     }
 }

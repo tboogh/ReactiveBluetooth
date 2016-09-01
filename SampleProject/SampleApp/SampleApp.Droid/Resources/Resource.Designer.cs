@@ -26,8 +26,8 @@ namespace SampleApp.Droid
 		
 		public static void UpdateIdValues()
 		{
-			global::WorkingNameBle.Android.Resource.String.ApplicationName = global::SampleApp.Droid.Resource.String.ApplicationName;
-			global::WorkingNameBle.Android.Resource.String.Hello = global::SampleApp.Droid.Resource.String.Hello;
+			global::ReactiveBluetooth.Android.Resource.String.ApplicationName = global::SampleApp.Droid.Resource.String.ApplicationName;
+			global::ReactiveBluetooth.Android.Resource.String.Hello = global::SampleApp.Droid.Resource.String.Hello;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::SampleApp.Droid.Resource.Attribute.actionBarSize;
 		}
 		
