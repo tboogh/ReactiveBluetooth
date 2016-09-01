@@ -5,79 +5,26 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Text;
 using CoreBluetooth;
 using CoreFoundation;
 using Foundation;
 using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
+using IService = WorkingNameBle.Core.Peripheral.IService;
 
 namespace WorkingNameBle.iOS.Peripheral
 {
-    public class PeripheralManagerDelegate : CBPeripheralManagerDelegate
-    {
-        public ReplaySubject<ManagerState> StateUpdatedSubject;
-        public ReplaySubject<bool> AdvertisingStartedSubject;
-        public PeripheralManagerDelegate()
-        {
-            StateUpdatedSubject = new ReplaySubject<ManagerState>();
-            AdvertisingStartedSubject = new ReplaySubject<bool>();
-        }
-
-        public override void AdvertisingStarted(CBPeripheralManager peripheral, NSError error)
-        {
-            if (error != null)
-            {
-                AdvertisingStartedSubject.OnError(new Exception(error.LocalizedDescription));
-            }
-            else
-            {
-                AdvertisingStartedSubject.OnNext(true);
-            }
-            
-        }
-
-        public override void CharacteristicSubscribed(CBPeripheralManager peripheral, CBCentral central, CBCharacteristic characteristic)
-        {
-            
-        }
-
-        public override void CharacteristicUnsubscribed(CBPeripheralManager peripheral, CBCentral central, CBCharacteristic characteristic)
-        {
-            
-        }
-
-        public override void ReadRequestReceived(CBPeripheralManager peripheral, CBATTRequest request)
-        {
-            
-        }
-
-        public override void ReadyToUpdateSubscribers(CBPeripheralManager peripheral)
-        {
-            
-        }
-
-        public override void ServiceAdded(CBPeripheralManager peripheral, CBService service, NSError error)
-        {
-            
-        }
-
-        public override void WriteRequestsReceived(CBPeripheralManager peripheral, CBATTRequest[] requests)
-        {
-            
-        }
-
-        public override void StateUpdated(CBPeripheralManager peripheral)
-        {
-            StateUpdatedSubject.OnNext((ManagerState)peripheral.State);
-        }
-    }
-
     public class PeripheralManager : IPeripheralManager
     {
         private CBPeripheralManager _peripheralManager;
-        private PeripheralManagerDelegate _peripheralDelegate;
+        private readonly PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
+
+        public PeripheralManager()
+        {
+            _peripheralDelegate = new PeripheralManagerDelegate.PeripheralManagerDelegate();
+            Factory = new AbstractFactory(_peripheralDelegate);
+        }
 
         public ManagerState State
         {
@@ -88,21 +35,22 @@ namespace WorkingNameBle.iOS.Peripheral
                 return ManagerState.PoweredOff;
             }
         }
-        
+
+        public IBluetoothAbstractFactory Factory { get; }
+
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
-            _peripheralDelegate = new PeripheralManagerDelegate();
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedSubject;
+            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
         }
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+            _peripheralManager.StopAdvertising();
         }
 
-        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions)
+        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
 
             var advertiseObservable = Observable.Create<bool>(observer =>
@@ -110,7 +58,13 @@ namespace WorkingNameBle.iOS.Peripheral
                 IDisposable started = _peripheralDelegate.AdvertisingStartedSubject.Subscribe(o =>
                 {
                     observer.OnNext(o);
-                } );
+                });
+
+                foreach (var service in services)
+                {
+                    var nativeService = (Service) service;
+                    _peripheralManager.AddService(nativeService.MutableService);
+                }
 
                 StartAdvertisingOptions options = CreateAdvertisementOptions(advertisingOptions);
                 _peripheralManager.StartAdvertising(options);
@@ -120,16 +74,54 @@ namespace WorkingNameBle.iOS.Peripheral
                     started.Dispose();
                 });
             });
-            return advertiseObservable.StartWith(_peripheralManager.Advertising);
+            return advertiseObservable;
         }
 
         public StartAdvertisingOptions CreateAdvertisementOptions(AdvertisingOptions advertisingOptions)
         {
-            return new StartAdvertisingOptions
+            var options = new StartAdvertisingOptions();
+            if (advertisingOptions.LocalName != null)
             {
-                LocalName = advertisingOptions.LocalName,
-                ServicesUUID = advertisingOptions.ServiceUuids.Select(x => CBUUID.FromString(x.ToString())).ToArray()
-            };
+                options.LocalName = advertisingOptions.LocalName;
+            }
+
+            if (advertisingOptions.ServiceUuids != null)
+                options.ServicesUUID = advertisingOptions.ServiceUuids.Select(x => CBUUID.FromString(x.ToString()))
+                    .ToArray();
+
+            return options;
+        }
+
+        public IObservable<bool> AddService(IService service)
+        {
+            var nativeService = ((Service) service).MutableService;
+            _peripheralManager.AddService(nativeService);
+            return _peripheralDelegate.ServiceAddedSubject.Select(x =>
+            {
+                return x.Service.UUID == nativeService.UUID;
+            })
+                .Catch(Observable.Return(false));
+        }
+
+        public void RemoveService(IService service)
+        {
+            var nativeService = ((Service)service).MutableService;
+            _peripheralManager.RemoveService(nativeService);
+        }
+
+        public void RemoveAllServices()
+        {
+            _peripheralManager.RemoveAllServices();
+        }
+
+        public bool SendResponse(IAttRequest request, int offset, byte[] value)
+        {
+            var attRequest = (AttRequest) request;
+            var r = attRequest.CBAttRequest;
+            r.Value = NSData.FromArray(value);
+            
+            _peripheralManager.RespondToRequest(r, CBATTError.Success);
+            return true;
         }
     }
 }

@@ -6,7 +6,9 @@ using Foundation;
 using Microsoft.Practices.Unity;
 using Prism.Unity;
 using UIKit;
+using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
+using WorkingNameBle.iOS.Central;
 using WorkingNameBle.iOS.Peripheral;
 
 namespace SampleApp.iOS
@@ -38,6 +40,7 @@ namespace SampleApp.iOS
         public void RegisterTypes(IUnityContainer container)
         {
             container.RegisterType<IPeripheralManager, PeripheralManager>();
+            container.RegisterType<ICentralManager, CentralManager>();
         }
     }
 }

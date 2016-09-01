@@ -57,9 +57,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Central\CentralManager.cs" />
+    <Compile Include="Central\CentralManagerDelegate\CentralManagerDelegate.cs" />
+    <Compile Include="Central\CentralManagerDelegate\ConnectedPeripheral.cs" />
+    <Compile Include="Central\CentralManagerDelegate\ConnectionStatePeripheral.cs" />
+    <Compile Include="Central\CentralManagerDelegate\DiscoveredPeripheral.cs" />
+    <Compile Include="Central\CentralManagerDelegate\RetrievedPeripherals.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
+    <Compile Include="Central\PeripheralDelegate\ModifiedServices.cs" />
+    <Compile Include="Central\PeripheralDelegate\PeripheralCharacteristicInfo.cs" />
+    <Compile Include="Central\PeripheralDelegate\PeripheralDelegate.cs" />
+    <Compile Include="Central\PeripheralDelegate\PeripheralDescriptorInfo.cs" />
+    <Compile Include="Central\PeripheralDelegate\PeripheralInfo.cs" />
+    <Compile Include="Central\PeripheralDelegate\PeripheralServiceInfo.cs" />
+    <Compile Include="Central\PeripheralDelegate\RssiRead.cs" />
+    <Compile Include="Extensions\CBAttributePermissionsExtensions.cs" />
+    <Compile Include="Extensions\CBCharacteristicPropertiesExtensions.cs" />
+    <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
+    <Compile Include="Extensions\CharacteristicPropertyExtensions.cs" />
+    <Compile Include="Peripheral\AbstractFactory.cs" />
+    <Compile Include="Peripheral\AttRequest.cs" />
+    <Compile Include="Peripheral\Characteristic.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\CharacteristicSubscriptionChange.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\PeripheralManagerDelegate.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\ReadRequestReceived.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\ServiceAdded.cs" />
+    <Compile Include="Peripheral\PeripheralManagerDelegate\WriteRequestsReceived.cs" />
+    <Compile Include="Peripheral\Service.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Central\Service.cs" />
   </ItemGroup>

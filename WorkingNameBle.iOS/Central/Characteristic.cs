@@ -1,5 +1,6 @@
 using System;
 using CoreBluetooth;
+using WorkingNameBle.Core;
 using WorkingNameBle.Core.Central;
 
 namespace WorkingNameBle.iOS.Central
@@ -13,6 +14,8 @@ namespace WorkingNameBle.iOS.Central
             _characteristic = characteristic;
         }
 
-        public Guid Id => Guid.Parse(_characteristic.UUID.ToString());
+        public Guid Uuid => Guid.Parse(_characteristic.UUID.ToString());
+        public CharacteristicProperty Properties { get; }
+        public CharacteristicPermission Permissions { get; }
     }
 }

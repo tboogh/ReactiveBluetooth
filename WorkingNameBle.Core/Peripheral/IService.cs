@@ -8,5 +8,6 @@ namespace WorkingNameBle.Core.Peripheral
 {
     public interface IService : Core.IService
     {
+        bool AddCharacteristic(ICharacteristic characteristic);
     }
 }

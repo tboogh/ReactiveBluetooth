@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
@@ -10,27 +11,37 @@ namespace WorkingNameBle.iOS.Central
 {
     public class Device : IDevice
     {
-        public Device(CBPeripheral nativeDevice)
+        private PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
+
+        public Device(CBPeripheral peripheral)
         {
-            NativeDevice = nativeDevice;
-            Name = nativeDevice.Name;
+            Peripheral = peripheral;
+            _cbPeripheralDelegate = new PeripheralDelegate.PeripheralDelegate();
+            peripheral.Delegate = _cbPeripheralDelegate;
+            Name = peripheral.Name;
         }
 
-        public CBPeripheral NativeDevice { get; }
-
+        public CBPeripheral Peripheral { get; }
         public string Name { get; }
-
-        public ConnectionState State => (ConnectionState) NativeDevice.State;
+        public ConnectionState State => (ConnectionState) Peripheral.State;
 
         public IObservable<IList<IService>> DiscoverServices()
         {
-            var observable = Observable.FromEventPattern<EventHandler<NSErrorEventArgs>, NSErrorEventArgs>(eh => NativeDevice.DiscoveredService += eh, eh => NativeDevice.DiscoveredService -= eh);
-            NativeDevice.DiscoverServices();
-            return observable.Select(x =>
+            return Observable.Create<IList<IService>>(observer =>
             {
-                return NativeDevice.Services.Select(cbService => new Service(cbService, NativeDevice))
-                    .Cast<IService>()
-                    .ToList();
+                var discoverDisp = _cbPeripheralDelegate.DiscoveredServiceSubject.Select(x => x.Peripheral.Services).Subscribe(services =>
+                {
+                    IList<IService> list = services.Select(x => new Service(x, Peripheral))
+                        .Cast<IService>().ToList();
+                    observer.OnNext(list);
+                });
+
+                Peripheral.DiscoverServices();
+
+                return Disposable.Create(() =>
+                {
+                    discoverDisp.Dispose();
+                });
             });
         }
     }

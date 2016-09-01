@@ -6,6 +6,7 @@ namespace WorkingNameBle.Core
 {
     public interface IService
     {
-        Guid Id { get; }
+        Guid Uuid { get; }
+        ServiceType ServiceType{ get; }
     }
 }

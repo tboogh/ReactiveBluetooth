@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Android.Bluetooth;
-using WorkingNameBle.Core.Central;
+using WorkingNameBle.Core;
+using IService = WorkingNameBle.Core.Central.IService;
 
 namespace WorkingNameBle.Android.Central
 {
@@ -16,7 +17,7 @@ namespace WorkingNameBle.Android.Central
             _service = service;
         }
 
-        public Guid Id
+        public Guid Uuid
         {
             get
             {
@@ -24,6 +25,8 @@ namespace WorkingNameBle.Android.Central
                 return Guid.Parse(uuid);
             }
         }
+
+        public ServiceType ServiceType => (ServiceType) _service.Type;
 
         public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
         {

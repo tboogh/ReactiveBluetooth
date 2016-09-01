@@ -8,7 +8,9 @@ using Android.Widget;
 using Android.OS;
 using Microsoft.Practices.Unity;
 using Prism.Unity;
+using WorkingNameBle.Android.Central;
 using WorkingNameBle.Android.Peripheral;
+using WorkingNameBle.Core.Central;
 using WorkingNameBle.Core.Peripheral;
 
 namespace SampleApp.Droid
@@ -33,6 +35,7 @@ namespace SampleApp.Droid
         public void RegisterTypes(IUnityContainer container)
         {
             container.RegisterType<IPeripheralManager, PeripheralManager>();
+            container.RegisterType<ICentralManager, CentralManager>();
         }
     }
 }

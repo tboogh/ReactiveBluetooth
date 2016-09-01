@@ -38,16 +38,21 @@
   <ItemGroup>
     <Compile Include="Central\IService.cs" />
     <Compile Include="Central\ManagerState.cs" />
+    <Compile Include="Exceptions\AddServiceException.cs" />
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
+    <Compile Include="Exceptions\StartAdvertisingException.cs" />
     <Compile Include="Peripheral\AdvertisingOptions.cs" />
+    <Compile Include="Peripheral\IAttRequest.cs" />
     <Compile Include="Peripheral\IBluetoothAbstractFactory.cs" />
     <Compile Include="Central\ICentralManager.cs" />
-    <Compile Include="Central\ICharacteristic.cs" />
+    <Compile Include="ICharacteristic.cs" />
     <Compile Include="Central\IDevice.cs" />
     <Compile Include="IService.cs" />
+    <Compile Include="Peripheral\ICharacteristic.cs" />
     <Compile Include="Peripheral\IPeripheralManager.cs" />
     <Compile Include="Peripheral\IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
