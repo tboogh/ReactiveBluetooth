@@ -42,7 +42,7 @@ namespace WorkingNameBle.iOS.Peripheral
         {
             _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
 
-            return _peripheralDelegate.StateUpdatedSubject.Select(x => x != null ? (ManagerState)x.State : ManagerState.Unknown);
+            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
         }
 
         public void Shutdown()

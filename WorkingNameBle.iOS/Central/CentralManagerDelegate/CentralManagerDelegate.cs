@@ -6,7 +6,7 @@ namespace WorkingNameBle.iOS.Central.CentralManagerDelegate
 {
     public class CentralManagerDelegate : CBCentralManagerDelegate
     {
-        public Subject<CBCentralManagerState> StateUpdatedSubject { get; }
+        public BehaviorSubject<CBCentralManagerState> StateUpdatedSubject { get; }
         public Subject<ConnectedPeripheral> ConnectedPeripheralSubject { get; }
 
         public Subject<ConnectionStatePeripheral> DisconnectedPeripheralSubject { get; }
@@ -17,7 +17,7 @@ namespace WorkingNameBle.iOS.Central.CentralManagerDelegate
 
         public CentralManagerDelegate()
         {
-            StateUpdatedSubject = new Subject<CBCentralManagerState>();
+            StateUpdatedSubject = new BehaviorSubject<CBCentralManagerState>(CBCentralManagerState.Unknown);
             ConnectedPeripheralSubject = new Subject<ConnectedPeripheral>();
             DisconnectedPeripheralSubject = new Subject<ConnectionStatePeripheral>();
             DiscoveredPeriperhalSubject = new Subject<DiscoveredPeripheral>();

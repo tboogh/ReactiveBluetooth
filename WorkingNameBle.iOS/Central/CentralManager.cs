@@ -82,7 +82,7 @@ namespace WorkingNameBle.iOS.Central
         {
             var peripheral = ((Device) device).Peripheral;
             _centralManager.CancelPeripheralConnection(peripheral);
-            return _centralManagerDelegate.DisconnectedPeripheralSubject.FirstAsync(x => x.Peripheral.UUID == peripheral.UUID).ToTask();
+            return _centralManagerDelegate.DisconnectedPeripheralSubject.FirstAsync(x => Equals(x.Peripheral.Identifier, peripheral.Identifier)).ToTask();
         }
 
         public IObservable<IService> DiscoverServices(IDevice device)

@@ -11,7 +11,7 @@ namespace WorkingNameBle.iOS.Peripheral.PeripheralManagerDelegate
     {
         public PeripheralManagerDelegate()
         {
-            StateUpdatedSubject = new BehaviorSubject<CBPeripheralManager>(null);
+            StateUpdatedSubject = new BehaviorSubject<CBPeripheralManagerState>(CBPeripheralManagerState.Unknown);
             AdvertisingStartedSubject = new Subject<bool>();
             CharacteristicSubscribedSubject = new Subject<CharacteristicSubscriptionChange>();
             CharacteristicUnsubscribedSubject = new Subject<CharacteristicSubscriptionChange>();
@@ -21,7 +21,7 @@ namespace WorkingNameBle.iOS.Peripheral.PeripheralManagerDelegate
             WriteRequestsReceivedSubject = new Subject<WriteRequestsReceived>();
         }
 
-        public BehaviorSubject<CBPeripheralManager> StateUpdatedSubject { get; }
+        public BehaviorSubject<CBPeripheralManagerState> StateUpdatedSubject { get; }
         public Subject<bool> AdvertisingStartedSubject { get; }
         public Subject<CharacteristicSubscriptionChange> CharacteristicSubscribedSubject { get; }
         public Subject<CharacteristicSubscriptionChange> CharacteristicUnsubscribedSubject { get; }
@@ -76,9 +76,9 @@ namespace WorkingNameBle.iOS.Peripheral.PeripheralManagerDelegate
             WriteRequestsReceivedSubject?.OnNext(new WriteRequestsReceived(peripheral, requests));
         }
 
-        public override void StateUpdated(CBPeripheralManager peripheral)
+        public override void StateUpdated(CBPeripheralManager peripheralManager)
         {
-            StateUpdatedSubject?.OnNext(peripheral);
+            StateUpdatedSubject?.OnNext(peripheralManager.State);
         }
     }
 }

@@ -66,8 +66,6 @@ namespace WorkingNameBle.Shared.IntegrationsTests
         [Test]
         public async Task ConnectToDevice_ConnectToTestDevice_ResultIsTrue()
         {
-           
-
             var scanObservable = _centralManager.ScanForDevices();
             var battByte = await scanObservable.FirstAsync(x => x.Name == TestDeviceName).Timeout(Timeout).ToTask();
 
@@ -114,7 +112,8 @@ namespace WorkingNameBle.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            var services = await device.DiscoverServices().Timeout(Timeout).ToTask();
+            var services = await device.DiscoverServices()
+                .FirstAsync();
             await service.DisconnectDevice(device);
 
             Assert.NotNull(services);
@@ -129,7 +128,8 @@ namespace WorkingNameBle.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            var services = await device.DiscoverServices().Timeout(Timeout).ToTask();
+            var services = await device.DiscoverServices()
+                .FirstAsync();
             await service.DisconnectDevice(device);
 
             if (services.Count == 0)
