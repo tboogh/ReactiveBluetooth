@@ -1,4 +1,4 @@
-# WorkingNameBLE
+# RxBluetooth.Net
 
 Bluetooth Smart library built for Xamarin using Reactive
 
@@ -8,12 +8,3 @@ My motivation for this project is to create a better Bluetooth Low Energy (BLE) 
 ###WorkingNameBle.Core
 - ICentralManager
 - IPeripheralManager
-
---
-# ReliaBLE
-# Reactive.BLE
-# Boogh.BLE
-# Enable
-# BLE
-# Bluetooth
-# Rx.BLE.Net
