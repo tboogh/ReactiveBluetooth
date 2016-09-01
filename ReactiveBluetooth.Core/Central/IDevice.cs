@@ -15,6 +15,8 @@ namespace ReactiveBluetooth.Core.Central
     {
         string Name { get;  }
 
+        Guid Uuid { get; }
+
         ConnectionState State { get; }
 
 

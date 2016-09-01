@@ -18,11 +18,11 @@ namespace ReactiveBluetooth.iOS.Central
             Peripheral = peripheral;
             _cbPeripheralDelegate = new PeripheralDelegate.PeripheralDelegate();
             peripheral.Delegate = _cbPeripheralDelegate;
-            Name = peripheral.Name;
         }
 
         public CBPeripheral Peripheral { get; }
-        public string Name { get; }
+        public Guid Uuid => Guid.Parse(Peripheral.Identifier.ToString());
+        public string Name => Peripheral.Name;
         public ConnectionState State => (ConnectionState) Peripheral.State;
 
         public IObservable<IList<IService>> DiscoverServices()

@@ -44,8 +44,9 @@ namespace SampleApp.ViewModels
             }
             else
             {
+                Devices.Clear();
                 _toggleScanDisposable = _centralManager.ScanForDevices()
-                    .Distinct()
+                    .Distinct(x => x.Uuid)
                     .Subscribe(device =>
                     {
                         Devices.Add(new DeviceViewModel(device));
