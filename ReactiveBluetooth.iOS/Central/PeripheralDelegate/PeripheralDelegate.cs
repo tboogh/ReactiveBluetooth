@@ -61,6 +61,7 @@ namespace ReactiveBluetooth.iOS.Central.PeripheralDelegate
         public override void DiscoveredService(CBPeripheral peripheral, NSError error)
         {
             DiscoveredServicesSubject?.OnNext(new PeripheralInfo(peripheral, error));
+            DiscoveredServicesSubject?.OnCompleted();
         }
 
         public override void InvalidatedService(CBPeripheral peripheral)

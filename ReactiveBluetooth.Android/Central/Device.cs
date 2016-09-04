@@ -63,7 +63,11 @@ namespace ReactiveBluetooth.Android.Central
                         .Cast<IService>()
                         .ToList();
                     return services;
-                }).Subscribe(observer.OnNext);
+                }).Subscribe(list =>
+                {
+                    observer.OnNext(list);
+                    observer.OnCompleted();
+                });
 
                 Gatt.DiscoverServices();
                 return Disposable.Create(() =>

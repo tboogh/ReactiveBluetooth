@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:valueConverters="clr-namespace:SampleApp.Common.ValueConverters;assembly=SampleApp"
+             xmlns:central="clr-namespace:ReactiveBluetooth.Core.Central;assembly=ReactiveBluetooth.Core"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="SampleApp.Views.DeviceDetailPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <StackLayout>
+        <Button Text="Connect" Command="{Binding ConnectCommand}">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
+                             Value="{x:Static central:ConnectionState.Connected}">
+                    <Setter Property="IsVisible" Value="False" />
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
+        <Button Text="Disconnect" Command="{Binding DisconnectCommand}" IsVisible="False">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
+                             Value="{x:Static central:ConnectionState.Connected}">
+                    <Setter Property="IsVisible" Value="True" />
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
+        <Label Text="{Binding Name}" />
+        <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
+        <Label Text="{Binding Rssi}" />
+        <Label Text="{Binding ConnectionState}" />
+    </StackLayout>
+</ContentPage>

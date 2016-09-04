@@ -41,6 +41,7 @@ namespace ReactiveBluetooth.iOS.Central
                     IList<IService> list = services.Select(x => new Service(x, Peripheral))
                         .Cast<IService>().ToList();
                     observer.OnNext(list);
+                    observer.OnCompleted();
                 });
 
                 Peripheral.DiscoverServices();
