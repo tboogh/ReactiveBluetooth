@@ -122,7 +122,7 @@ namespace ReactiveBluetooth.Android.Central
 
             var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
             androidDevice.Gatt = gatt;
-            return androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x.Item3);
+            return androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x);
         }
 
         public Task DisconnectDevice(IDevice device)

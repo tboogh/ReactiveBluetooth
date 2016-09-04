@@ -11,6 +11,7 @@ using Prism.Common;
 using Prism.Navigation;
 using ReactiveBluetooth.Core.Central;
 using SampleApp.ViewModels.Central;
+using SampleApp.Views;
 using Xamarin.Forms;
 
 namespace SampleApp.ViewModels
@@ -18,21 +19,21 @@ namespace SampleApp.ViewModels
     public class CentralModeViewModel : BindableBase, INavigationAware
     {
         private readonly ICentralManager _centralManager;
+        private readonly INavigationService _navigationService;
         private string _state;
-
         private IDisposable _toggleScanDisposable;
 
         public CentralModeViewModel(ICentralManager centralManager, INavigationService navigationService)
         {
             _centralManager = centralManager;
+            _navigationService = navigationService;
             _centralManager.Init()
-                .Subscribe(state =>
-                { State = state.ToString(); });
+                .Subscribe(state => { State = state.ToString(); });
             ToggleScanCommand = new DelegateCommand(ToggleScan);
             DeviceSelectedCommand = new DelegateCommand<DeviceViewModel>(ItemSelected);
             Devices = new ObservableCollection<DeviceViewModel>();
         }
-        
+
         public DelegateCommand<DeviceViewModel> DeviceSelectedCommand { get; }
         public DelegateCommand ToggleScanCommand { get; }
         public ObservableCollection<DeviceViewModel> Devices { get; }
@@ -59,24 +60,19 @@ namespace SampleApp.ViewModels
                         var currentDevice = Devices.FirstOrDefault(x => x.Uuid == device.Uuid);
                         if (currentDevice == null)
                         {
-                            Devices.Add(new DeviceViewModel(device));
+                            currentDevice = new DeviceViewModel(_centralManager);
+                            Devices.Add(currentDevice);
                         }
-                        else
-                        {
-                            currentDevice.UpdateDevice(device);
-                        }
+                        currentDevice.Device = device;
                     });
             }
         }
 
-        public void ItemSelected(DeviceViewModel device)
+        public async void ItemSelected(DeviceViewModel device)
         {
-            Task.Run(async () =>
-            {
-                
-            });
+            _toggleScanDisposable?.Dispose();
+            await _navigationService.NavigateAsync($"{nameof(DeviceDetailPage)}", new NavigationParameters() {{"Device", device.Device}});
         }
-
 
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
@@ -85,7 +81,6 @@ namespace SampleApp.ViewModels
 
         public void OnNavigatedTo(NavigationParameters parameters)
         {
-            
         }
     }
 }
