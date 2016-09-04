@@ -2,6 +2,7 @@ using System;
 using CoreBluetooth;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.iOS.Extensions;
 
 namespace ReactiveBluetooth.iOS.Central
 {
@@ -15,7 +16,6 @@ namespace ReactiveBluetooth.iOS.Central
         }
 
         public Guid Uuid => Guid.Parse(_characteristic.UUID.ToString());
-        public CharacteristicProperty Properties { get; }
-        public CharacteristicPermission Permissions { get; }
+        public CharacteristicProperty Properties => _characteristic.Properties.ToCharacteristicProperty();
     }
 }

@@ -3,16 +3,20 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:behaviors="clr-namespace:SampleApp.Common.Behaviors;assembly=SampleApp"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="SampleApp.Views.CentralPage"
              x:Name="ThisPage">
     <StackLayout>
-        <Label Text="{Binding State}"></Label>
+        <Label Text="{Binding State}" />
         <Button Text="Toggle Scan" Command="{Binding ToggleScanCommand}" />
-        <ListView ItemsSource="{Binding Devices}">
+        <ListView x:Name="ListView" ItemsSource="{Binding Devices}">
+            <ListView.Behaviors>
+                <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding DeviceSelectedCommand}" BindingContext="{Binding .}"/>
+            </ListView.Behaviors>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextCell Text="{Binding Name}" />
+                    <TextCell Text="{Binding Name}" Detail="{Binding Rssi}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

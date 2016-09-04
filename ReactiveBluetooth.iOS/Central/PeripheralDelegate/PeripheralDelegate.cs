@@ -12,10 +12,10 @@ namespace ReactiveBluetooth.iOS.Central.PeripheralDelegate
     {
         public PeripheralDelegate()
         {
-            DiscoveredCharacteristicSubject = new Subject<PeripheralServiceInfo>();
-            DiscoveredDescriptorSubject = new Subject<PeripheralCharacteristicInfo>();
-            DiscoveredIncludedServiceSubject = new Subject<PeripheralServiceInfo>();
-            DiscoveredServiceSubject = new Subject<PeripheralInfo>();
+            DiscoveredCharacteristicsSubject = new Subject<PeripheralServiceInfo>();
+            DiscoveredDescriptorsSubject = new Subject<PeripheralCharacteristicInfo>();
+            DiscoveredIncludedServicesSubject = new Subject<PeripheralServiceInfo>();
+            DiscoveredServicesSubject = new Subject<PeripheralInfo>();
             InvalidatedServiceSubject = new Subject<PeripheralInfo>();
             ModifiedServicesSubject = new Subject<ModifiedServices>();
             RssiReadSubject = new Subject<RssiRead>();
@@ -28,10 +28,10 @@ namespace ReactiveBluetooth.iOS.Central.PeripheralDelegate
             WroteDescriptorValueSubject = new Subject<PeripheralDescriptorInfo>();
         }
 
-        public Subject<PeripheralServiceInfo> DiscoveredCharacteristicSubject { get; }
-        public Subject<PeripheralCharacteristicInfo> DiscoveredDescriptorSubject { get; }
-        public Subject<PeripheralServiceInfo> DiscoveredIncludedServiceSubject { get; }
-        public Subject<PeripheralInfo> DiscoveredServiceSubject { get; }
+        public Subject<PeripheralServiceInfo> DiscoveredCharacteristicsSubject { get; }
+        public Subject<PeripheralCharacteristicInfo> DiscoveredDescriptorsSubject { get; }
+        public Subject<PeripheralServiceInfo> DiscoveredIncludedServicesSubject { get; }
+        public Subject<PeripheralInfo> DiscoveredServicesSubject { get; }
         public Subject<PeripheralInfo> InvalidatedServiceSubject { get; }
         public Subject<ModifiedServices> ModifiedServicesSubject { get; }
         public Subject<RssiRead> RssiReadSubject { get; }
@@ -45,22 +45,22 @@ namespace ReactiveBluetooth.iOS.Central.PeripheralDelegate
 
         public override void DiscoveredCharacteristic(CBPeripheral peripheral, CBService service, NSError error)
         {
-            DiscoveredCharacteristicSubject?.OnNext(new PeripheralServiceInfo(peripheral, service, error));
+            DiscoveredCharacteristicsSubject?.OnNext(new PeripheralServiceInfo(peripheral, service, error));
         }
 
         public override void DiscoveredDescriptor(CBPeripheral peripheral, CBCharacteristic characteristic, NSError error)
         {
-            DiscoveredDescriptorSubject?.OnNext(new PeripheralCharacteristicInfo(peripheral, characteristic, error));
+            DiscoveredDescriptorsSubject?.OnNext(new PeripheralCharacteristicInfo(peripheral, characteristic, error));
         }
 
         public override void DiscoveredIncludedService(CBPeripheral peripheral, CBService service, NSError error)
         {
-            DiscoveredIncludedServiceSubject?.OnNext(new PeripheralServiceInfo(peripheral, service, error));
+            DiscoveredIncludedServicesSubject?.OnNext(new PeripheralServiceInfo(peripheral, service, error));
         }
 
         public override void DiscoveredService(CBPeripheral peripheral, NSError error)
         {
-            DiscoveredServiceSubject?.OnNext(new PeripheralInfo(peripheral, error));
+            DiscoveredServicesSubject?.OnNext(new PeripheralInfo(peripheral, error));
         }
 
         public override void InvalidatedService(CBPeripheral peripheral)

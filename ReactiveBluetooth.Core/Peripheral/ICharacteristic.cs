@@ -10,5 +10,7 @@ namespace ReactiveBluetooth.Core.Peripheral
     {
         IObservable<IAttRequest> ReadRequestObservable { get; }
         IObservable<IAttRequest> WriteRequestObservable { get; }
+
+        CharacteristicPermission Permissions { get; }
     }
 }

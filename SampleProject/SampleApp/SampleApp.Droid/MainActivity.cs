@@ -1,6 +1,8 @@
 ﻿using System;
 
 using Android.App;
+using Android.Bluetooth;
+using Android.Content;
 using Android.Content.PM;
 using Android.Runtime;
 using Android.Views;
@@ -26,7 +28,8 @@ namespace SampleApp.Droid
             base.OnCreate(bundle);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
-            LoadApplication(new App(new PlatformInitializer()));
+            var app = new App(new PlatformInitializer());
+            LoadApplication(app);
         }
     }
 
@@ -34,8 +37,8 @@ namespace SampleApp.Droid
     {
         public void RegisterTypes(IUnityContainer container)
         {
-            container.RegisterType<IPeripheralManager, PeripheralManager>();
-            container.RegisterType<ICentralManager, CentralManager>();
+            container.RegisterType<IPeripheralManager, PeripheralManager>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ICentralManager, CentralManager>(new ContainerControlledLifetimeManager());
         }
     }
 }

@@ -40,6 +40,7 @@
     <Compile Include="Central\ManagerState.cs" />
     <Compile Include="Exceptions\AddServiceException.cs" />
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
+    <Compile Include="Exceptions\FailedToConnectException.cs" />
     <Compile Include="Exceptions\StartAdvertisingException.cs" />
     <Compile Include="Peripheral\AdvertisingOptions.cs" />
     <Compile Include="Peripheral\IAttRequest.cs" />

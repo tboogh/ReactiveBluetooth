@@ -31,6 +31,5 @@ namespace ReactiveBluetooth.Core
         Guid Uuid { get; }
 
         CharacteristicProperty Properties { get; }
-        CharacteristicPermission Permissions { get; }
     }
 }

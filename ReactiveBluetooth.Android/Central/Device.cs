@@ -12,13 +12,19 @@ namespace ReactiveBluetooth.Android.Central
 {
     public class Device : IDevice
     {
-        public Device(BluetoothDevice device)
+        public Device(BluetoothDevice device, int rssi)
         {
             NativeDevice = device;
+            GattCallback = new BleGattCallback();
+            var currentRssi = Observable.Return(rssi);
+            var callbackRssi = GattCallback.ReadRemoteRssiSubject.Select(x => x.Item2);
+
+            Rssi = currentRssi.Merge(callbackRssi);
         }
 
         public BluetoothDevice NativeDevice { get; }
         public BluetoothGatt Gatt { get; set; }
+        public BleGattCallback GattCallback { get; }
         public string Name => NativeDevice.Name;
 
         public Guid Uuid
@@ -28,14 +34,13 @@ namespace ReactiveBluetooth.Android.Central
                 Byte[] deviceGuid = new Byte[16];
                 String macWithoutColons = NativeDevice.Address.Replace(":", "");
                 Byte[] macBytes = Enumerable.Range(0, macWithoutColons.Length)
-                    .Where(x => x % 2 == 0)
+                    .Where(x => x%2 == 0)
                     .Select(x => Convert.ToByte(macWithoutColons.Substring(x, 2), 16))
                     .ToArray();
                 macBytes.CopyTo(deviceGuid, 10);
                 return new Guid(deviceGuid);
             }
         }
-        public BleGattCallback Callback { get; set; }
 
         public ConnectionState State
         {
@@ -46,25 +51,31 @@ namespace ReactiveBluetooth.Android.Central
             }
         }
 
+        public IObservable<int> Rssi { get; }
+
         public IObservable<IList<IService>> DiscoverServices()
         {
-            var discoverObservable = Observable.Create<IList<IService>>(observer =>
+            return Observable.Create<IList<IService>>(observer =>
             {
-                Callback.ServicesDiscovered = (gatt, status) =>
+                var discoverDisposable = GattCallback.ServicesDiscovered.Select(x =>
                 {
                     IList<IService> services = Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
                         .Cast<IService>()
                         .ToList();
-
-                    observer.OnNext(services);
-                    observer.OnCompleted();
-                };
+                    return services;
+                }).Subscribe(observer.OnNext);
 
                 Gatt.DiscoverServices();
-                
-                return Disposable.Create(() => { Callback.ServicesDiscovered = null; });
+                return Disposable.Create(() =>
+                {
+                    discoverDisposable.Dispose();
+                });
             });
-            return discoverObservable;
+        }
+
+        public void UpdateRemoteRssi()
+        {
+            Gatt.ReadRemoteRssi();
         }
     }
 }

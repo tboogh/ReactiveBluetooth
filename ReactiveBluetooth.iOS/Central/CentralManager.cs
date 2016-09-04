@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CoreBluetooth;
 using CoreFoundation;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Exceptions;
 
 namespace ReactiveBluetooth.iOS.Central
 {
@@ -17,11 +18,16 @@ namespace ReactiveBluetooth.iOS.Central
         private CentralManagerDelegate.CentralManagerDelegate _centralManagerDelegate;
         private bool _initialized;
 
-        public ManagerState State => _initialized ? ManagerState.PoweredOn : ManagerState.PoweredOff;
-
         public CentralManager()
         {
             _centralManagerDelegate = new CentralManagerDelegate.CentralManagerDelegate();
+        }
+
+        public ManagerState State => _initialized ? ManagerState.PoweredOn : ManagerState.PoweredOff;
+
+        public IObservable<ManagerState> StateUpdates()
+        {
+            return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
         }
 
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
@@ -35,7 +41,7 @@ namespace ReactiveBluetooth.iOS.Central
             _centralManager = new CBCentralManager(_centralManagerDelegate, _dispatchQueue);
 
             _initialized = true;
-            return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState) x);
+            return StateUpdates();
         }
 
         public void Shutdown()
@@ -52,7 +58,7 @@ namespace ReactiveBluetooth.iOS.Central
                 _centralManagerDelegate.DiscoveredPeriperhalSubject
                     .Select(x =>
                     {
-                        Device device = new Device(x.Peripheral);
+                        Device device = new Device(x.Item2, x.Item4.Int32Value);
                         return device;
                     }).Subscribe(observer);
 
@@ -62,34 +68,47 @@ namespace ReactiveBluetooth.iOS.Central
             });
         }
 
-        public Task<bool> ConnectToDevice(IDevice device)
+        public IObservable<ConnectionState> ConnectToDevice(IDevice device)
         {
             CheckInitialized();
             var nativeDevice = ((Device) device).Peripheral;
 
-            var connectedObservable = _centralManagerDelegate.ConnectedPeripheralSubject
-                .Select(x => true);
-            var connectionErrorObservable = _centralManagerDelegate.FailedToConnectPeripheralSubject
-                .Select(x => false);
+            return Observable.Create<ConnectionState>(observer =>
+            {
+                var connectedObservable = _centralManagerDelegate.ConnectedPeripheralSubject
+                    .Where(x => Equals(x.Item2.Identifier, nativeDevice.Identifier))
+                    .Select(x => ConnectionState.Connected);
+                var disconnectObservable = _centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, nativeDevice.Identifier))
+                    .Select(x => ConnectionState.Disconnected);
+                var stateDisposable = Observable.Merge(connectedObservable, disconnectObservable).StartWith(ConnectionState.Connecting).Subscribe(observer);
 
-            var merged = connectionErrorObservable.Merge(connectedObservable);
-            _centralManager.ConnectPeripheral(nativeDevice);
+                var connectionErrorDisp = _centralManagerDelegate.FailedToConnectPeripheralSubject
+                .Select(x => x.Item2.Identifier == nativeDevice.Identifier)
+                    .Subscribe(tuple =>
+                    {
+                        observer.OnError(new FailedToConnectException());
+                    });
 
-            return merged.FirstAsync().ToTask();
+                _centralManager.ConnectPeripheral(nativeDevice);
+                return Disposable.Create(() =>
+                {
+                    connectionErrorDisp.Dispose();
+                    stateDisposable.Dispose();
+                });
+            });
         }
 
         public Task DisconnectDevice(IDevice device)
         {
             var peripheral = ((Device) device).Peripheral;
             _centralManager.CancelPeripheralConnection(peripheral);
-            return _centralManagerDelegate.DisconnectedPeripheralSubject.FirstAsync(x => Equals(x.Peripheral.Identifier, peripheral.Identifier)).ToTask();
+            return _centralManagerDelegate.DisconnectedPeripheralSubject.FirstAsync(x => Equals(x.Item2.Identifier, peripheral.Identifier)).ToTask();
         }
 
-        public IObservable<IService> DiscoverServices(IDevice device)
+        public void DiscoverServices(IDevice device)
         {
             var nativeDevice = ((Device) device).Peripheral;
             nativeDevice.DiscoverServices();
-            throw new NotImplementedException();
         }
 
         private void CheckInitialized()

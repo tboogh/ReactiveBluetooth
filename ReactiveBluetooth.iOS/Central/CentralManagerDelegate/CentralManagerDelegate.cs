@@ -1,3 +1,4 @@
+using System;
 using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
@@ -7,23 +8,24 @@ namespace ReactiveBluetooth.iOS.Central.CentralManagerDelegate
     public class CentralManagerDelegate : CBCentralManagerDelegate
     {
         public BehaviorSubject<CBCentralManagerState> StateUpdatedSubject { get; }
-        public Subject<ConnectedPeripheral> ConnectedPeripheralSubject { get; }
 
-        public Subject<ConnectionStatePeripheral> DisconnectedPeripheralSubject { get; }
-        public Subject<DiscoveredPeripheral> DiscoveredPeriperhalSubject { get; }
-        public Subject<ConnectionStatePeripheral> FailedToConnectPeripheralSubject { get; }
-        public Subject<RetrievedPeripherals> RetrievedConnectedPeripheralsSubject { get; }
-        public Subject<RetrievedPeripherals> RetrievedPeripheralsSubject { get; }
+        public Subject<Tuple<CBCentralManager, CBPeripheral>> ConnectedPeripheralSubject { get; }
+        public Subject<Tuple<CBCentralManager, CBPeripheral, NSError>> DisconnectedPeripheralSubject { get; }
+        public Subject<Tuple<CBCentralManager, CBPeripheral, NSError>> FailedToConnectPeripheralSubject { get; }
+
+        public Subject<Tuple<CBCentralManager, CBPeripheral, NSDictionary, NSNumber>> DiscoveredPeriperhalSubject { get; }
+        public Subject<Tuple<CBCentralManager, CBPeripheral[]>> RetrievedConnectedPeripheralsSubject { get; }
+        public Subject<Tuple<CBCentralManager, CBPeripheral[]>> RetrievedPeripheralsSubject { get; }
 
         public CentralManagerDelegate()
         {
             StateUpdatedSubject = new BehaviorSubject<CBCentralManagerState>(CBCentralManagerState.Unknown);
-            ConnectedPeripheralSubject = new Subject<ConnectedPeripheral>();
-            DisconnectedPeripheralSubject = new Subject<ConnectionStatePeripheral>();
-            DiscoveredPeriperhalSubject = new Subject<DiscoveredPeripheral>();
-            FailedToConnectPeripheralSubject = new Subject<ConnectionStatePeripheral>();
-            RetrievedConnectedPeripheralsSubject = new Subject<RetrievedPeripherals>();
-            RetrievedPeripheralsSubject = new Subject<RetrievedPeripherals>();
+            ConnectedPeripheralSubject = new Subject<Tuple<CBCentralManager, CBPeripheral>>();
+            DisconnectedPeripheralSubject =new Subject<Tuple<CBCentralManager, CBPeripheral, NSError>>();
+            FailedToConnectPeripheralSubject = new Subject<Tuple<CBCentralManager, CBPeripheral, NSError>>();
+            DiscoveredPeriperhalSubject = new Subject<Tuple<CBCentralManager, CBPeripheral, NSDictionary, NSNumber>>();
+            RetrievedConnectedPeripheralsSubject = new Subject<Tuple<CBCentralManager, CBPeripheral[]>>();
+            RetrievedPeripheralsSubject = new Subject<Tuple<CBCentralManager, CBPeripheral[]>>();
         }
 
         public override void UpdatedState(CBCentralManager central)
@@ -33,32 +35,32 @@ namespace ReactiveBluetooth.iOS.Central.CentralManagerDelegate
 
         public override void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
         {
-            ConnectedPeripheralSubject?.OnNext(new ConnectedPeripheral(central, peripheral));
+            ConnectedPeripheralSubject?.OnNext(new Tuple<CBCentralManager, CBPeripheral>(central, peripheral));
         }
 
         public override void DisconnectedPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError error)
         {
-            DisconnectedPeripheralSubject?.OnNext(new ConnectionStatePeripheral(central, peripheral, error));
+            DisconnectedPeripheralSubject?.OnNext(new Tuple<CBCentralManager, CBPeripheral, NSError>(central, peripheral, error));
         }
 
         public override void DiscoveredPeripheral(CBCentralManager central, CBPeripheral peripheral, NSDictionary advertisementData, NSNumber RSSI)
         {
-            DiscoveredPeriperhalSubject?.OnNext(new DiscoveredPeripheral(central, peripheral, advertisementData, RSSI)); 
+            DiscoveredPeriperhalSubject?.OnNext(new Tuple<CBCentralManager, CBPeripheral, NSDictionary, NSNumber>(central, peripheral, advertisementData, RSSI)); 
         }
 
         public override void FailedToConnectPeripheral(CBCentralManager central, CBPeripheral peripheral, NSError error)
         {
-            FailedToConnectPeripheralSubject?.OnNext(new ConnectionStatePeripheral(central, peripheral, error));
+            FailedToConnectPeripheralSubject?.OnNext(new Tuple<CBCentralManager, CBPeripheral, NSError>(central, peripheral, error));
         }
 
         public override void RetrievedConnectedPeripherals(CBCentralManager central, CBPeripheral[] peripherals)
         {
-            RetrievedConnectedPeripheralsSubject?.OnNext(new RetrievedPeripherals(central, peripherals));
+            RetrievedConnectedPeripheralsSubject?.OnNext(new Tuple<CBCentralManager, CBPeripheral[]>(central, peripherals));
         }
 
         public override void RetrievedPeripherals(CBCentralManager central, CBPeripheral[] peripherals)
         {
-            RetrievedPeripheralsSubject?.OnNext(new RetrievedPeripherals(central, peripherals));
+            RetrievedPeripheralsSubject?.OnNext(new Tuple<CBCentralManager, CBPeripheral[]>(central, peripherals));
         }
     }
 }

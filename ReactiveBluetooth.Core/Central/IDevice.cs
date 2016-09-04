@@ -19,7 +19,10 @@ namespace ReactiveBluetooth.Core.Central
 
         ConnectionState State { get; }
 
-
         IObservable<IList<IService>> DiscoverServices();
+
+        IObservable<int> Rssi { get; }
+
+        void UpdateRemoteRssi();
     }
 }

@@ -74,9 +74,9 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
                 throw new Exception("Make sure test device is available");
             }
 
-            var connectionResult = await _centralManager.ConnectToDevice(battByte);
+            var connectionResult = await _centralManager.ConnectToDevice(battByte).FirstAsync(x => x == ConnectionState.Connected).Timeout(TimeSpan.FromSeconds(2));
 
-            Assert.IsTrue(connectionResult);
+            Assert.AreEqual(ConnectionState.Connected, connectionResult);
 
             await _centralManager.DisconnectDevice(battByte);
         }

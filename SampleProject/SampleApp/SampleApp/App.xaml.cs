@@ -17,12 +17,12 @@ namespace SampleApp
 
         protected override void OnInitialized()
         {
-            NavigationService.NavigateAsync($"/{nameof(NavigationPage)}/{nameof(MainPage)}");
+            NavigationService.NavigateAsync($"/{nameof(MainNavigationPage)}/{nameof(MainPage)}");
         }
 
         protected override void RegisterTypes()
         {
-            Container.RegisterTypeForNavigation<NavigationPage>();
+            Container.RegisterTypeForNavigation<MainNavigationPage>();
             Container.RegisterTypeForNavigation<MainPage>();
             Container.RegisterTypeForNavigation<PeripheralPage, PeripheralModeViewModel>();
             Container.RegisterTypeForNavigation<CentralPage, CentralModeViewModel>();
