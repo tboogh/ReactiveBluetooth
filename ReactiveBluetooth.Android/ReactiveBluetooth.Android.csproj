@@ -76,16 +76,7 @@
     <Compile Include="Peripheral\AbstractFactory.cs" />
     <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
-    <Compile Include="Peripheral\GattServer\CharacteristicReadRequest.cs" />
-    <Compile Include="Peripheral\GattServer\CharacteristicWriteRequest.cs" />
-    <Compile Include="Peripheral\GattServer\ConnectionStateChange.cs" />
-    <Compile Include="Peripheral\GattServer\DescriptorReadRequest.cs" />
-    <Compile Include="Peripheral\GattServer\DescriptorWriteRequest.cs" />
-    <Compile Include="Peripheral\GattServer\ExecuteWrite.cs" />
     <Compile Include="Peripheral\GattServer\IServerCallback.cs" />
-    <Compile Include="Peripheral\GattServer\MtuChanged.cs" />
-    <Compile Include="Peripheral\GattServer\NotificationSent.cs" />
-    <Compile Include="Peripheral\GattServer\ServiceAdded.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
     <Compile Include="Peripheral\GattServer\ServerCallback.cs" />
     <Compile Include="Peripheral\Service.cs" />

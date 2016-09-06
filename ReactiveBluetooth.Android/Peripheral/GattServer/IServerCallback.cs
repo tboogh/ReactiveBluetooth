@@ -1,28 +1,22 @@
-﻿using System.Reactive.Subjects;
+﻿using System;
+using System.Reactive.Subjects;
 using Android.Bluetooth;
 
 namespace ReactiveBluetooth.Android.Peripheral.GattServer
 {
     public interface IServerCallback
     {
-        Subject<CharacteristicReadRequest> CharacteristicReadRequestSubject { get; }
-        Subject<CharacteristicWriteRequest> CharacteristicWriteRequestSubject { get; }
-        Subject<ConnectionStateChange> ConnectionStateChangedSubject { get; }
-        Subject<DescriptorReadRequest> DescriptorReadRequestSubject { get; }
-        Subject<DescriptorWriteRequest> DescriptorWriteRequestSubject { get; }
-        Subject<ExecuteWrite> ExecuteWriteSubject { get; }
-        Subject<MtuChanged> MtuChangedSubject { get; }
-        Subject<NotificationSent> NotificationSentSubject { get; }
-        Subject<ServiceAdded> ServiceAddedSubject { get; }
-
-        void OnCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattCharacteristic characteristic);
-        void OnCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, bool preparedWrite, bool responseNeeded, int offset, byte[] value);
-        void OnConnectionStateChange(BluetoothDevice device, ProfileState status, ProfileState newState);
-        void OnDescriptorReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattDescriptor descriptor);
-        void OnDescriptorWriteRequest(BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, bool preparedWrite, bool responseNeeded, int offset, byte[] value);
-        void OnExecuteWrite(BluetoothDevice device, int requestId, bool execute);
-        void OnMtuChanged(BluetoothDevice device, int mtu);
-        void OnNotificationSent(BluetoothDevice device, GattStatus status);
-        void OnServiceAdded(ProfileState status, BluetoothGattService service);
+        /// <summary>
+        /// Device, RequestId, Offset, Characteristic
+        /// </summary>
+        Subject<Tuple<BluetoothDevice, int, int, BluetoothGattCharacteristic>> CharacteristicReadRequestSubject { get; }
+        Subject<Tuple<BluetoothDevice, int, BluetoothGattCharacteristic, bool, bool, int, byte[]>> CharacteristicWriteRequestSubject { get; }
+        Subject<Tuple<BluetoothDevice, ProfileState, ProfileState>> ConnectionStateChangedSubject { get; }
+        Subject<Tuple<BluetoothDevice, int, int, BluetoothGattDescriptor>> DescriptorReadRequestSubject { get; }
+        Subject<Tuple<BluetoothDevice, int, BluetoothGattDescriptor, bool, bool, int, byte[]>> DescriptorWriteRequestSubject { get; }
+        Subject<Tuple<BluetoothDevice, int, bool>> ExecuteWriteSubject { get; }
+        Subject<Tuple<BluetoothDevice, int>> MtuChangedSubject { get; }
+        Subject<Tuple<BluetoothDevice, GattStatus>> NotificationSentSubject { get; }
+        Subject<Tuple<ProfileState, BluetoothGattService>> ServiceAddedSubject { get; }
     }
 }

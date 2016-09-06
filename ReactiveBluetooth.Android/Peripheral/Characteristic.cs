@@ -17,12 +17,12 @@ namespace ReactiveBluetooth.Android.Peripheral
             GattCharacteristic = characteristic;
 
             ReadRequestObservable = serverCallback.CharacteristicReadRequestSubject
-                .Where(x => x.Characteristic.Uuid == characteristic.Uuid)
-                .Select(request => new AttRequest(this, request.Offet, null, request.RequestId, request.BluetoothDevice));
+                .Where(x => x.Item4.Uuid == characteristic.Uuid)
+                .Select(request => new AttRequest(this, request.Item3, null, request.Item2, request.Item1));
 
             WriteRequestObservable = serverCallback.CharacteristicWriteRequestSubject
-                .Where(x => x.Characteristic.Uuid == characteristic.Uuid)
-                .Select(request => new AttRequest(this, request.Offset, request.Value, request.RequestId, request.BluetoothDevice));
+                .Where(x => x.Item3.Uuid == characteristic.Uuid)
+                .Select(request => new AttRequest(this, request.Item6, request.Item7, request.Item2, request.Item1));
         }
 
         public BluetoothGattCharacteristic GattCharacteristic { get; }
