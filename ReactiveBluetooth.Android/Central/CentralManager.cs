@@ -8,6 +8,8 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 using Plugin.CurrentActivity;
+using ReactiveBluetooth.Android.Common;
+using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
 
@@ -18,45 +20,25 @@ namespace ReactiveBluetooth.Android.Central
         private BluetoothAdapter _bluetoothAdapter;
         private bool _initialized;
         private IObservable<IDevice> _discoverObservable;
-        private readonly BleBroadcastReciever _broadcastReciever;
-        public ManagerState State => StateToManagerState(_bluetoothAdapter.State);
+        private BroadcastListener _broadcastListener;
+        public ManagerState State => _bluetoothAdapter.State.ToManagerState();
 
         public CentralManager()
         {
-            _broadcastReciever = new BleBroadcastReciever();
-        }
-
-        private ManagerState StateToManagerState(State state)
-        {
-            switch (state)
-            {
-                case global::Android.Bluetooth.State.Connected:
-                case global::Android.Bluetooth.State.Connecting:
-                case global::Android.Bluetooth.State.Disconnected:
-                case global::Android.Bluetooth.State.Disconnecting:
-                case global::Android.Bluetooth.State.On:
-                    return ManagerState.PoweredOn;
-                case global::Android.Bluetooth.State.Off:
-                    return ManagerState.PoweredOff;
-                case global::Android.Bluetooth.State.TurningOff:
-                case global::Android.Bluetooth.State.TurningOn:
-                    return ManagerState.Resetting;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            
         }
 
         public IObservable<ManagerState> StateUpdates()
         {
-            return _broadcastReciever.StateUpdatedSubject.Select(StateToManagerState).StartWith(State);
+            return _broadcastListener.StateUpdatedSubject.Select(state => state.ToManagerState()).StartWith(State);
         }
 
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
             if (!_initialized)
             {
-                CrossCurrentActivity.Current.Activity.RegisterReceiver(_broadcastReciever, new IntentFilter(BluetoothAdapter.ActionStateChanged));
                 _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
+                _broadcastListener = new BroadcastListener();
             }
             _initialized = true;
 
@@ -65,8 +47,9 @@ namespace ReactiveBluetooth.Android.Central
 
         public void Shutdown()
         {
-            CrossCurrentActivity.Current.Activity.UnregisterReceiver(_broadcastReciever);
             _initialized = false;
+            _broadcastListener.Dispose();
+            _broadcastListener = null;
         }
 
         public IObservable<IDevice> ScanForDevices()

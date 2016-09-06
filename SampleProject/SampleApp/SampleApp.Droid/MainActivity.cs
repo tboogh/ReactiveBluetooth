@@ -9,8 +9,10 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Microsoft.Practices.Unity;
+using Plugin.CurrentActivity;
 using Prism.Unity;
 using ReactiveBluetooth.Android.Central;
+using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Peripheral;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Peripheral;
@@ -38,7 +40,7 @@ namespace SampleApp.Droid
         public void RegisterTypes(IUnityContainer container)
         {
             container.RegisterType<IPeripheralManager, PeripheralManager>(new ContainerControlledLifetimeManager(), new InjectionConstructor());
-            container.RegisterType<ICentralManager, CentralManager>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ICentralManager, CentralManager>(new ContainerControlledLifetimeManager(), new InjectionConstructor());
         }
     }
 }

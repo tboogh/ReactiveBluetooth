@@ -17,6 +17,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Javax.Security.Auth;
+using Plugin.CurrentActivity;
+using ReactiveBluetooth.Android.Common;
+using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
@@ -27,6 +30,7 @@ namespace ReactiveBluetooth.Android.Peripheral
 {
     public class PeripheralManager : IPeripheralManager
     {
+        private BroadcastListener _broadcastListener;
         private BluetoothAdapter _bluetoothAdapter;
         private BluetoothLeAdvertiser _bluetoothLeAdvertiser;
         private readonly IServerCallback _serverCallback;
@@ -35,6 +39,7 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public PeripheralManager() :this(null, null)
         {
+            
         }
 
         public PeripheralManager(IServerCallback serverCallback = null, IBluetoothAbstractFactory bluetoothAbstractFactory = null)
@@ -45,42 +50,21 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public IBluetoothAbstractFactory Factory { get; }
 
-        public ManagerState State
-        {
-            get
-            {
-                switch (_bluetoothAdapter.State)
-                {
-                    case global::Android.Bluetooth.State.Connected:
-                    case global::Android.Bluetooth.State.Connecting:
-                    case global::Android.Bluetooth.State.Disconnected:
-                    case global::Android.Bluetooth.State.Disconnecting:
-                    case global::Android.Bluetooth.State.On:
-                        return ManagerState.PoweredOn;
-                    case global::Android.Bluetooth.State.Off:
-                        return ManagerState.PoweredOff;
-                    case global::Android.Bluetooth.State.TurningOff:
-                    case global::Android.Bluetooth.State.TurningOn:
-                        return ManagerState.Resetting;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
+        public ManagerState State => _bluetoothAdapter.State.ToManagerState();
 
         public IObservable<ManagerState> Init(IScheduler scheduler = null)
         {
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
-
-            return Observable
-                .Timer(TimeSpan.FromSeconds(0.5))
-                .Select(x => State).StartWith(State);
+            _broadcastListener = new BroadcastListener();
+            return _broadcastListener.StateUpdatedSubject.Select(x => x.ToManagerState());
         }
 
         public void Shutdown()
         {
             _gattServer.Close();
+            _broadcastListener.Dispose();
+            _broadcastListener = null;
         }
 
         public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)

@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Central\BleBroadcastReciever.cs" />
+    <Compile Include="Common\BroadcastListener.cs" />
     <Compile Include="Central\BleGattCallback.cs" />
     <Compile Include="Central\BleScanCallback.cs" />
     <Compile Include="Central\CentralManager.cs" />
@@ -73,6 +73,7 @@
     <Compile Include="Extensions\CharacteristicPropertiesExtensions.cs" />
     <Compile Include="Extensions\GattPermissionExtensions.cs" />
     <Compile Include="Extensions\GattPropertyExtensions.cs" />
+    <Compile Include="Extensions\StateExtentions.cs" />
     <Compile Include="Peripheral\AbstractFactory.cs" />
     <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
