@@ -82,6 +82,7 @@
     <Compile Include="Peripheral\GattServer\DescriptorReadRequest.cs" />
     <Compile Include="Peripheral\GattServer\DescriptorWriteRequest.cs" />
     <Compile Include="Peripheral\GattServer\ExecuteWrite.cs" />
+    <Compile Include="Peripheral\GattServer\IServerCallback.cs" />
     <Compile Include="Peripheral\GattServer\MtuChanged.cs" />
     <Compile Include="Peripheral\GattServer\NotificationSent.cs" />
     <Compile Include="Peripheral\GattServer\ServiceAdded.cs" />

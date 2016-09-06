@@ -34,7 +34,7 @@ namespace ReactiveBluetooth.iOS.Peripheral.PeripheralManagerDelegate
         {
             if (error != null)
             {
-                AdvertisingStartedSubject.OnError(new StartAdvertisingException(error.LocalizedDescription));
+                AdvertisingStartedSubject.OnError(new AdvertiseException(error.LocalizedDescription));
             }
             else
             {

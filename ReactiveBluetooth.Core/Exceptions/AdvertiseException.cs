@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ReactiveBluetooth.Core.Exceptions
 {
-    public class StartAdvertisingException : Exception
+    public class AdvertiseException : Exception
     {
-        public StartAdvertisingException(string message) : base(message)
+        public AdvertiseException(string message) : base(message)
         {
         }
     }
