@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace SampleApp.ViewModels.Central
             ConnectCommand = new DelegateCommand(Connect);
             DisconnectCommand = DelegateCommand.FromAsyncHandler(Disconnect);
             UpdateRssiCommand = new DelegateCommand(UpdateRssi);
+            Services = new ObservableCollection<ServiceViewModel>();
         }
 
         public Guid Uuid
@@ -65,9 +67,10 @@ namespace SampleApp.ViewModels.Central
             set { SetProperty(ref _connectionState, value); }
         }
 
+        public ObservableCollection<ServiceViewModel> Services { get; set; }
+
         public DelegateCommand UpdateRssiCommand { get; }
         public DelegateCommand ConnectCommand { get; }
-
         public DelegateCommand DisconnectCommand { get; }
 
         public void UpdateDevice(IDevice device)
@@ -85,6 +88,7 @@ namespace SampleApp.ViewModels.Central
 
         public void Connect()
         {
+            _connectionStateDisposable?.Dispose();
             _connectionStateDisposable = _centralManager.ConnectToDevice(Device)
                 .Subscribe(async state =>
                 {
@@ -98,10 +102,12 @@ namespace SampleApp.ViewModels.Central
 
         private async Task DiscoverServices()
         {
+            Services.Clear();
             var services = await _device.DiscoverServices();
             foreach (var service in services)
             {
-                
+                ServiceViewModel serviceViewModel = new ServiceViewModel(service);
+                Services.Add(serviceViewModel);
             }
         }
 

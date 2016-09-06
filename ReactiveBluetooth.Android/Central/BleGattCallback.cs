@@ -9,7 +9,7 @@ namespace ReactiveBluetooth.Android.Central
         public BleGattCallback()
         {
             CharacteristicChangedSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>>();
-            ConnectionStateChange = new BehaviorSubject<ProfileState>(ProfileState.Disconnected);
+            ConnectionStateChange = new Subject<ProfileState>();
             CharacteristicReadSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>>();
             CharacteristicWriteSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>>();
             DescriptorReadSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>>();
@@ -20,7 +20,7 @@ namespace ReactiveBluetooth.Android.Central
         }
 
         public Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>> CharacteristicChangedSubject { get; }
-        public BehaviorSubject<ProfileState> ConnectionStateChange { get; }
+        public Subject<ProfileState> ConnectionStateChange { get; }
         public Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>> CharacteristicReadSubject { get; }
         public Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>> CharacteristicWriteSubject { get; }
         public Subject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>> DescriptorReadSubject { get; }
@@ -72,8 +72,7 @@ namespace ReactiveBluetooth.Android.Central
 
         public override void OnServicesDiscovered(BluetoothGatt gatt, GattStatus status)
         {
-            ServicesDiscovered?.OnNext(new Tuple<BluetoothGatt, GattStatus>(gatt, status));
-            ServicesDiscovered?.OnCompleted();
+            ServicesDiscovered?.OnNext(new Tuple<BluetoothGatt, GattStatus>(gatt, status));           
         }
     }
 }

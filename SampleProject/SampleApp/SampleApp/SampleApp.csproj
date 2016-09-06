@@ -44,6 +44,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\Central\CentralModeViewModel.cs" />
     <Compile Include="ViewModels\Central\DeviceViewModel.cs" />
+    <Compile Include="ViewModels\Central\ServiceViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\Peripheral\PeripheralModeViewModel.cs" />
     <Compile Include="Views\CentralPage.xaml.cs">

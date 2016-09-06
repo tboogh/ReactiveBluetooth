@@ -55,6 +55,7 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<IList<IService>> DiscoverServices()
         {
+            Gatt.DiscoverServices();
             return Observable.Create<IList<IService>>(observer =>
             {
                 var discoverDisposable = GattCallback.ServicesDiscovered.Select(x =>
@@ -69,7 +70,6 @@ namespace ReactiveBluetooth.Android.Central
                     observer.OnCompleted();
                 });
 
-                Gatt.DiscoverServices();
                 return Disposable.Create(() =>
                 {
                     discoverDisposable.Dispose();

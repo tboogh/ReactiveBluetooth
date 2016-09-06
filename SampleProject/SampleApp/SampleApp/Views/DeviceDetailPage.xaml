@@ -12,26 +12,37 @@
             <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    <StackLayout>
-        <Button Text="Connect" Command="{Binding ConnectCommand}">
-            <Button.Triggers>
-                <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
-                             Value="{x:Static central:ConnectionState.Connected}">
-                    <Setter Property="IsVisible" Value="False" />
-                </DataTrigger>
-            </Button.Triggers>
-        </Button>
-        <Button Text="Disconnect" Command="{Binding DisconnectCommand}" IsVisible="False">
-            <Button.Triggers>
-                <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
-                             Value="{x:Static central:ConnectionState.Connected}">
-                    <Setter Property="IsVisible" Value="True" />
-                </DataTrigger>
-            </Button.Triggers>
-        </Button>
-        <Label Text="{Binding Name}" />
-        <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
-        <Label Text="{Binding Rssi}" />
-        <Label Text="{Binding ConnectionState}" />
-    </StackLayout>
+    <ListView Header="{Binding .}" ItemsSource="{Binding Services}">
+        <ListView.HeaderTemplate>
+            <DataTemplate>
+                <StackLayout>
+                    <Button Text="Connect" Command="{Binding ConnectCommand}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
+                                         Value="{x:Static central:ConnectionState.Connected}">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button Text="Disconnect" Command="{Binding DisconnectCommand}" IsVisible="False">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
+                                         Value="{x:Static central:ConnectionState.Connected}">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Label Text="{Binding Name}" />
+                    <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
+                    <Label Text="{Binding Rssi}" />
+                    <Label Text="{Binding ConnectionState}" />
+                </StackLayout>
+            </DataTemplate>
+        </ListView.HeaderTemplate>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <TextCell Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
 </ContentPage>
