@@ -27,7 +27,7 @@ namespace SampleApp.ViewModels
         {
             _centralManager = centralManager;
             _navigationService = navigationService;
-            _centralManager.Init()
+            _centralManager.State()
                 .Subscribe(state => { State = state.ToString(); });
             ToggleScanCommand = new DelegateCommand(ToggleScan);
             DeviceSelectedCommand = new DelegateCommand<DeviceViewModel>(ItemSelected);

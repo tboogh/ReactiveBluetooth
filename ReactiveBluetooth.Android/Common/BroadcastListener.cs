@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Subjects;
+using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 using Plugin.CurrentActivity;
@@ -8,9 +9,12 @@ namespace ReactiveBluetooth.Android.Common
 {
     public class BroadcastListener : BroadcastReceiver
     {
+        private readonly Activity _activity;
+
         public BroadcastListener()
         {
-            CrossCurrentActivity.Current.Activity.RegisterReceiver(this, new IntentFilter(BluetoothAdapter.ActionConnectionStateChanged));
+            _activity = CrossCurrentActivity.Current.Activity;
+            _activity.RegisterReceiver(this, new IntentFilter(BluetoothAdapter.ActionStateChanged));
             StateUpdatedSubject = new BehaviorSubject<State>(BluetoothAdapter.DefaultAdapter.State);
         }
 
@@ -30,7 +34,7 @@ namespace ReactiveBluetooth.Android.Common
 
         protected override void Dispose(bool disposing)
         {
-            CrossCurrentActivity.Current.Activity.UnregisterReceiver(this);
+            _activity.UnregisterReceiver(this);
             base.Dispose(disposing);
         }
     }

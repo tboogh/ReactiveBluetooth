@@ -23,34 +23,23 @@ namespace ReactiveBluetooth.iOS.Peripheral
         public PeripheralManager()
         {
             _peripheralDelegate = new PeripheralManagerDelegate.PeripheralManagerDelegate();
+            _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
             Factory = new AbstractFactory(_peripheralDelegate);
         }
 
-        public ManagerState State
+        public IObservable<ManagerState> State()
         {
-            get
-            {
-                if (_peripheralManager != null)
-                    return (ManagerState) _peripheralManager.State;
-                return ManagerState.PoweredOff;
-            }
+            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
         }
 
         public IBluetoothAbstractFactory Factory { get; }
-
-        public IObservable<ManagerState> Init(IScheduler scheduler = null)
-        {
-            _peripheralManager = new CBPeripheralManager(_peripheralDelegate, DispatchQueue.MainQueue);
-
-            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
-        }
 
         public void Shutdown()
         {
             _peripheralManager.StopAdvertising();
         }
 
-        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)
+        public IObservable<bool> Advertise(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
 
             var advertiseObservable = Observable.Create<bool>(observer =>

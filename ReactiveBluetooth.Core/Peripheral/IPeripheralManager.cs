@@ -10,13 +10,9 @@ namespace ReactiveBluetooth.Core.Peripheral
 {
     public interface IPeripheralManager
     {
-        ManagerState State { get; }
         IBluetoothAbstractFactory Factory { get; }
-        IObservable<ManagerState> Init(IScheduler scheduler = null);
-
-        void Shutdown();
-
-        IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services);
+        IObservable<ManagerState> State();
+        IObservable<bool> Advertise(AdvertisingOptions advertisingOptions, IList<IService> services);
 
         IObservable<bool> AddService(IService service);
         void RemoveService(IService service);

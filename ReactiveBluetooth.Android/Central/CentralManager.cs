@@ -17,45 +17,33 @@ namespace ReactiveBluetooth.Android.Central
 {
     public class CentralManager : ICentralManager
     {
-        private BluetoothAdapter _bluetoothAdapter;
-        private bool _initialized;
+        private readonly BluetoothAdapter _bluetoothAdapter;
         private IObservable<IDevice> _discoverObservable;
         private BroadcastListener _broadcastListener;
-        public ManagerState State => _bluetoothAdapter.State.ToManagerState();
 
         public CentralManager()
         {
-            
+            _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
+            _broadcastListener = new BroadcastListener();
         }
 
-        public IObservable<ManagerState> StateUpdates()
+        public void Dispose()
         {
-            return _broadcastListener.StateUpdatedSubject.Select(state => state.ToManagerState()).StartWith(State);
-        }
-
-        public IObservable<ManagerState> Init(IScheduler scheduler = null)
-        {
-            if (!_initialized)
-            {
-                _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
-                _broadcastListener = new BroadcastListener();
-            }
-            _initialized = true;
-
-            return StateUpdates();
-        }
-
-        public void Shutdown()
-        {
-            _initialized = false;
             _broadcastListener.Dispose();
             _broadcastListener = null;
         }
 
+        public IObservable<ManagerState> State()
+        {
+            return _broadcastListener.StateUpdatedSubject.Select(state =>
+            {
+                var s = state.ToManagerState();
+                return s;
+            }).StartWith(_bluetoothAdapter.State.ToManagerState());
+        }
+
         public IObservable<IDevice> ScanForDevices()
         {
-            CheckInitialized();
-
             if (_discoverObservable == null)
             {
                 // Store this and return the same someone else subscribes
@@ -76,7 +64,6 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<ConnectionState> ConnectToDevice(IDevice device)
         {
-            CheckInitialized();
             var androidDevice = (Device) device;
             var nativeDevice = androidDevice.NativeDevice;
             var context = Application.Context;
@@ -88,7 +75,6 @@ namespace ReactiveBluetooth.Android.Central
 
         public Task DisconnectDevice(IDevice device)
         {
-            CheckInitialized();
             var androidDevice = (Device) device;
 
             androidDevice.Gatt?.Close();
@@ -97,17 +83,8 @@ namespace ReactiveBluetooth.Android.Central
 
         public void DiscoverServices(IDevice device)
         {
-            CheckInitialized();
             var androidDevice = (Device) device;
             androidDevice.Gatt.DiscoverServices();
-        }
-
-        private void CheckInitialized()
-        {
-            if (!_initialized)
-            {
-                throw new Exception("Service not initialized");
-            }
         }
     }
 }

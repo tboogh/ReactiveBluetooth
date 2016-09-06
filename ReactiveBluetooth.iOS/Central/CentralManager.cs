@@ -21,32 +21,13 @@ namespace ReactiveBluetooth.iOS.Central
         public CentralManager()
         {
             _centralManagerDelegate = new CentralManagerDelegate.CentralManagerDelegate();
-        }
-
-        public ManagerState State => _initialized ? ManagerState.PoweredOn : ManagerState.PoweredOff;
-
-        public IObservable<ManagerState> StateUpdates()
-        {
-            return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
-        }
-
-        public IObservable<ManagerState> Init(IScheduler scheduler = null)
-        {
-            if (_initialized)
-            {
-                throw new NotSupportedException("Manager already initialized");
-            }
-
             _dispatchQueue = new DispatchQueue("com.workingble.periperhalmanager.queue");
             _centralManager = new CBCentralManager(_centralManagerDelegate, _dispatchQueue);
-
-            _initialized = true;
-            return StateUpdates();
         }
 
-        public void Shutdown()
+        public IObservable<ManagerState> State()
         {
-            _initialized = false;
+            return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
         }
 
         public IObservable<IDevice> ScanForDevices()
@@ -117,6 +98,11 @@ namespace ReactiveBluetooth.iOS.Central
             {
                 throw new Exception("Service not initialized");
             }
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

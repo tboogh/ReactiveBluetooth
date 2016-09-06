@@ -24,22 +24,18 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         public async Task SetupManager()
         {
             _centralManager = GetCentralManager();
-            await _centralManager.Init()
+            await _centralManager.State()
                 .FirstAsync(state => state == ManagerState.PoweredOn)
                 .Timeout(Timeout);
         }
 
         [Test]
-        public void ManagerState_IsPoweredOn()
+        public async Task ManagerState_IsPoweredOn()
         {
-            Assert.AreEqual(ManagerState.PoweredOn, _centralManager.State);
-        }
-
-        [Test]
-        public void Init_CompleteInitialization_NoExceptions()
-        {
-            var bluetoothService = GetCentralManager();
-            Assert.DoesNotThrow(() => bluetoothService.Init());
+            var currentState = await _centralManager.State()
+                .FirstAsync(state => state == ManagerState.PoweredOn)
+                .Timeout(Timeout);
+            Assert.AreEqual(ManagerState.PoweredOn, currentState);
         }
 
         [Test]

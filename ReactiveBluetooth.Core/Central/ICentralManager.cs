@@ -5,17 +5,9 @@ using ReactiveBluetooth.Core.Exceptions;
 
 namespace ReactiveBluetooth.Core.Central
 {
-    public interface ICentralManager
+    public interface ICentralManager : IDisposable
     {
-        /// <summary>
-        /// Gets the current <see cref="ManagerState"/> of the bluetooth adapter
-        /// </summary>
-        ManagerState State { get; }
-
-        IObservable<ManagerState> StateUpdates();
-
-        IObservable<ManagerState> Init(IScheduler scheduler = null);
-        void Shutdown();
+        IObservable<ManagerState> State();
 
         /// <summary>
         /// Starts a scan for BLE devices, stops scanning on dispose

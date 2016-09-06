@@ -25,7 +25,7 @@ namespace SampleApp.ViewModels.Peripheral
             _peripheralManager = peripheralManager;
             AdvertiseCommand = new DelegateCommand(StartAdvertise);
             StopAdvertiseCommand = new DelegateCommand(StopAdvertise);
-            _stateDisposable = _peripheralManager.Init()
+            _stateDisposable = _peripheralManager.State()
                 .Subscribe(state => { State = state.ToString(); });
         }
 
@@ -80,7 +80,7 @@ namespace SampleApp.ViewModels.Peripheral
                 throw new Exception("Failed to add read characteristic");
             }
 
-            _advertiseDisposable = _peripheralManager.StartAdvertising(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {service})
+            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {service})
                 .Catch(Observable.Return(false))
                 .Subscribe(b => { Advertising = b; });
         }

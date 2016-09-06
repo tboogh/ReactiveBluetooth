@@ -31,7 +31,7 @@ namespace ReactiveBluetooth.Android.Peripheral
     public class PeripheralManager : IPeripheralManager
     {
         private BroadcastListener _broadcastListener;
-        private BluetoothAdapter _bluetoothAdapter;
+        private readonly BluetoothAdapter _bluetoothAdapter;
         private BluetoothLeAdvertiser _bluetoothLeAdvertiser;
         private readonly IServerCallback _serverCallback;
         private BluetoothGattServer _gattServer;
@@ -46,19 +46,17 @@ namespace ReactiveBluetooth.Android.Peripheral
         {
             _serverCallback = serverCallback ?? new ServerCallback();
             Factory = bluetoothAbstractFactory ?? new AbstractFactory(_serverCallback);
+
+            _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
+            _broadcastListener = new BroadcastListener();
         }
 
         public IBluetoothAbstractFactory Factory { get; }
 
-        public ManagerState State => _bluetoothAdapter.State.ToManagerState();
-
-        public IObservable<ManagerState> Init(IScheduler scheduler = null)
+        public IObservable<ManagerState> State()
         {
-            _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
-            _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
-            _broadcastListener = new BroadcastListener();
             return _broadcastListener.StateUpdatedSubject.Select(x => x.ToManagerState());
-        }
+        } 
 
         public void Shutdown()
         {
@@ -67,7 +65,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             _broadcastListener = null;
         }
 
-        public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)
+        public IObservable<bool> Advertise(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
             if (_startAdvertisingObservable != null)
             {
@@ -78,7 +76,14 @@ namespace ReactiveBluetooth.Android.Peripheral
             {
                 _bluetoothAdapter.SetName(advertisingOptions.LocalName);
             }
-            
+
+            _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
+
+            if (_bluetoothLeAdvertiser == null)
+            {
+                throw new AdvertisingNotSupportedException();
+            }
+
             var settings = CreateAdvertiseSettings();
             var advertiseData = CreateAdvertiseData(advertisingOptions);
 

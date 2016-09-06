@@ -39,6 +39,7 @@
     <Compile Include="Central\IService.cs" />
     <Compile Include="Central\ManagerState.cs" />
     <Compile Include="Exceptions\AddServiceException.cs" />
+    <Compile Include="Exceptions\AdvertisingNotSupportedException.cs" />
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
     <Compile Include="Exceptions\FailedToConnectException.cs" />
     <Compile Include="Exceptions\AdvertiseException.cs" />

@@ -26,23 +26,25 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         {
             _manager = GetPeripheralManager();
 
-            var result = await _manager.Init()
+            var result = await _manager.State()
                 .FirstAsync(x => x == ManagerState.PoweredOn)
-                .Timeout(TimeSpan.FromSeconds(2))
-                .ToTask();
+                .Timeout(TimeSpan.FromSeconds(2));
             Assert.AreEqual(ManagerState.PoweredOn, result);
         }
 
         [Test]
-        public void State_PoweredOn()
+        public async Task State_PoweredOn()
         {
-            Assert.AreEqual(ManagerState.PoweredOn, _manager.State);
+            var result = await _manager.State()
+                .FirstAsync(x => x == ManagerState.PoweredOn)
+                .Timeout(TimeSpan.FromSeconds(2));
+            Assert.AreEqual(ManagerState.PoweredOn, result);
         }
 
         [Test]
         public async Task StartAdvertising_StartsWithoutError()
         {
-            var result = await _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
+            var result = await _manager.Advertise(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
                 .FirstAsync(b => b)
                 .Timeout(Timeout);
 
@@ -52,7 +54,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         [Test]
         public async Task StartAdvertising_TwoCalls_DoesNotThrow()
         {
-            var result = _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
+            var result = _manager.Advertise(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
                 .Subscribe(b =>
                 {
 
@@ -61,7 +63,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             bool threw = false;
             try
             {
-                var result2 = await _manager.StartAdvertising(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
+                var result2 = await _manager.Advertise(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
                     .FirstAsync(b => b)
                     .Timeout(Timeout);
             }
@@ -79,11 +81,11 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             bool threw = false;
             try
             {
-                var result = await _manager.StartAdvertising(new AdvertisingOptions { ServiceUuids = new List<Guid>() { Guid.NewGuid() } }, new List<IService>())
+                var result = await _manager.Advertise(new AdvertisingOptions { ServiceUuids = new List<Guid>() { Guid.NewGuid() } }, new List<IService>())
                                 .FirstAsync(b => b)
                                 .Timeout(Timeout);
 
-                var result2 = await _manager.StartAdvertising(new AdvertisingOptions { ServiceUuids = new List<Guid>() { Guid.NewGuid() } }, new List<IService>())
+                var result2 = await _manager.Advertise(new AdvertisingOptions { ServiceUuids = new List<Guid>() { Guid.NewGuid() } }, new List<IService>())
                     .FirstAsync(b => b)
                     .Timeout(Timeout);
             } catch (Exception e)
