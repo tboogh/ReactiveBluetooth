@@ -2,7 +2,6 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
@@ -14,27 +13,6 @@ using ReactiveBluetooth.Core.Exceptions;
 
 namespace ReactiveBluetooth.Android.Central
 {
-    public class BleBroadcastReciever : BroadcastReceiver
-    {
-        public BleBroadcastReciever()
-        {
-            StateUpdatedSubject = new BehaviorSubject<State>(BluetoothAdapter.DefaultAdapter.State);
-        }
-
-        public BehaviorSubject<State> StateUpdatedSubject { get; }
-
-        public override void OnReceive(Context context, Intent intent)
-        {
-            string action = intent.Action;
-
-            if (action == BluetoothAdapter.ActionStateChanged)
-            {
-                State state = (State) intent.GetIntExtra(BluetoothAdapter.ExtraState, BluetoothAdapter.Error);
-                StateUpdatedSubject?.OnNext(state);
-            }
-        }
-    }
-
     public class CentralManager : ICentralManager
     {
         private BluetoothAdapter _bluetoothAdapter;

@@ -28,7 +28,7 @@ namespace ReactiveBluetooth.Android.Peripheral
     {
         private BluetoothAdapter _bluetoothAdapter;
         private BluetoothLeAdvertiser _bluetoothLeAdvertiser;
-        private ServerCallback _serverCallback;
+        private readonly ServerCallback _serverCallback;
         private BluetoothGattServer _gattServer;
 
         public PeripheralManager()
