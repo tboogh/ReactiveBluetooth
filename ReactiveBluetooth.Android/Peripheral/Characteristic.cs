@@ -12,7 +12,7 @@ namespace ReactiveBluetooth.Android.Peripheral
 {
     public class Characteristic : ICharacteristic
     {
-        public Characteristic(BluetoothGattCharacteristic characteristic, ServerCallback serverCallback)
+        public Characteristic(BluetoothGattCharacteristic characteristic, IServerCallback serverCallback)
         {
             GattCharacteristic = characteristic;
 

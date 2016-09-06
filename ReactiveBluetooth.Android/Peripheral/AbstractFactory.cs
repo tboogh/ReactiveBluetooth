@@ -13,9 +13,9 @@ namespace ReactiveBluetooth.Android.Peripheral
 {
     public class AbstractFactory : IBluetoothAbstractFactory
     {
-        private readonly ServerCallback _serverCallback;
+        private readonly IServerCallback _serverCallback;
 
-        public AbstractFactory(ServerCallback serverCallback)
+        public AbstractFactory(IServerCallback serverCallback)
         {
             _serverCallback = serverCallback;
         }

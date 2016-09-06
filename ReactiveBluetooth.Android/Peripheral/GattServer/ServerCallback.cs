@@ -4,7 +4,7 @@ using ReactiveBluetooth.Core.Exceptions;
 
 namespace ReactiveBluetooth.Android.Peripheral.GattServer
 {
-    public class ServerCallback : BluetoothGattServerCallback
+    public class ServerCallback : BluetoothGattServerCallback, IServerCallback
     {
         public ServerCallback()
         {

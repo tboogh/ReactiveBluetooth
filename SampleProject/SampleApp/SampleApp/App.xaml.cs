@@ -5,6 +5,7 @@ using System.Text;
 using Prism.Unity;
 using SampleApp.ViewModels;
 using SampleApp.ViewModels.Central;
+using SampleApp.ViewModels.Peripheral;
 using SampleApp.Views;
 using Xamarin.Forms;
 

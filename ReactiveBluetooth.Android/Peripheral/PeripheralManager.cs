@@ -19,6 +19,7 @@ using Android.Widget;
 using Javax.Security.Auth;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Peripheral;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
@@ -28,16 +29,18 @@ namespace ReactiveBluetooth.Android.Peripheral
     {
         private BluetoothAdapter _bluetoothAdapter;
         private BluetoothLeAdvertiser _bluetoothLeAdvertiser;
-        private ServerCallback _serverCallback;
+        private readonly IServerCallback _serverCallback;
         private BluetoothGattServer _gattServer;
+        private IObservable<bool> _startAdvertisingObservable;
 
-        public PeripheralManager()
+        public PeripheralManager() :this(null, null)
         {
-            if (_serverCallback == null)
-            {
-                _serverCallback = new ServerCallback();
-            }
-            Factory = new AbstractFactory(_serverCallback);
+        }
+
+        public PeripheralManager(IServerCallback serverCallback = null, IBluetoothAbstractFactory bluetoothAbstractFactory = null)
+        {
+            _serverCallback = serverCallback ?? new ServerCallback();
+            Factory = bluetoothAbstractFactory ?? new AbstractFactory(_serverCallback);
         }
 
         public IBluetoothAbstractFactory Factory { get; }
@@ -82,6 +85,11 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public IObservable<bool> StartAdvertising(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
+            if (_startAdvertisingObservable != null)
+            {
+                return _startAdvertisingObservable;
+            }
+
             if (advertisingOptions.LocalName != null)
             {
                 _bluetoothAdapter.SetName(advertisingOptions.LocalName);
@@ -92,14 +100,25 @@ namespace ReactiveBluetooth.Android.Peripheral
 
             var startObservable = Observable.Create<bool>(observer =>
             {
-                var callback = new StartAdvertiseCallback {StartFailure = failure => observer.OnError(new Exception($"Advertise start failed: {Enum.GetName(typeof(AdvertiseFailure), failure)}")), StartSuccess = b =>
+
+                var callback = new StartAdvertiseCallback();
+                var errorDisposable = callback.StartFailureSubject.Subscribe(failure =>
                 {
-                    observer.OnNext(b);
-                }};
+                    if (failure != 0)
+                    {
+                        observer.OnError(new AdvertiseException(failure.ToString()));
+                    }
+                });
+
+                var successDisposable = callback.StartSuccessSubject.Subscribe(advertiseSettings =>
+                {
+                    observer.OnNext(true);
+                });
+
                 if (_gattServer == null)
                 {
                     var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
-                    _gattServer = bluetoothManager.OpenGattServer(Application.Context, _serverCallback);
+                    _gattServer = bluetoothManager.OpenGattServer(Application.Context, (BluetoothGattServerCallback) _serverCallback);
                 }
 
                 foreach (var service in services)
@@ -110,9 +129,11 @@ namespace ReactiveBluetooth.Android.Peripheral
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
                 return Disposable.Create(() =>
                 {
+                    errorDisposable.Dispose();
+                    successDisposable.Dispose();
                     _gattServer.Close();
-                    _gattServer = null;
                     _bluetoothLeAdvertiser.StopAdvertising(callback);
+                    _startAdvertisingObservable = null;
                 });
             });
             return startObservable;

@@ -37,7 +37,7 @@ namespace SampleApp.Droid
     {
         public void RegisterTypes(IUnityContainer container)
         {
-            container.RegisterType<IPeripheralManager, PeripheralManager>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IPeripheralManager, PeripheralManager>(new ContainerControlledLifetimeManager(), new InjectionConstructor());
             container.RegisterType<ICentralManager, CentralManager>(new ContainerControlledLifetimeManager());
         }
     }

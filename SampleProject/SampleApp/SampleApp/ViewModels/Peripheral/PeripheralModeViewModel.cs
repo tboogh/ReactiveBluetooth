@@ -1,19 +1,15 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-using Prism.Common;
+using Prism.Commands;
+using Prism.Mvvm;
 using Prism.Navigation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Peripheral;
-using Xamarin.Forms;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
-namespace SampleApp.ViewModels
+namespace SampleApp.ViewModels.Peripheral
 {
     public class PeripheralModeViewModel : BindableBase, INavigationAware
     {

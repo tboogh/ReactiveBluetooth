@@ -99,6 +99,10 @@ namespace SampleApp.ViewModels.Central
         private async Task DiscoverServices()
         {
             var services = await _device.DiscoverServices();
+            foreach (var service in services)
+            {
+                
+            }
         }
 
         public async Task Disconnect()
