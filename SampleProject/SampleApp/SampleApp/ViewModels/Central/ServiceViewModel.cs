@@ -18,11 +18,18 @@ namespace SampleApp.ViewModels.Central
         }
 
         private Guid _uuid;
+        private bool _displayCharacteristics;
 
         public Guid Uuid
         {
             get { return _uuid; }
             set { SetProperty(ref _uuid, value); }
+        }
+
+        public bool DisplayCharacteristics
+        {
+            get { return _displayCharacteristics; }
+            set { SetProperty(ref _displayCharacteristics, value); }
         }
     }
 }

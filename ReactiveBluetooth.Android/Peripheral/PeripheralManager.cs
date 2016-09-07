@@ -28,7 +28,7 @@ using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
 namespace ReactiveBluetooth.Android.Peripheral
 {
-    public class PeripheralManager : IPeripheralManager
+    public class PeripheralManager : IPeripheralManager, IDisposable
     {
         private BroadcastListener _broadcastListener;
         private readonly BluetoothAdapter _bluetoothAdapter;
@@ -53,12 +53,11 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public IBluetoothAbstractFactory Factory { get; }
 
-        public IObservable<ManagerState> State()
-        {
-            return _broadcastListener.StateUpdatedSubject.Select(x => x.ToManagerState());
-        } 
 
-        public void Shutdown()
+        public IObservable<ManagerState> State() => _broadcastListener.StateUpdatedSubject.Select(x => x.ToManagerState());
+
+
+        public void Dispose()
         {
             _gattServer.Close();
             _broadcastListener.Dispose();
@@ -70,6 +69,19 @@ namespace ReactiveBluetooth.Android.Peripheral
             if (_startAdvertisingObservable != null)
             {
                 return _startAdvertisingObservable;
+            }
+
+            
+            if (_bluetoothAdapter.State.ToManagerState() == ManagerState.PoweredOff)
+            {
+                throw new Exception("Device is off");
+            }
+
+            _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
+
+            if (_bluetoothLeAdvertiser == null)
+            {
+                throw new Exception("No support for advertising");
             }
 
             if (advertisingOptions.LocalName != null)

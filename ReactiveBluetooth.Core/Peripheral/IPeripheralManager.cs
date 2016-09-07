@@ -10,8 +10,16 @@ namespace ReactiveBluetooth.Core.Peripheral
 {
     public interface IPeripheralManager
     {
+
         IBluetoothAbstractFactory Factory { get; }
         IObservable<ManagerState> State();
+        
+        /// <summary>
+        /// Starts device advertising, stops when obersavable is disposed
+        /// </summary>
+        /// <param name="advertisingOptions"></param>
+        /// <param name="services"></param>
+        /// <returns></returns>
         IObservable<bool> Advertise(AdvertisingOptions advertisingOptions, IList<IService> services);
 
         IObservable<bool> AddService(IService service);
