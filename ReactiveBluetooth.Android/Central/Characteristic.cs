@@ -17,6 +17,5 @@ namespace ReactiveBluetooth.Android.Central
 
         public Guid Uuid => Guid.Parse(_characteristic.Uuid.ToString());
         public CharacteristicProperty Properties => _characteristic.Properties.ToCharacteristicProperty();
-        public CharacteristicPermission Permissions => _characteristic.Permissions.ToCharacteristicPermission();
     }
 } 
