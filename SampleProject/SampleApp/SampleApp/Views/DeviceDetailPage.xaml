@@ -12,7 +12,10 @@
             <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    <ListView Header="{Binding .}" ItemsSource="{Binding Services}">
+    <ListView Header="{Binding .}"
+              ItemsSource="{Binding Services}"
+              IsGroupingEnabled="True"
+              GroupDisplayBinding="{Binding Key}">
         <ListView.HeaderTemplate>
             <DataTemplate>
                 <StackLayout>
@@ -39,6 +42,11 @@
                 </StackLayout>
             </DataTemplate>
         </ListView.HeaderTemplate>
+        <ListView.GroupHeaderTemplate>
+            <DataTemplate>
+                <TextCell Text="{Binding Key.Uuid, Converter={StaticResource GuidToStringValueConverter}}" TextColor="Blue"/>
+            </DataTemplate>
+        </ListView.GroupHeaderTemplate>
         <ListView.ItemTemplate>
             <DataTemplate>
                 <TextCell Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />

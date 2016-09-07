@@ -29,9 +29,8 @@ namespace ReactiveBluetooth.Android.Central
         public ServiceType ServiceType => (ServiceType) _service.Type;
 
         public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
-        {
-            return Observable.Return(_service.Characteristics.Select(characteristic => new Characteristic(characteristic)))
-                .Cast<ICharacteristic>().ToList();
+        {   
+            return Observable.Return(_service.Characteristics.Select(characteristic => new Characteristic(characteristic)).Cast<ICharacteristic>().ToList());
         }
     }
 }
