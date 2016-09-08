@@ -24,5 +24,7 @@ namespace ReactiveBluetooth.Core.Central
         IObservable<int> Rssi { get; }
 
         void UpdateRemoteRssi();
+
+        IObservable<byte[]> ReadValue(ICharacteristic characteristic);
     }
 }

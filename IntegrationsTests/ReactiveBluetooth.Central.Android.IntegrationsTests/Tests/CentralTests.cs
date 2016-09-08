@@ -14,7 +14,7 @@ using ReactiveBluetooth.Core.Central;
 
 namespace ReactiveBluetooth.Central.Android.IntegrationsTests.Tests
 {
-    public class CentralManagerTests : Shared.IntegrationsTests.CentralManagerTests
+    public class CentralTests : Shared.IntegrationsTests.CentralTests
     {
         public override ICentralManager GetCentralManager()
         {

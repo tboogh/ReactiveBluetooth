@@ -12,7 +12,7 @@ using ReactiveBluetooth.Core.Central;
 namespace ReactiveBluetooth.Shared.IntegrationsTests
 {
     [TestFixture]
-    public abstract class CentralManagerTests
+    public abstract class CentralTests
     {
         private static readonly string TestDeviceName = "TestPeripheral";
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
@@ -108,7 +108,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            var services = await device.DiscoverServices()
+            var services = await device.DiscoverServices().Timeout(Timeout)
                 .FirstAsync();
             await service.DisconnectDevice(device);
 
@@ -124,7 +124,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            var services = await device.DiscoverServices()
+            var services = await device.DiscoverServices().Timeout(Timeout)
                 .FirstAsync();
             await service.DisconnectDevice(device);
 
@@ -133,22 +133,48 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
                 throw new Exception("Check test device services");
             }
 
-            var testService = services.First();
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
-            Assert.NotNull(testService.Uuid);
+            Assert.NotNull(testService?.Uuid);
         }
 
         [Test]
         public async Task DiscoverCharacteristics_FindCharacteristicsOnService_NotNullList()
         {
             var testSetup = await ConnectToTestDevice();
-            var service = testSetup.Item1;
             var device = testSetup.Item2;
 
-            // 180A
-            // 0000-1000-8000-00805F9B34FB
 
-            throw new NotImplementedException("Test incomplete");
+            var services = await device.DiscoverServices().Timeout(Timeout).FirstAsync();
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            var characteristics = await testService.DiscoverCharacteristics().Timeout(Timeout).FirstAsync();
+
+            var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
+
+            await testSetup.Item1.DisconnectDevice(device);
+
+            Assert.NotNull(testCharacterstic);
+        }
+
+        [Test]
+        public async Task ReadValue_CharactersiticValue_CorrectValue()
+        {
+            var testSetup = await ConnectToTestDevice();
+            var device = testSetup.Item2;
+
+
+            var services = await device.DiscoverServices().Timeout(Timeout).FirstAsync();
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            var characteristics = await testService.DiscoverCharacteristics().Timeout(Timeout).FirstAsync();
+
+            var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
+
+            await testSetup.Item1.DisconnectDevice(device);
+
+            var value = await device.ReadValue(testCharacterstic).Timeout(Timeout).FirstAsync();
+            Assert.AreEqual(new byte[] { 0xB0, 0x06 }, value);
         }
 
         private async Task<Tuple<ICentralManager, IDevice>> ConnectToTestDevice()
@@ -163,7 +189,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
                 throw new Exception("Make sure test device is available");
             }
 
-            await _centralManager.ConnectToDevice(testDevice);
+            var connectionResult = await _centralManager.ConnectToDevice(testDevice).FirstAsync(x => x == ConnectionState.Connected).Timeout(TimeSpan.FromSeconds(2));
             return new Tuple<ICentralManager, IDevice>(_centralManager, testDevice);
         }
     }

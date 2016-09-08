@@ -5,14 +5,15 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
+using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.iOS.Central
 {
     public class Device : IDevice
     {
-        private PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
-        private int int32Value;
+        private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
         public Device(CBPeripheral peripheral, int rssi)
         {
@@ -56,6 +57,11 @@ namespace ReactiveBluetooth.iOS.Central
         public void UpdateRemoteRssi()
         {
             Peripheral.ReadRSSI();
+        }
+
+        public IObservable<byte[]> ReadValue(ICharacteristic characteristic)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,7 +6,9 @@ using System.Reactive.Linq;
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
+using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.Android.Central
 {
@@ -18,7 +20,6 @@ namespace ReactiveBluetooth.Android.Central
             GattCallback = new BleGattCallback();
             var currentRssi = Observable.Return(rssi);
             var callbackRssi = GattCallback.ReadRemoteRssiSubject.Select(x => x.Item2);
-
             Rssi = currentRssi.Merge(callbackRssi);
         }
 
@@ -80,6 +81,11 @@ namespace ReactiveBluetooth.Android.Central
         public void UpdateRemoteRssi()
         {
             Gatt.ReadRemoteRssi();
+        }
+
+        public IObservable<byte[]> ReadValue(ICharacteristic characteristic)
+        {
+            throw new NotImplementedException();
         }
     }
 }

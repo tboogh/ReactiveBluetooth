@@ -76,7 +76,7 @@ namespace SampleApp.ViewModels
 
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
-            _toggleScanDisposable.Dispose();
+            _toggleScanDisposable?.Dispose();
         }
 
         public void OnNavigatedTo(NavigationParameters parameters)

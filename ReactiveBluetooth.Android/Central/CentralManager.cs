@@ -76,7 +76,6 @@ namespace ReactiveBluetooth.Android.Central
         public Task DisconnectDevice(IDevice device)
         {
             var androidDevice = (Device) device;
-
             androidDevice.Gatt?.Close();
             return Task.FromResult(true);
         }

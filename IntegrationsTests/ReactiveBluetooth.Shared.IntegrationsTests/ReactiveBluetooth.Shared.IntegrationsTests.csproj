@@ -58,7 +58,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CentralManagerTests.cs" />
+    <Compile Include="CentralTests.cs" />
     <Compile Include="PeripheralManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
