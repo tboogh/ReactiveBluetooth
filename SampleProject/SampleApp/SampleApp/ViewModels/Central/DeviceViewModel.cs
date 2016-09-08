@@ -12,11 +12,11 @@ using Prism.Navigation;
 using Reactive.Bindings;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using SampleApp.Views;
 using Xamarin.Forms;
 
 namespace SampleApp.ViewModels.Central
 {
-    
     public class DeviceViewModel : BindableBase, INavigationAware
     {
         public class Grouping<K, T> : ObservableCollection<T>
@@ -32,6 +32,7 @@ namespace SampleApp.ViewModels.Central
         }
 
         private readonly ICentralManager _centralManager;
+        private readonly INavigationService _navigationService;
 
         public IDevice Device
         {
@@ -57,8 +58,17 @@ namespace SampleApp.ViewModels.Central
             ConnectCommand = new DelegateCommand(Connect);
             DisconnectCommand = DelegateCommand.FromAsyncHandler(Disconnect);
             UpdateRssiCommand = new DelegateCommand(UpdateRssi);
+            ItemSelectedCommand = DelegateCommand<CharacteristicViewModel>.FromAsyncHandler(CharacteristicSelected);
             Services = new ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>>();
         }
+
+        public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService) : this(centralManager)
+        {
+            _navigationService = navigationService;
+   
+        }
+
+        public DelegateCommand<CharacteristicViewModel> ItemSelectedCommand { get; }
 
         public Guid Uuid
         {
@@ -85,7 +95,6 @@ namespace SampleApp.ViewModels.Central
         }
 
         public ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>> Services { get; set; }
-
         public DelegateCommand UpdateRssiCommand { get; }
         public DelegateCommand ConnectCommand { get; }
         public DelegateCommand DisconnectCommand { get; }
@@ -120,17 +129,15 @@ namespace SampleApp.ViewModels.Central
         private async Task DiscoverServices()
         {
             Services.Clear();
-            var services = await _device.DiscoverServices().ToTask();
+            var services = await _device.DiscoverServices()
+                .ToTask();
             foreach (var service in services)
             {
                 ServiceViewModel serviceViewModel = new ServiceViewModel(service);
                 await serviceViewModel.DiscoverCharacteristics();
-                
+
                 var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel, serviceViewModel.Characteristics);
-                Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
-                {
-                    Services.Add(grouping);
-                });
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
             }
         }
 
@@ -139,6 +146,11 @@ namespace SampleApp.ViewModels.Central
             await _centralManager.DisconnectDevice(Device);
             _connectionStateDisposable.Dispose();
             ConnectionState = ConnectionState.Disconnected;
+        }
+
+        private async Task CharacteristicSelected(CharacteristicViewModel characteristicViewModel)
+        {
+            await _navigationService.NavigateAsync(nameof(CharacteristicDetailPage), new NavigationParameters() {{nameof(ICharacteristic), characteristicViewModel.Characteristic}});
         }
 
         public void OnNavigatedFrom(NavigationParameters parameters)

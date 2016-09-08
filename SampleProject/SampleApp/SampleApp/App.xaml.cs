@@ -29,6 +29,7 @@ namespace SampleApp
             Container.RegisterTypeForNavigation<PeripheralPage, PeripheralModeViewModel>();
             Container.RegisterTypeForNavigation<CentralPage, CentralModeViewModel>();
             Container.RegisterTypeForNavigation<DeviceDetailPage, DeviceViewModel>();
+            Container.RegisterTypeForNavigation<CharacteristicDetailPage, CharacteristicViewModel>();
         }
     }
 }

@@ -5,6 +5,7 @@
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
              xmlns:valueConverters="clr-namespace:SampleApp.Common.ValueConverters;assembly=SampleApp"
              xmlns:central="clr-namespace:ReactiveBluetooth.Core.Central;assembly=ReactiveBluetooth.Core"
+             xmlns:behaviors="clr-namespace:SampleApp.Common.Behaviors;assembly=SampleApp"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="SampleApp.Views.DeviceDetailPage">
     <ContentPage.Resources>
@@ -16,6 +17,9 @@
               ItemsSource="{Binding Services}"
               IsGroupingEnabled="True"
               GroupDisplayBinding="{Binding Key}">
+      <ListView.Behaviors>
+          <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding ItemSelectedCommand}" />
+      </ListView.Behaviors>
         <ListView.HeaderTemplate>
             <DataTemplate>
                 <StackLayout>

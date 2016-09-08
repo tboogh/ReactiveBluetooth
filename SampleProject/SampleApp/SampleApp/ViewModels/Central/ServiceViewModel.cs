@@ -44,7 +44,7 @@ namespace SampleApp.ViewModels.Central
 
             foreach (var characteristic in characteristics)
             {
-                CharacteristicViewModel characteristicViewModel = new CharacteristicViewModel(characteristic);
+                CharacteristicViewModel characteristicViewModel = new CharacteristicViewModel {Characteristic = characteristic};
                 Characteristics.Add(characteristicViewModel);
             }
         }
