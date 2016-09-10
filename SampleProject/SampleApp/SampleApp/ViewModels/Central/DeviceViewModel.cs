@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Prism.Navigation;
+using Prism.Services;
 using Reactive.Bindings;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
@@ -33,6 +34,7 @@ namespace SampleApp.ViewModels.Central
 
         private readonly ICentralManager _centralManager;
         private readonly INavigationService _navigationService;
+        private readonly IPageDialogService _pageDialogService;
 
         public IDevice Device
         {
@@ -55,17 +57,18 @@ namespace SampleApp.ViewModels.Central
         public DeviceViewModel(ICentralManager centralManager)
         {
             _centralManager = centralManager;
-            ConnectCommand = new DelegateCommand(Connect);
+            ConnectCommand = DelegateCommand.FromAsyncHandler(Connect);
             DisconnectCommand = DelegateCommand.FromAsyncHandler(Disconnect);
             UpdateRssiCommand = new DelegateCommand(UpdateRssi);
             ItemSelectedCommand = DelegateCommand<CharacteristicViewModel>.FromAsyncHandler(CharacteristicSelected);
             Services = new ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>>();
         }
 
-        public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService) : this(centralManager)
+        public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService,
+            IPageDialogService pageDialogService) : this(centralManager)
         {
             _navigationService = navigationService;
-   
+            _pageDialogService = pageDialogService;
         }
 
         public DelegateCommand<CharacteristicViewModel> ItemSelectedCommand { get; }
@@ -112,18 +115,25 @@ namespace SampleApp.ViewModels.Central
             Device?.UpdateRemoteRssi();
         }
 
-        public void Connect()
+        public async Task Connect()
         {
             _connectionStateDisposable?.Dispose();
-            _connectionStateDisposable = _centralManager.ConnectToDevice(Device)
-                .Subscribe(async state =>
-                {
-                    ConnectionState = state;
-                    if (state == ConnectionState.Connected)
+            try
+            {
+                _connectionStateDisposable = _centralManager.ConnectToDevice(Device)
+                    .Subscribe(async state =>
                     {
-                        await DiscoverServices();
-                    }
-                });
+                        ConnectionState = state;
+                        if (state == ConnectionState.Connected)
+                        {
+                            await DiscoverServices();
+                        }
+                    });
+            }
+            catch (TimeoutException exception)
+            {
+                await _pageDialogService.DisplayAlertAsync("Failed to connect", "Could not connect to device", "Ok");
+            }
         }
 
         private async Task DiscoverServices()
@@ -136,7 +146,8 @@ namespace SampleApp.ViewModels.Central
                 ServiceViewModel serviceViewModel = new ServiceViewModel(service);
                 await serviceViewModel.DiscoverCharacteristics();
 
-                var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel, serviceViewModel.Characteristics);
+                var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel,
+                    serviceViewModel.Characteristics);
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
             }
         }
@@ -150,7 +161,9 @@ namespace SampleApp.ViewModels.Central
 
         private async Task CharacteristicSelected(CharacteristicViewModel characteristicViewModel)
         {
-            await _navigationService.NavigateAsync(nameof(CharacteristicDetailPage), new NavigationParameters() {{nameof(ICharacteristic), characteristicViewModel.Characteristic}});
+            await
+                _navigationService.NavigateAsync(nameof(CharacteristicDetailPage),
+                    new NavigationParameters() {{nameof(ICharacteristic), characteristicViewModel.Characteristic}});
         }
 
         public void OnNavigatedFrom(NavigationParameters parameters)

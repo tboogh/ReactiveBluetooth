@@ -12,6 +12,7 @@ using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
+using Object = Java.Lang.Object;
 
 namespace ReactiveBluetooth.Android.Central
 {
@@ -20,9 +21,11 @@ namespace ReactiveBluetooth.Android.Central
         private readonly BluetoothAdapter _bluetoothAdapter;
         private IObservable<IDevice> _discoverObservable;
         private BroadcastListener _broadcastListener;
+        private BluetoothManager _bluetoothManager;
 
         public CentralManager()
         {
+            _bluetoothManager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             _broadcastListener = new BroadcastListener();
         }
@@ -70,7 +73,7 @@ namespace ReactiveBluetooth.Android.Central
 
             var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
             androidDevice.Gatt = gatt;
-            return androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x);
+            return androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x).StartWith((ConnectionState)_bluetoothManager.GetConnectionState(nativeDevice, ProfileType.Gatt));
         }
 
         public Task DisconnectDevice(IDevice device)

@@ -80,8 +80,7 @@ namespace SampleApp.ViewModels.Peripheral
                 throw new Exception("Failed to add read characteristic");
             }
 
-            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TestPeripheral", ServiceUuids = new List<Guid>() {Guid.Parse("BC2F984A-0000-1000-8000-00805f9b34fb")}}, new List<IService> {service})
-                .Catch(Observable.Return(false))
+            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") }}, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });
         }
 

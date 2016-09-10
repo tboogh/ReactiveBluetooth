@@ -119,7 +119,7 @@ namespace ReactiveBluetooth.Android.Peripheral
                 if (_gattServer == null)
                 {
                     var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
-                    _gattServer = bluetoothManager.OpenGattServer(Application.Context, (BluetoothGattServerCallback) _serverCallback);
+                    _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback) _serverCallback);
                 }
 
                 foreach (var service in services)
@@ -164,7 +164,6 @@ namespace ReactiveBluetooth.Android.Peripheral
             settingsBuilder.SetAdvertiseMode(AdvertiseMode.Balanced);
             settingsBuilder.SetConnectable(true);
             settingsBuilder.SetTxPowerLevel(AdvertiseTx.PowerMedium);
-            settingsBuilder.SetTimeout(5000);
             var settings = settingsBuilder.Build();
             return settings;
         }
