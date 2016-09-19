@@ -1,29 +1,30 @@
 ﻿using System;
+using System.Reactive.Subjects;
 using Android.Bluetooth.LE;
 
 namespace ReactiveBluetooth.Android.Central
 {
     public class BleScanCallback : ScanCallback
     {
-        private readonly Action<ScanCallbackType, ScanResult> _scanResultAction;
-        private readonly Action<ScanFailure> _failureAction;
+        public Subject<Tuple<ScanCallbackType, ScanResult>> ScanResultSubject { get; }
+        public Subject<ScanFailure> FailureSubject { get; }
 
-        public BleScanCallback(Action<ScanCallbackType, ScanResult> scanResultAction, Action<ScanFailure> failureAction)
+        public BleScanCallback()
         {
-            _scanResultAction = scanResultAction;
-            _failureAction = failureAction;
+            ScanResultSubject = new Subject<Tuple<ScanCallbackType, ScanResult>>();
+            FailureSubject = new Subject<ScanFailure>();
         }
 
         public override void OnScanFailed(ScanFailure errorCode)
         {
             base.OnScanFailed(errorCode);
-            _failureAction?.Invoke(errorCode);
+            FailureSubject.OnNext(errorCode);
         }
 
         public override void OnScanResult(ScanCallbackType callbackType, ScanResult result)
         {
             base.OnScanResult(callbackType, result);
-            _scanResultAction?.Invoke(callbackType, result);
+            ScanResultSubject.OnNext(new Tuple<ScanCallbackType, ScanResult>(callbackType, result));
         }
     }
 }

@@ -8,26 +8,26 @@ namespace ReactiveBluetooth.Android.Central
     {
         public BleGattCallback()
         {
-            CharacteristicChangedSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>>();
+            CharacteristicChangedSubject = new ReplaySubject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>>();
             ConnectionStateChange = new Subject<ProfileState>();
-            CharacteristicReadSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>>();
-            CharacteristicWriteSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>>();
-            DescriptorReadSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>>();
-            DescriptorWriteSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>>();
-            ReadRemoteRssiSubject = new Subject<Tuple<BluetoothGatt, int, GattStatus>>();
-            ReliableWriteCompletedSubject = new Subject<Tuple<BluetoothGatt, GattStatus>>();
-            ServicesDiscovered = new Subject<Tuple<BluetoothGatt, GattStatus>>();
+            CharacteristicReadSubject = new ReplaySubject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>>();
+            CharacteristicWriteSubject = new ReplaySubject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>>();
+            DescriptorReadSubject = new ReplaySubject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>>();
+            DescriptorWriteSubject = new ReplaySubject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>>();
+            ReadRemoteRssiSubject = new ReplaySubject<Tuple<BluetoothGatt, int, GattStatus>>();
+            ReliableWriteCompletedSubject = new ReplaySubject<Tuple<BluetoothGatt, GattStatus>>();
+            ServicesDiscovered = new ReplaySubject<Tuple<BluetoothGatt, GattStatus>>();
         }
 
-        public Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>> CharacteristicChangedSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>> CharacteristicChangedSubject { get; }
         public Subject<ProfileState> ConnectionStateChange { get; }
-        public Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>> CharacteristicReadSubject { get; }
-        public Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>> CharacteristicWriteSubject { get; }
-        public Subject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>> DescriptorReadSubject { get; }
-        public Subject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>> DescriptorWriteSubject { get; }
-        public Subject<Tuple<BluetoothGatt, int, GattStatus>> ReadRemoteRssiSubject { get; }
-        public Subject<Tuple<BluetoothGatt, GattStatus>> ReliableWriteCompletedSubject { get; }
-        public Subject<Tuple<BluetoothGatt, GattStatus>> ServicesDiscovered { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>> CharacteristicReadSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, BluetoothGattCharacteristic, GattStatus>> CharacteristicWriteSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>> DescriptorReadSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, BluetoothGattDescriptor, GattStatus>> DescriptorWriteSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, int, GattStatus>> ReadRemoteRssiSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, GattStatus>> ReliableWriteCompletedSubject { get; }
+        public ReplaySubject<Tuple<BluetoothGatt, GattStatus>> ServicesDiscovered { get; }
 
 
         public override void OnCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic)

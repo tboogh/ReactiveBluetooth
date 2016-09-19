@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
+using Android.OS.Storage;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using IService = ReactiveBluetooth.Core.Central.IService;
@@ -56,26 +58,15 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<IList<IService>> DiscoverServices()
         {
-            Gatt.DiscoverServices();
-            return Observable.Create<IList<IService>>(observer =>
-            {
-                var discoverDisposable = GattCallback.ServicesDiscovered.Select(x =>
+            return Observable.FromEvent<IList<IService>>(action => { Gatt.DiscoverServices(); }, action => { })
+                .Merge(GattCallback.ServicesDiscovered.Select(x =>
                 {
-                    IList<IService> services = Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
-                        .Cast<IService>()
-                        .ToList();
+                    IList<IService> services =
+                        Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
+                            .Cast<IService>()
+                            .ToList();
                     return services;
-                }).Subscribe(list =>
-                {
-                    observer.OnNext(list);
-                    observer.OnCompleted();
-                });
-
-                return Disposable.Create(() =>
-                {
-                    discoverDisposable.Dispose();
-                });
-            });
+                }));
         }
 
         public void UpdateRemoteRssi()
