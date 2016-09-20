@@ -21,18 +21,5 @@ namespace ReactiveBluetooth.Core.Central
         /// <param name="device"></param>
         /// <returns></returns>
         IObservable<ConnectionState> ConnectToDevice(IDevice device);
-
-        /// <summary>
-        /// Triggers the start of a service discovery. Subscribe to property <seealso cref="IDevice.DiscoverServices"/>> for discovery results
-        /// </summary>
-        /// <param name="device"></param>
-        void DiscoverServices(IDevice device);
-
-        /// <summary>
-        /// Disconnect the device
-        /// </summary>
-        /// <param name="device"></param>
-        /// <returns></returns>
-        Task DisconnectDevice(IDevice device);
     }
 }

@@ -139,8 +139,7 @@ namespace SampleApp.ViewModels.Central
         private async Task DiscoverServices()
         {
             Services.Clear();
-            var services = await _device.DiscoverServices()
-                .ToTask();
+            var services = await _device.DiscoverServices();
             foreach (var service in services)
             {
                 ServiceViewModel serviceViewModel = new ServiceViewModel(service);
@@ -154,7 +153,6 @@ namespace SampleApp.ViewModels.Central
 
         public async Task Disconnect()
         {
-            await _centralManager.DisconnectDevice(Device);
             _connectionStateDisposable.Dispose();
             ConnectionState = ConnectionState.Disconnected;
         }

@@ -12,7 +12,6 @@ namespace ReactiveBluetooth.iOS.Central.CentralManagerDelegate
         public Subject<Tuple<CBCentralManager, CBPeripheral>> ConnectedPeripheralSubject { get; }
         public Subject<Tuple<CBCentralManager, CBPeripheral, NSError>> DisconnectedPeripheralSubject { get; }
         public Subject<Tuple<CBCentralManager, CBPeripheral, NSError>> FailedToConnectPeripheralSubject { get; }
-
         public Subject<Tuple<CBCentralManager, CBPeripheral, NSDictionary, NSNumber>> DiscoveredPeriperhalSubject { get; }
         public Subject<Tuple<CBCentralManager, CBPeripheral[]>> RetrievedConnectedPeripheralsSubject { get; }
         public Subject<Tuple<CBCentralManager, CBPeripheral[]>> RetrievedPeripheralsSubject { get; }

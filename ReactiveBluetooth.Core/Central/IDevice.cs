@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ReactiveBluetooth.Core.Central
 {
@@ -19,7 +20,7 @@ namespace ReactiveBluetooth.Core.Central
 
         ConnectionState State { get; }
 
-        IObservable<IList<IService>> DiscoverServices();
+        Task<IList<IService>> DiscoverServices();
 
         IObservable<int> Rssi { get; }
 

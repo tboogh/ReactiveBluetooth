@@ -77,7 +77,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             Assert.AreEqual(ConnectionState.Connected, connectionResult);
 
-            await _centralManager.DisconnectDevice(battByte);
+            //await _centralManager.DisconnectDevice(battByte);
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
             Assert.AreEqual(ConnectionState.Connected, device.State);
-            await service.DisconnectDevice(device);
+            //await service.DisconnectDevice(device);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var service = testSetup.Item1;
             var device = testSetup.Item2;
             
-            await service.DisconnectDevice(device);
+            //await service.DisconnectDevice(device);
 
             Assert.AreEqual(ConnectionState.Disconnected, device.State);
         }
@@ -113,7 +113,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             var services = await device.DiscoverServices().Timeout(Timeout)
                 .FirstAsync();
-            await service.DisconnectDevice(device);
+            //await service.DisconnectDevice(device);
 
             Assert.NotNull(services);
             Assert.IsNotEmpty(services);
@@ -129,7 +129,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             var services = await device.DiscoverServices().Timeout(Timeout)
                 .FirstAsync();
-            await service.DisconnectDevice(device);
+            //await service.DisconnectDevice(device);
 
             if (services.Count == 0)
             {
@@ -155,7 +155,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
 
-            await testSetup.Item1.DisconnectDevice(device);
+            //await testSetup.Item1.DisconnectDevice(device);
 
             Assert.NotNull(testCharacterstic);
         }
@@ -174,7 +174,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
 
-            await testSetup.Item1.DisconnectDevice(device);
+            //await testSetup.Item1.DisconnectDevice(device);
 
             var value = await device.ReadValue(testCharacterstic).Timeout(Timeout).FirstAsync();
             Assert.AreEqual(new byte[] { 0xB0, 0x06 }, value);

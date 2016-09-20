@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
@@ -56,17 +58,16 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<int> Rssi { get; }
 
-        public IObservable<IList<IService>> DiscoverServices()
+        public Task<IList<IService>> DiscoverServices()
         {
             return Observable.FromEvent<IList<IService>>(action => { Gatt.DiscoverServices(); }, action => { })
-                .Merge(GattCallback.ServicesDiscovered.Select(x =>
-                {
-                    IList<IService> services =
-                        Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
+                .Merge(
+                    GattCallback.ServicesDiscovered.Select(
+                        x => Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
                             .Cast<IService>()
-                            .ToList();
-                    return services;
-                }));
+                            .ToList()))
+                .Take(1)
+                .ToTask();
         }
 
         public void UpdateRemoteRssi()

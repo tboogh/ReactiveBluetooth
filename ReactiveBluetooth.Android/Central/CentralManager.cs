@@ -52,23 +52,17 @@ namespace ReactiveBluetooth.Android.Central
             {
                 // Store this and return the same someone else subscribes
                 BleScanCallback bleScanCallback = new BleScanCallback();
+
                 _discoverObservable = Observable.FromEvent<IDevice>(action =>
                 {
-                    bleScanCallback.FailureSubject.Subscribe(failure =>
-                    {
-                        throw new DiscoverDeviceException(failure.ToString()); 
-                        
-                    });
-                    bleScanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi))
-                        .Subscribe(device =>
-                        {
-                            action(device);
-                        });
                     _bluetoothAdapter.BluetoothLeScanner.StartScan(bleScanCallback);
-                }, action =>
-                {
-                    _bluetoothAdapter.BluetoothLeScanner.StopScan(bleScanCallback); 
-                });
+                }, action => { _bluetoothAdapter.BluetoothLeScanner.StopScan(bleScanCallback); })
+                    .Merge(bleScanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi)))
+                    .Merge<IDevice>(bleScanCallback.FailureSubject.Select(failure =>
+                    {
+                        throw new Exception(failure.ToString());
+                        return default(Device);
+                    }));
             }
 
             return _discoverObservable;
@@ -85,23 +79,8 @@ namespace ReactiveBluetooth.Android.Central
                 var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
                 androidDevice.Gatt = gatt;
                 action((ConnectionState) androidDevice.State);
-            }, action =>
-            {
-                androidDevice.Gatt?.Close();
-            }).Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState)x));
-        }
-
-        public Task DisconnectDevice(IDevice device)
-        {
-            var androidDevice = (Device) device;
-            androidDevice.Gatt?.Close();
-            return Task.FromResult(true);
-        }
-
-        public void DiscoverServices(IDevice device)
-        {
-            var androidDevice = (Device) device;
-            androidDevice.Gatt.DiscoverServices();
+            }, action => { androidDevice.Gatt?.Close(); })
+                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x));
         }
     }
 }
