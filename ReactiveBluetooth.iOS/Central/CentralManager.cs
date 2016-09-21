@@ -13,15 +13,13 @@ namespace ReactiveBluetooth.iOS.Central
 {
     public class CentralManager : ICentralManager
     {
-        private DispatchQueue _dispatchQueue;
-        private CBCentralManager _centralManager;
-        private CentralManagerDelegate.CentralManagerDelegate _centralManagerDelegate;
+        private readonly CBCentralManager _centralManager;
+        private readonly CentralManagerDelegate.CentralManagerDelegate _centralManagerDelegate;
 
         public CentralManager()
         {
             _centralManagerDelegate = new CentralManagerDelegate.CentralManagerDelegate();
-            _dispatchQueue = new DispatchQueue("com.workingble.periperhalmanager.queue");
-            _centralManager = new CBCentralManager(_centralManagerDelegate, _dispatchQueue);
+            _centralManager = new CBCentralManager(_centralManagerDelegate, null);
         }
 
         public IObservable<ManagerState> State()
@@ -46,7 +44,8 @@ namespace ReactiveBluetooth.iOS.Central
 
             return Observable.FromEvent<ConnectionState>(action =>
             {
-                _centralManager.ConnectPeripheral(nativeDevice);
+                var d = nativeDevice;
+                _centralManager.ConnectPeripheral(d);
                 action(device.State);
             }, action =>
             {
