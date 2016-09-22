@@ -42,7 +42,7 @@ namespace ReactiveBluetooth.iOS.Central
             return Observable.FromEvent<IList<IService>>(action => { Peripheral.DiscoverServices(); }, _ => { })
                 .Merge(
                     _cbPeripheralDelegate.DiscoveredServicesSubject.Select(
-                        x => x.Item1.Services.Select(y => new Service(y, Peripheral))
+                        x => x.Item1.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
                             .Cast<IService>()
                             .ToList()))
                 .Take(1)
@@ -57,9 +57,14 @@ namespace ReactiveBluetooth.iOS.Central
         public Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken)
         {
             CBCharacteristic cbCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            var observable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.FirstAsync(x => x.Item1.UUID == Peripheral.UUID && x.Item2.UUID == cbCharacteristic.UUID).Select(x => x.Item2.Value?.ToArray());
+            var observable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.FirstAsync(x =>
+            {
+                bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
+                bool chgarEqual = x.Item2.UUID.Uuid == cbCharacteristic.UUID.Uuid;
+                return perphEqual && chgarEqual;
+            }).Select(x => x.Item2.Value?.ToArray());
 
-            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { }).Merge(observable).ToTask(cancellationToken);
+            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { }).Merge(observable).FirstAsync().ToTask(cancellationToken);
         }
     }
 }

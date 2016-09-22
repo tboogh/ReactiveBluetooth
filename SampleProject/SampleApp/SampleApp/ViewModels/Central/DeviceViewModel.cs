@@ -165,7 +165,12 @@ namespace SampleApp.ViewModels.Central
         {
             await
                 _navigationService.NavigateAsync(nameof(CharacteristicDetailPage),
-                    new NavigationParameters() {{nameof(ICharacteristic), characteristicViewModel.Characteristic}});
+                    new NavigationParameters()
+                    {
+                        {nameof(ICharacteristic), characteristicViewModel.Characteristic},
+                        {nameof(IDevice), Device }
+                    
+                    });
         }
 
         public void OnNavigatedFrom(NavigationParameters parameters)

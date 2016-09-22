@@ -15,7 +15,7 @@ namespace ReactiveBluetooth.iOS.Central
 
         public CBCharacteristic NativeCharacteristic { get; }
 
-        public Guid Uuid => Guid.Parse(NativeCharacteristic.UUID.ToString());
+        public Guid Uuid => Guid.Parse(NativeCharacteristic.UUID.Uuid);
         public CharacteristicProperty Properties => NativeCharacteristic.Properties.ToCharacteristicProperty(); 
     }
 }

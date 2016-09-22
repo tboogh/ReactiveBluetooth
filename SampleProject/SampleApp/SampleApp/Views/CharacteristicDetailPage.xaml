@@ -9,17 +9,18 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
-            <valueConverters:CharactersticPropertiesToStringConverter x:Key="ChractersticPropertiesToStringConverter"></valueConverters:CharactersticPropertiesToStringConverter>
+            <valueConverters:CharactersticPropertiesToStringConverter x:Key="ChractersticPropertiesToStringConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <StackLayout>
         <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
-      <Label Text="{Binding Properties, Converter={StaticResource ChractersticPropertiesToStringConverter}}"></Label>
+        <Label Text="{Binding Properties, Converter={StaticResource ChractersticPropertiesToStringConverter}}" />
+      <Label Text="{Binding Value}" />
         <StackLayout Orientation="Horizontal">
-            <Button Text="Read Value" IsEnabled="{Binding CanRead}"/>
-            <Button Text="Enable notifications" IsEnabled="{Binding CanNotify}"/>
+            <Button Text="Read Value" IsEnabled="{Binding CanRead}" Command="{Binding ReadValueCommand}"/>
+            <Button Text="Enable notifications" IsEnabled="{Binding CanNotify}" />
         </StackLayout>
 
-        <Button Text="Write Value" IsEnabled="{Binding CanWrite}"/>
+        <Button Text="Write Value" IsEnabled="{Binding CanWrite}" />
     </StackLayout>
 </ContentPage>

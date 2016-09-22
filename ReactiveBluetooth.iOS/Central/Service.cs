@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -12,11 +13,13 @@ namespace ReactiveBluetooth.iOS.Central
     {
         private readonly CBService _service;
         private readonly CBPeripheral _nativeDevice;
+        private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
-        public Service(CBService service, CBPeripheral nativeDevice)
+        public Service(CBService service, CBPeripheral nativeDevice, PeripheralDelegate.PeripheralDelegate cbPeripheralDelegate)
         {
             _service = service;
             _nativeDevice = nativeDevice;
+            _cbPeripheralDelegate = cbPeripheralDelegate;
         }
 
         public Guid Uuid => Guid.Parse(_service.UUID.Uuid);
@@ -24,14 +27,14 @@ namespace ReactiveBluetooth.iOS.Central
 
         public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
         {
-            var observable = Observable.FromEventPattern<EventHandler<CBServiceEventArgs>, CBServiceEventArgs>(eh => _nativeDevice.DiscoveredCharacteristic += eh, eh => _nativeDevice.DiscoveredCharacteristic -= eh)
-                .Select(x => _service.Characteristics.Select(characteristic => new Characteristic(characteristic))
-                    .Cast<ICharacteristic>()
-                    .ToList());
+            var observable = Observable.FromEvent<IList<ICharacteristic>>(action =>
+            { _nativeDevice.DiscoverCharacteristics(_service); }, _ => { });
 
-            _nativeDevice.DiscoverCharacteristics(_service);
+            IObservable<IList<ICharacteristic>> delegateObservable =
+                _cbPeripheralDelegate.DiscoveredCharacteristicsSubject.Select(
+                    x => x.Item2.Characteristics.Select(y => new Characteristic(y)).Cast<ICharacteristic>().ToList());
 
-            return observable;
+            return observable.Merge(delegateObservable).FirstAsync();
         }
     }
 }
