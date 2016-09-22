@@ -4,14 +4,6 @@ using System.Threading.Tasks;
 
 namespace ReactiveBluetooth.Core.Central
 {
-    public enum ConnectionState
-    {
-        Disconnected,
-        Connecting,
-        Connected,
-        Disconnecting
-    }
-
     public interface IDevice
     {
         string Name { get;  }

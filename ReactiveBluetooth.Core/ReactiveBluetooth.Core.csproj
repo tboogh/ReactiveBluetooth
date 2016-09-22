@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Central\ConnectionState.cs" />
     <Compile Include="Central\IService.cs" />
     <Compile Include="Central\ManagerState.cs" />
     <Compile Include="Exceptions\AddServiceException.cs" />
