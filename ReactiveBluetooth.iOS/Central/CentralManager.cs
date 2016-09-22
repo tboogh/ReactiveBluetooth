@@ -40,20 +40,17 @@ namespace ReactiveBluetooth.iOS.Central
 
         public IObservable<ConnectionState> ConnectToDevice(IDevice device)
         {
-            var nativeDevice = ((Device) device).Peripheral;
-
             return Observable.FromEvent<ConnectionState>(action =>
             {
-                var d = nativeDevice;
-                _centralManager.ConnectPeripheral(d);
+                _centralManager.ConnectPeripheral(((Device)device).Peripheral);
                 action(device.State);
             }, action =>
             {
-                _centralManager.CancelPeripheralConnection(nativeDevice); 
+                _centralManager.CancelPeripheralConnection(((Device)device).Peripheral); 
             }).Merge(_centralManagerDelegate.ConnectedPeripheralSubject
-                    .Where(x => Equals(x.Item2.Identifier, nativeDevice.Identifier))
+                    .Where(x => Equals(x.Item2.Identifier, ((Device)device).Peripheral.Identifier))
                     .Select(x => ConnectionState.Connected))
-                    .Merge(_centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, nativeDevice.Identifier))
+                    .Merge(_centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device)device).Peripheral.Identifier))
                     .Select(x => ConnectionState.Disconnected));
         }
 

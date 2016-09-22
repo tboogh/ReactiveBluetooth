@@ -84,36 +84,24 @@
     <CodesignKey>iPhone Distribution</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\Device.cs">
-      <Link>Device.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\ModifiedServices.cs">
-      <Link>PeripheralDelegate\ModifiedServices.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\PeripheralCharacteristicInfo.cs">
-      <Link>PeripheralDelegate\PeripheralCharacteristicInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\PeripheralDelegate.cs">
-      <Link>PeripheralDelegate\PeripheralDelegate.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\PeripheralDescriptorInfo.cs">
-      <Link>PeripheralDelegate\PeripheralDescriptorInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\PeripheralInfo.cs">
-      <Link>PeripheralDelegate\PeripheralInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\PeripheralServiceInfo.cs">
-      <Link>PeripheralDelegate\PeripheralServiceInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\RssiRead.cs">
-      <Link>PeripheralDelegate\RssiRead.cs</Link>
-    </Compile>
     <Compile Include="CentralManager.cs" />
     <Compile Include="CentralManagerDelegate.cs" />
     <Compile Include="ConnectionState.cs" />
+    <Compile Include="CoreTableViewController.cs" />
+    <Compile Include="CoreTableViewController.designer.cs">
+      <DependentUpon>CoreTableViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Device.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="ManagerState.cs" />
+    <Compile Include="PeripheralDelegate\ModifiedServices.cs" />
+    <Compile Include="PeripheralDelegate\PeripheralCharacteristicInfo.cs" />
+    <Compile Include="PeripheralDelegate\PeripheralDelegate.cs" />
+    <Compile Include="PeripheralDelegate\PeripheralDescriptorInfo.cs" />
+    <Compile Include="PeripheralDelegate\PeripheralInfo.cs" />
+    <Compile Include="PeripheralDelegate\PeripheralServiceInfo.cs" />
+    <Compile Include="PeripheralDelegate\RssiRead.cs" />
     <Compile Include="TableViewController.cs" />
     <Compile Include="TableViewController.designer.cs">
       <DependentUpon>TableViewController.cs</DependentUpon>
@@ -151,6 +139,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Entitlements.plist" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
+      <Project>{67f9d3a8-f71e-4428-913f-c37ae82cdb24}</Project>
+      <Name>ReactiveBluetooth.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ReactiveBluetooth.iOS\ReactiveBluetooth.iOS.csproj">
+      <Project>{7505d92f-2f85-4792-b31c-a96d7cb1db6c}</Project>
+      <Name>ReactiveBluetooth.iOS</Name>
+      <IsAppExtension>false</IsAppExtension>
+      <IsWatchApp>false</IsWatchApp>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

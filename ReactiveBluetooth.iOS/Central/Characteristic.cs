@@ -8,14 +8,14 @@ namespace ReactiveBluetooth.iOS.Central
 {
     public class Characteristic : ICharacteristic
     {
-        private readonly CBCharacteristic _characteristic;
-
         public Characteristic(CBCharacteristic characteristic)
         {
-            _characteristic = characteristic;
+            NativeCharacteristic = characteristic;
         }
 
-        public Guid Uuid => Guid.Parse(_characteristic.UUID.ToString());
-        public CharacteristicProperty Properties => _characteristic.Properties.ToCharacteristicProperty();
+        public CBCharacteristic NativeCharacteristic { get; }
+
+        public Guid Uuid => Guid.Parse(NativeCharacteristic.UUID.ToString());
+        public CharacteristicProperty Properties => NativeCharacteristic.Properties.ToCharacteristicProperty(); 
     }
 }

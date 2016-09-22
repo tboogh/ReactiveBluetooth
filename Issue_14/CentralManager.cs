@@ -22,7 +22,13 @@ namespace Issue_14
 
         public IObservable<Device> ScanForDevices()
         {
-            var scanObservable = Observable.FromEvent<Device>(action => { _centralManager.ScanForPeripherals((CBUUID[])null); }, action => { _centralManager.StopScan(); });
+            var scanObservable = Observable.FromEvent<Device>(action =>
+            {
+                _centralManager.ScanForPeripherals((CBUUID[])null);
+            }, action =>
+            {
+                _centralManager.StopScan();
+            });
             return scanObservable.Merge(_centralManagerDelegate.DiscoveredPeriperhalSubject.Select(x =>
             {
                 Device device = new Device(x.Item2, x.Item4.Int32Value);

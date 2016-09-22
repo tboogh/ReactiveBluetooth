@@ -39,8 +39,8 @@ namespace SampleApp.iOS
     {
         public void RegisterTypes(IUnityContainer container)
         {
-            container.RegisterType<IPeripheralManager, PeripheralManager>();
-            container.RegisterType<ICentralManager, CentralManager>();
+            container.RegisterType<IPeripheralManager, PeripheralManager>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ICentralManager, CentralManager>(new ContainerControlledLifetimeManager());
         }
     }
 }

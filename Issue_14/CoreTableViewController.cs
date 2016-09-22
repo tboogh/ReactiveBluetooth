@@ -1,29 +1,31 @@
 ﻿using Foundation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
+using ReactiveBluetooth.Core.Central;
 using UIKit;
 
 namespace Issue_14
 {
-    public partial class TableViewController : UITableViewController
+    public partial class CoreTableViewController : UITableViewController
     {
-        private List<Device> _devices;
-        private CentralManager _centralManager;
-        private IDisposable _scanDisp;
-        private IDisposable _connectDisp;
-        private IDisposable _stateDisp;
-
-        public TableViewController(IntPtr handle) : base(handle)
+        public CoreTableViewController (IntPtr handle) : base (handle)
         {
         }
 
+        private List<IDevice> _devices;
+        private ReactiveBluetooth.iOS.Central.CentralManager _centralManager;
+        private IDisposable _scanDisp;
+        private IDisposable _connectDisp;
+        private IDisposable _stateDisp;
+        
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            _devices = new List<Device>();
-            _centralManager = new CentralManager();
+            _devices = new List<IDevice>();
+            _centralManager = new ReactiveBluetooth.iOS.Central.CentralManager();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -31,7 +33,7 @@ namespace Issue_14
             base.ViewWillAppear(animated);
             _stateDisp = _centralManager.State().SubscribeOn(SynchronizationContext.Current).Subscribe(state =>
             {
-                if (state == ManagerState.PoweredOn)
+                if (state == ReactiveBluetooth.Core.Central.ManagerState.PoweredOn)
                 {
                     _scanDisp?.Dispose();
                     _scanDisp = _centralManager.ScanForDevices().Distinct(x => x.Uuid).SubscribeOn(SynchronizationContext.Current).Subscribe(device =>
@@ -41,11 +43,6 @@ namespace Issue_14
                     });
                 }
             });
-        }
-
-        public override void ViewDidAppear(bool animated)
-        {
-            base.ViewDidAppear(animated);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -74,15 +71,16 @@ namespace Issue_14
             _connectDisp?.Dispose();
             _connectDisp = _centralManager.ConnectToDevice(_devices[indexPath.Row]).SubscribeOn(SynchronizationContext.Current).Subscribe(state =>
             {
-                UIAlertController  controller = UIAlertController.Create("Connection changed", state.ToString(), UIAlertControllerStyle.Alert);
-                controller.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, action =>
-                {
-                    DismissViewController(true, null);
-                }));
-                PresentViewController(controller, true, () =>
-                {
-                    
-                });
+                Debug.WriteLine(state.ToString());
+                //UIAlertController controller = UIAlertController.Create("Connection changed", state.ToString(), UIAlertControllerStyle.Alert);
+                //controller.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, action =>
+                //{
+                //    DismissViewController(true, null);
+                //}));
+                //PresentViewController(controller, true, () =>
+                //{
+
+                //});
             });
         }
     }

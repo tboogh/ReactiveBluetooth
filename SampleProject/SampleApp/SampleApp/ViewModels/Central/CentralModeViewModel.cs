@@ -71,7 +71,7 @@ namespace SampleApp.ViewModels
         public async void ItemSelected(DeviceViewModel device)
         {
             _toggleScanDisposable?.Dispose();
-            await _navigationService.NavigateAsync($"{nameof(DeviceDetailPage)}", new NavigationParameters() {{"Device", device.Device}});
+            await _navigationService.NavigateAsync(nameof(DeviceDetailPage), new NavigationParameters() {{nameof(DeviceViewModel), device}});
         }
 
         public void OnNavigatedFrom(NavigationParameters parameters)

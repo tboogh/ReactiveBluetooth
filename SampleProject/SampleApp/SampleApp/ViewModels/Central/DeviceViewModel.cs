@@ -7,10 +7,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using Prism.Navigation;
 using Prism.Services;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using SampleApp.Views;
@@ -53,6 +55,7 @@ namespace SampleApp.ViewModels.Central
         private IDevice _device;
         private IDisposable _connectionStateDisposable;
         private ConnectionState _connectionState;
+        private DeviceViewModel _deviceViewModel;
 
         public DeviceViewModel(ICentralManager centralManager)
         {
@@ -120,7 +123,8 @@ namespace SampleApp.ViewModels.Central
             _connectionStateDisposable?.Dispose();
             try
             {
-                _connectionStateDisposable = _centralManager.ConnectToDevice(Device)
+                _connectionStateDisposable = _centralManager.ConnectToDevice(_deviceViewModel.Device)
+                    .SubscribeOn(SynchronizationContext.Current)
                     .Subscribe(async state =>
                     {
                         ConnectionState = state;
@@ -170,10 +174,11 @@ namespace SampleApp.ViewModels.Central
 
         public void OnNavigatedTo(NavigationParameters parameters)
         {
-            if (parameters.ContainsKey("Device"))
+            if (parameters.ContainsKey(nameof(DeviceViewModel)))
             {
-                IDevice device = (IDevice) parameters["Device"];
-                Device = device;
+                DeviceViewModel deviceViewModel = (DeviceViewModel) parameters[nameof(DeviceViewModel)];
+                _deviceViewModel = deviceViewModel;
+                Device = deviceViewModel.Device;
             }
         }
     }

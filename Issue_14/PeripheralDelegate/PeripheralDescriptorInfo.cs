@@ -1,7 +1,7 @@
 ﻿using CoreBluetooth;
 using Foundation;
 
-namespace ReactiveBluetooth.iOS.Central.PeripheralDelegate
+namespace Issue_14.PeripheralDelegate
 {
     public class PeripheralDescriptorInfo
     {

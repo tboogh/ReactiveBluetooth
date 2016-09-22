@@ -8,14 +8,14 @@ namespace ReactiveBluetooth.Android.Central
 {
     public class Characteristic : ICharacteristic
     {
-        private readonly BluetoothGattCharacteristic _characteristic;
-
         public Characteristic(BluetoothGattCharacteristic characteristic)
         {
-            _characteristic = characteristic;
+            GattCharacteristic = characteristic;
         }
 
-        public Guid Uuid => Guid.Parse(_characteristic.Uuid.ToString());
-        public CharacteristicProperty Properties => _characteristic.Properties.ToCharacteristicProperty();
+        public BluetoothGattCharacteristic GattCharacteristic { get; }
+
+        public Guid Uuid => Guid.Parse(GattCharacteristic.Uuid.ToString());
+        public CharacteristicProperty Properties => GattCharacteristic.Properties.ToCharacteristicProperty();
     }
 } 

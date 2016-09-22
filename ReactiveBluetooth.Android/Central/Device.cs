@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Bluetooth;
@@ -75,9 +76,11 @@ namespace ReactiveBluetooth.Android.Central
             Gatt.ReadRemoteRssi();
         }
 
-        public IObservable<byte[]> ReadValue(ICharacteristic characteristic)
+        public Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).GattCharacteristic;
+            var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic).Select(x => x.Item2.GetValue());
+            return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { }).Merge(observable).ToTask(cancellationToken);
         }
     }
 }
