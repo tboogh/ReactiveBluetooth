@@ -36,6 +36,7 @@ namespace SampleApp.Common.Behaviors
                 .Subscribe(eventPattern =>
                 {
                     ItemSelectedCommand.Execute(eventPattern.EventArgs.SelectedItem);
+                    bindable.SelectedItem = null;
                 });
         }
 

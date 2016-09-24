@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 using Prism.Common;
 using Prism.Navigation;
 using ReactiveBluetooth.Core.Central;
+using SampleApp.Common.Behaviors;
 using SampleApp.ViewModels.Central;
 using SampleApp.Views;
 using Xamarin.Forms;
 
 namespace SampleApp.ViewModels
 {
-    public class CentralModeViewModel : BindableBase, INavigationAware
+    public class CentralModeViewModel : BindableBase, INavigationAware, IPageAppearingAware
     {
         private readonly ICentralManager _centralManager;
         private readonly INavigationService _navigationService;
@@ -70,6 +71,9 @@ namespace SampleApp.ViewModels
 
         public async void ItemSelected(DeviceViewModel device)
         {
+            if (device == null)
+                return;
+            
             _toggleScanDisposable?.Dispose();
             await _navigationService.NavigateAsync(nameof(DeviceDetailPage), new NavigationParameters() {{nameof(DeviceViewModel), device}});
         }
@@ -81,6 +85,16 @@ namespace SampleApp.ViewModels
 
         public void OnNavigatedTo(NavigationParameters parameters)
         {
+        }
+
+        public void OnAppearing(Page page)
+        {
+            
+        }
+
+        public void OnDisappearing(Page page)
+        {
+            _toggleScanDisposable?.Dispose();
         }
     }
 }

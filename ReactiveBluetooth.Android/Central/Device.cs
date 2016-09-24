@@ -59,16 +59,17 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<int> Rssi { get; }
 
-        public Task<IList<IService>> DiscoverServices()
+        public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
         {
             return Observable.FromEvent<IList<IService>>(action => { Gatt.DiscoverServices(); }, action => { })
-                .Merge(
-                    GattCallback.ServicesDiscovered.Select(
-                        x => Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
-                            .Cast<IService>()
-                            .ToList()))
+                .Merge(GattCallback.ServicesDiscovered.Select(x =>
+                {
+                    return Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
+                        .Cast<IService>()
+                        .ToList();
+                }))
                 .Take(1)
-                .ToTask();
+                .ToTask(cancellationToken);
         }
 
         public void UpdateRemoteRssi()
@@ -79,8 +80,12 @@ namespace ReactiveBluetooth.Android.Central
         public Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken)
         {
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).GattCharacteristic;
-            var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic).Select(x => x.Item2.GetValue());
-            return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { }).Merge(observable).FirstAsync().ToTask(cancellationToken);
+            var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
+                .Select(x => x.Item2.GetValue());
+            return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { })
+                .Merge(observable)
+                .FirstAsync()
+                .ToTask(cancellationToken);
         }
     }
 }

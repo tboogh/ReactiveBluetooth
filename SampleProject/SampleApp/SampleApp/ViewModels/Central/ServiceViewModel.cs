@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core.Central;
 
@@ -37,15 +38,25 @@ namespace SampleApp.ViewModels.Central
             set { SetProperty(ref _displayCharacteristics, value); }
         }
 
-        public async Task DiscoverCharacteristics()
+        public async Task DiscoverCharacteristics(CancellationToken cancellationToken)
         {
-            var characteristics = await _service.DiscoverCharacteristics();
-            Characteristics.Clear();
-
-            foreach (var characteristic in characteristics)
+            try
             {
-                CharacteristicViewModel characteristicViewModel = new CharacteristicViewModel {Characteristic = characteristic};
-                Characteristics.Add(characteristicViewModel);
+                var characteristics = await _service.DiscoverCharacteristics(cancellationToken);
+                Characteristics.Clear();
+
+                foreach (var characteristic in characteristics)
+                {
+                    CharacteristicViewModel characteristicViewModel = new CharacteristicViewModel
+                    {
+                        Characteristic = characteristic
+                    };
+                    Characteristics.Add(characteristicViewModel);
+                }
+            }
+            catch (Exception)
+            {
+                // ignored
             }
         }
     }

@@ -37,16 +37,30 @@ namespace ReactiveBluetooth.iOS.Central
         public ConnectionState State => (ConnectionState) Peripheral.State;
         public IObservable<int> Rssi { get; }
 
-        public Task<IList<IService>> DiscoverServices()
+        public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
         {
-            return Observable.FromEvent<IList<IService>>(action => { Peripheral.DiscoverServices(); }, _ => { })
+            if (Peripheral.Services != null)
+            {
+                return
+                    Task.FromResult<IList<IService>>(
+                        Peripheral.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
+                            .Cast<IService>()
+                            .ToList());
+            }
+            return Observable.FromEvent<IList<IService>>(action =>
+            {
+                Peripheral.DiscoverServices();
+            }, _ => { })
                 .Merge(
                     _cbPeripheralDelegate.DiscoveredServicesSubject.Select(
-                        x => x.Item1.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
-                            .Cast<IService>()
-                            .ToList()))
+                        x =>
+                        {
+                            return x.Item1.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
+                                .Cast<IService>()
+                                .ToList();
+                        }))
                 .Take(1)
-                .ToTask();
+                .ToTask(cancellationToken);
         }
 
         public void UpdateRemoteRssi()

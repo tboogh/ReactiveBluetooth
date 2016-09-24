@@ -3,8 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
 using CoreBluetooth;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Extensions;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.iOS.Central
@@ -15,26 +19,36 @@ namespace ReactiveBluetooth.iOS.Central
         private readonly CBPeripheral _nativeDevice;
         private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
-        public Service(CBService service, CBPeripheral nativeDevice, PeripheralDelegate.PeripheralDelegate cbPeripheralDelegate)
+        public Service(CBService service, CBPeripheral nativeDevice,
+            PeripheralDelegate.PeripheralDelegate cbPeripheralDelegate)
         {
             _service = service;
             _nativeDevice = nativeDevice;
             _cbPeripheralDelegate = cbPeripheralDelegate;
         }
 
-        public Guid Uuid => Guid.Parse(_service.UUID.Uuid);
+        public Guid Uuid
+        {
+            get { return _service.UUID.Uuid.ToGuid(); }
+        }
+
         public ServiceType ServiceType => _service.Primary ? ServiceType.Primary : ServiceType.Secondary;
 
-        public IObservable<IList<ICharacteristic>> DiscoverCharacteristics()
+        public Task<IList<ICharacteristic>> DiscoverCharacteristics(CancellationToken cancellationToken)
         {
-            var observable = Observable.FromEvent<IList<ICharacteristic>>(action =>
-            { _nativeDevice.DiscoverCharacteristics(_service); }, _ => { });
+            var observable =
+                Observable.FromEvent<IList<ICharacteristic>>(
+                    action => { _nativeDevice.DiscoverCharacteristics(_service); }, _ => { });
 
             IObservable<IList<ICharacteristic>> delegateObservable =
                 _cbPeripheralDelegate.DiscoveredCharacteristicsSubject.Select(
-                    x => x.Item2.Characteristics.Select(y => new Characteristic(y)).Cast<ICharacteristic>().ToList());
+                    x => x.Item2.Characteristics.Select(y => new Characteristic(y))
+                        .Cast<ICharacteristic>()
+                        .ToList());
 
-            return observable.Merge(delegateObservable).FirstAsync();
+            return observable.Merge(delegateObservable)
+                .Take(1)
+                .ToTask(cancellationToken);
         }
     }
 }

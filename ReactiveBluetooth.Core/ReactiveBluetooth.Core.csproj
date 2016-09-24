@@ -44,6 +44,7 @@
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />
     <Compile Include="Exceptions\FailedToConnectException.cs" />
     <Compile Include="Exceptions\AdvertiseException.cs" />
+    <Compile Include="Extensions\GuidExtensions.cs" />
     <Compile Include="Peripheral\AdvertisingOptions.cs" />
     <Compile Include="Peripheral\IAttRequest.cs" />
     <Compile Include="Peripheral\IBluetoothAbstractFactory.cs" />

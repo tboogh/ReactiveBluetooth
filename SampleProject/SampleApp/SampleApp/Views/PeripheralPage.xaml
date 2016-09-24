@@ -3,8 +3,12 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:behaviors="clr-namespace:SampleApp.Common.Behaviors;assembly=SampleApp"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="SampleApp.Views.PeripheralPage">
+    <ContentPage.Behaviors>
+        <behaviors:PageAppearingBehavior />
+    </ContentPage.Behaviors>
     <StackLayout>
         <Label Text="Peripheral Mode" FontSize="Large" />
         <Label Text="State" />
@@ -16,7 +20,7 @@
                 </DataTrigger>
             </Label.Triggers>
         </Label>
-      <Button Text="Start Advertising" Command="{Binding AdvertiseCommand}"></Button>
-      <Button Text="Stop Advertising" Command="{Binding StopAdvertiseCommand}"></Button>
+        <Button Text="Start Advertising" Command="{Binding AdvertiseCommand}" />
+        <Button Text="Stop Advertising" Command="{Binding StopAdvertiseCommand}" />
     </StackLayout>
 </ContentPage>

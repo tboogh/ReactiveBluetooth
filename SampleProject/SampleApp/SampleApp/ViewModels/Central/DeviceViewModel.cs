@@ -9,18 +9,21 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Prism.Common;
 using Prism.Navigation;
 using Prism.Services;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using SampleApp.Common.Behaviors;
 using SampleApp.Views;
 using Xamarin.Forms;
+using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace SampleApp.ViewModels.Central
 {
-    public class DeviceViewModel : BindableBase, INavigationAware
+    public class DeviceViewModel : BindableBase, INavigationAware, IPageAppearingAware
     {
         public class Grouping<K, T> : ObservableCollection<T>
         {
@@ -57,14 +60,15 @@ namespace SampleApp.ViewModels.Central
         private ConnectionState _connectionState;
         private DeviceViewModel _deviceViewModel;
 
+        private CancellationTokenSource _cancellationTokenSource;
+
         public DeviceViewModel(ICentralManager centralManager)
         {
             _centralManager = centralManager;
-            ConnectCommand = DelegateCommand.FromAsyncHandler(Connect);
-            DisconnectCommand = DelegateCommand.FromAsyncHandler(Disconnect);
             UpdateRssiCommand = new DelegateCommand(UpdateRssi);
             ItemSelectedCommand = DelegateCommand<CharacteristicViewModel>.FromAsyncHandler(CharacteristicSelected);
             Services = new ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>>();
+            _cancellationTokenSource = new CancellationTokenSource();
         }
 
         public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService,
@@ -102,8 +106,6 @@ namespace SampleApp.ViewModels.Central
 
         public ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>> Services { get; set; }
         public DelegateCommand UpdateRssiCommand { get; }
-        public DelegateCommand ConnectCommand { get; }
-        public DelegateCommand DisconnectCommand { get; }
 
         public void UpdateDevice(IDevice device)
         {
@@ -143,22 +145,23 @@ namespace SampleApp.ViewModels.Central
         private async Task DiscoverServices()
         {
             Services.Clear();
-            var services = await _device.DiscoverServices();
-            foreach (var service in services)
+            try
             {
-                ServiceViewModel serviceViewModel = new ServiceViewModel(service);
-                await serviceViewModel.DiscoverCharacteristics();
+                IList<IService> services = await _device.DiscoverServices(_cancellationTokenSource.Token);
+                foreach (var service in services)
+                {
+                    ServiceViewModel serviceViewModel = new ServiceViewModel(service);
+                    await serviceViewModel.DiscoverCharacteristics(_cancellationTokenSource.Token);
 
-                var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel,
-                    serviceViewModel.Characteristics);
-                Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
+                    var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel,
+                        serviceViewModel.Characteristics);
+                    Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
+                }
             }
-        }
-
-        public async Task Disconnect()
-        {
-            _connectionStateDisposable.Dispose();
-            ConnectionState = ConnectionState.Disconnected;
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         private async Task CharacteristicSelected(CharacteristicViewModel characteristicViewModel)
@@ -184,7 +187,21 @@ namespace SampleApp.ViewModels.Central
                 DeviceViewModel deviceViewModel = (DeviceViewModel) parameters[nameof(DeviceViewModel)];
                 _deviceViewModel = deviceViewModel;
                 Device = deviceViewModel.Device;
+
+                Task.Factory.StartNew(Connect, CancellationToken.None, TaskCreationOptions.None,
+                    TaskScheduler.FromCurrentSynchronizationContext());
             }
+        }
+
+        public void OnAppearing(Page page)
+        {
+            
+        }
+
+        public void OnDisappearing(Page page)
+        {
+            _cancellationTokenSource?.Cancel();
+            _connectionStateDisposable?.Dispose();
         }
     }
 }

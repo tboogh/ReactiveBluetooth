@@ -7,16 +7,20 @@
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="SampleApp.Views.CentralPage"
              x:Name="ThisPage">
+    <ContentPage.Behaviors>
+        <behaviors:PageAppearingBehavior />
+    </ContentPage.Behaviors>
     <StackLayout>
         <Label Text="{Binding State}" />
         <Button Text="Toggle Scan" Command="{Binding ToggleScanCommand}" />
         <ListView x:Name="ListView" ItemsSource="{Binding Devices}">
             <ListView.Behaviors>
-                <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding DeviceSelectedCommand}" BindingContext="{Binding .}"/>
+                <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding DeviceSelectedCommand}"
+                                                         BindingContext="{Binding .}" />
             </ListView.Behaviors>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextCell Text="{Binding Name}" Detail="{Binding Rssi}"/>
+                    <TextCell Text="{Binding Name}" Detail="{Binding Rssi}" />
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

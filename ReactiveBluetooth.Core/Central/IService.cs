@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ReactiveBluetooth.Core.Central
 {
     public interface IService : Core.IService
     {
-        IObservable<IList<ICharacteristic>> DiscoverCharacteristics();
+        Task<IList<ICharacteristic>> DiscoverCharacteristics(CancellationToken cancellationToken);
     }
 }

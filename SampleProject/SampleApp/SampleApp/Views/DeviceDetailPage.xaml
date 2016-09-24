@@ -13,32 +13,20 @@
             <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
+    <ContentPage.Behaviors>
+        <behaviors:PageAppearingBehavior />
+    </ContentPage.Behaviors>
+
     <ListView Header="{Binding .}"
               ItemsSource="{Binding Services}"
               IsGroupingEnabled="True"
               GroupDisplayBinding="{Binding Key}">
-      <ListView.Behaviors>
-          <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding ItemSelectedCommand}" />
-      </ListView.Behaviors>
+        <ListView.Behaviors>
+            <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding ItemSelectedCommand}" />
+        </ListView.Behaviors>
         <ListView.HeaderTemplate>
             <DataTemplate>
                 <StackLayout>
-                    <Button Text="Connect" Command="{Binding ConnectCommand}">
-                        <Button.Triggers>
-                            <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
-                                         Value="{x:Static central:ConnectionState.Connected}">
-                                <Setter Property="IsVisible" Value="False" />
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
-                    <Button Text="Disconnect" Command="{Binding DisconnectCommand}" IsVisible="False">
-                        <Button.Triggers>
-                            <DataTrigger TargetType="Button" Binding="{Binding ConnectionState}"
-                                         Value="{x:Static central:ConnectionState.Connected}">
-                                <Setter Property="IsVisible" Value="True" />
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
                     <Label Text="{Binding Name}" />
                     <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
                     <Label Text="{Binding Rssi}" />
@@ -48,7 +36,8 @@
         </ListView.HeaderTemplate>
         <ListView.GroupHeaderTemplate>
             <DataTemplate>
-                <TextCell Text="{Binding Key.Uuid, Converter={StaticResource GuidToStringValueConverter}}" TextColor="Blue"/>
+                <TextCell Text="{Binding Key.Uuid, Converter={StaticResource GuidToStringValueConverter}}"
+                          TextColor="Blue" />
             </DataTemplate>
         </ListView.GroupHeaderTemplate>
         <ListView.ItemTemplate>

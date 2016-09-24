@@ -7,11 +7,13 @@ using Prism.Mvvm;
 using Prism.Navigation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Peripheral;
+using SampleApp.Common.Behaviors;
+using Xamarin.Forms;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
 namespace SampleApp.ViewModels.Peripheral
 {
-    public class PeripheralModeViewModel : BindableBase, INavigationAware
+    public class PeripheralModeViewModel : BindableBase, INavigationAware, IPageAppearingAware
     {
         private readonly IPeripheralManager _peripheralManager;
         private string _state;
@@ -98,6 +100,16 @@ namespace SampleApp.ViewModels.Peripheral
 
         public void OnNavigatedTo(NavigationParameters parameters)
         {
+        }
+
+        public void OnAppearing(Page page)
+        {
+            
+        }
+
+        public void OnDisappearing(Page page)
+        {
+            _advertiseDisposable?.Dispose();
         }
     }
 }
