@@ -21,6 +21,6 @@
             <Button Text="Enable notifications" IsEnabled="{Binding CanNotify}" />
         </StackLayout>
         <Entry Text="{Binding WriteValue, Mode=TwoWay}"></Entry>
-        <Button Text="Write Value" IsEnabled="{Binding CanWrite}" />
+        <Button Text="Write Value" IsEnabled="{Binding CanWrite}" Command="{Binding WriteValueCommand}" />
     </StackLayout>
 </ContentPage>
