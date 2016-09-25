@@ -60,6 +60,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
                 return Disposable.Create(() =>
                 {
                     _peripheralManager.StopAdvertising();
+                    _peripheralManager.RemoveAllServices();
                     started.Dispose();
                 });
             });

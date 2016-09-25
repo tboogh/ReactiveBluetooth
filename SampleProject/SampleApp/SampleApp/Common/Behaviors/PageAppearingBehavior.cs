@@ -47,4 +47,30 @@ namespace SampleApp.Common.Behaviors
             _pageDisappearingDisposable?.Dispose();
         }
     }
+
+    public interface INavigationBackAware
+    {
+        void PagePopped();
+    }
+
+    public class NavigationBackAwareBehavior : Behavior<NavigationPage>
+    {
+        private IDisposable _eventDisposable;
+        protected override void OnAttachedTo(NavigationPage bindable)
+        {
+            base.OnAttachedTo(bindable);
+            _eventDisposable =  Observable.FromEventPattern<EventHandler<NavigationEventArgs>, NavigationEventArgs>(eh => bindable.Popped += eh, eh => bindable.Popped -= eh).Subscribe(
+                pattern =>
+                {
+                    INavigationBackAware navigationBackAware = pattern.EventArgs.Page.BindingContext as INavigationBackAware;;
+                    navigationBackAware?.PagePopped();
+                });
+        }
+
+        protected override void OnDetachingFrom(NavigationPage bindable)
+        {
+            base.OnDetachingFrom(bindable);
+            _eventDisposable.Dispose();
+        }
+    }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -23,7 +24,7 @@ using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace SampleApp.ViewModels.Central
 {
-    public class DeviceViewModel : BindableBase, INavigationAware, IPageAppearingAware
+    public class DeviceViewModel : BindableBase, INavigationAware, IPageAppearingAware, INavigationBackAware
     {
         public class Grouping<K, T> : ObservableCollection<T>
         {
@@ -59,8 +60,8 @@ namespace SampleApp.ViewModels.Central
         private IDisposable _connectionStateDisposable;
         private ConnectionState _connectionState;
         private DeviceViewModel _deviceViewModel;
-
         private CancellationTokenSource _cancellationTokenSource;
+        private IObservable<ConnectionState> _connectObservable;
 
         public DeviceViewModel(ICentralManager centralManager)
         {
@@ -123,18 +124,22 @@ namespace SampleApp.ViewModels.Central
         public async Task Connect()
         {
             _connectionStateDisposable?.Dispose();
+            _connectObservable = _centralManager.ConnectToDevice(_deviceViewModel.Device)
+                .SubscribeOn(SynchronizationContext.Current);
             try
             {
-                _connectionStateDisposable = _centralManager.ConnectToDevice(_deviceViewModel.Device)
-                    .SubscribeOn(SynchronizationContext.Current)
-                    .Subscribe(async state =>
+                _connectionStateDisposable = _connectObservable.Subscribe(async state =>
+                {
+                    ConnectionState = state;
+                    if (state == ConnectionState.Connected)
                     {
-                        ConnectionState = state;
-                        if (state == ConnectionState.Connected)
-                        {
-                            await DiscoverServices();
-                        }
-                    });
+                        await DiscoverServices();
+                    }
+                    if (state == ConnectionState.Disconnected)
+                    {
+                        _cancellationTokenSource.Cancel();
+                    }
+                });
             }
             catch (TimeoutException exception)
             {
@@ -158,21 +163,24 @@ namespace SampleApp.ViewModels.Central
                     Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
                 }
             }
-            catch (Exception)
+            catch (TaskCanceledException)
             {
-                // ignored
             }
         }
 
         private async Task CharacteristicSelected(CharacteristicViewModel characteristicViewModel)
         {
-            await
-                _navigationService.NavigateAsync(nameof(CharacteristicDetailPage),
+            if (characteristicViewModel == null)
+                return;
+            if (ConnectionState != ConnectionState.Connected)
+                return;
+
+            await _navigationService.NavigateAsync(nameof(CharacteristicDetailPage),
                     new NavigationParameters()
                     {
                         {nameof(ICharacteristic), characteristicViewModel.Characteristic},
-                        {nameof(IDevice), Device }
-                    
+                        {nameof(IDevice), Device},
+                        {"ConnectionObservable", _connectObservable}
                     });
         }
 
@@ -187,7 +195,8 @@ namespace SampleApp.ViewModels.Central
                 DeviceViewModel deviceViewModel = (DeviceViewModel) parameters[nameof(DeviceViewModel)];
                 _deviceViewModel = deviceViewModel;
                 Device = deviceViewModel.Device;
-
+                ConnectionState = Device.State;
+                
                 Task.Factory.StartNew(Connect, CancellationToken.None, TaskCreationOptions.None,
                     TaskScheduler.FromCurrentSynchronizationContext());
             }
@@ -195,10 +204,14 @@ namespace SampleApp.ViewModels.Central
 
         public void OnAppearing(Page page)
         {
-            
         }
 
         public void OnDisappearing(Page page)
+        {
+            
+        }
+
+        public void PagePopped()
         {
             _cancellationTokenSource?.Cancel();
             _connectionStateDisposable?.Dispose();

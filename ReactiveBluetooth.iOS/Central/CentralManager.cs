@@ -43,7 +43,6 @@ namespace ReactiveBluetooth.iOS.Central
             return Observable.FromEvent<ConnectionState>(action =>
             {
                 _centralManager.ConnectPeripheral(((Device)device).Peripheral);
-                action(device.State);
             }, action =>
             {
                 _centralManager.CancelPeripheralConnection(((Device)device).Peripheral); 

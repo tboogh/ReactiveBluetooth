@@ -49,14 +49,13 @@ namespace SampleApp.ViewModels.Central
                 {
                     CharacteristicViewModel characteristicViewModel = new CharacteristicViewModel
                     {
-                        Characteristic = characteristic
+                        Characteristic = characteristic,
                     };
                     Characteristics.Add(characteristicViewModel);
                 }
             }
-            catch (Exception)
+            catch (TaskCanceledException)
             {
-                // ignored
             }
         }
     }
