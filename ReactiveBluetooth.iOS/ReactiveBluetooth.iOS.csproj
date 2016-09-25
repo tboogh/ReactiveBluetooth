@@ -65,6 +65,7 @@
     <Compile Include="Extensions\CBCharacteristicPropertiesExtensions.cs" />
     <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
     <Compile Include="Extensions\CharacteristicPropertyExtensions.cs" />
+    <Compile Include="Extensions\WriteTypeExtension.cs" />
     <Compile Include="Peripheral\AbstractFactory.cs" />
     <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />

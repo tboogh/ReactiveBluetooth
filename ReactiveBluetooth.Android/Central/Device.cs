@@ -11,6 +11,7 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 using Android.OS.Storage;
+using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Types;
@@ -89,9 +90,31 @@ namespace ReactiveBluetooth.Android.Central
                 .ToTask(cancellationToken);
         }
 
-        public Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
+        public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic)characteristic).GattCharacteristic;
+
+            var writeObservable = Observable.FromEvent<bool>(action =>
+            {
+                gattCharacteristic.WriteType = writeType.ToGattWriteType();
+                gattCharacteristic.SetValue(value);
+
+                Gatt.WriteCharacteristic(gattCharacteristic);
+            }, _ => { });
+
+            if (writeType == WriteType.WithResponse)
+            {
+                return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic).Select(
+                    x =>
+                    {
+                        if (x.Item3 != GattStatus.Success)
+                        {
+                            throw new Exception($"Failed to write characteristic: {x.Item3.ToString()}");
+                        }
+                        return true;
+                    })).Take(1).ToTask(cancellationToken);
+            }
+            return writeObservable.Merge(Observable.Return(true)).Take(1).ToTask(cancellationToken);
         }
     }
 }

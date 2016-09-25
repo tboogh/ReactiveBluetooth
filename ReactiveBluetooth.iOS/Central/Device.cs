@@ -11,6 +11,7 @@ using Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Types;
+using ReactiveBluetooth.iOS.Extensions;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.iOS.Central
@@ -31,9 +32,7 @@ namespace ReactiveBluetooth.iOS.Central
         }
 
         public CBPeripheral Peripheral { get; }
-
         public Guid Uuid => Guid.Parse(Peripheral.Identifier.ToString());
-
         public string Name => Peripheral.Name;
         public ConnectionState State => (ConnectionState) Peripheral.State;
         public IObservable<int> Rssi { get; }
@@ -48,18 +47,13 @@ namespace ReactiveBluetooth.iOS.Central
                             .Cast<IService>()
                             .ToList());
             }
-            return Observable.FromEvent<IList<IService>>(action =>
-            {
-                Peripheral.DiscoverServices();
-            }, _ => { })
-                .Merge(
-                    _cbPeripheralDelegate.DiscoveredServicesSubject.Select(
-                        x =>
-                        {
-                            return x.Item1.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
-                                .Cast<IService>()
-                                .ToList();
-                        }))
+            return Observable.FromEvent<IList<IService>>(action => { Peripheral.DiscoverServices(); }, _ => { })
+                .Merge(_cbPeripheralDelegate.DiscoveredServicesSubject.Select(x =>
+                {
+                    return x.Item1.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
+                        .Cast<IService>()
+                        .ToList();
+                }))
                 .Take(1)
                 .ToTask(cancellationToken);
         }
@@ -77,14 +71,43 @@ namespace ReactiveBluetooth.iOS.Central
                 bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
                 bool chgarEqual = x.Item2.UUID.Uuid == cbCharacteristic.UUID.Uuid;
                 return perphEqual && chgarEqual;
-            }).Select(x => x.Item2.Value?.ToArray());
+            })
+                .Select(x => x.Item2.Value?.ToArray());
 
-            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { }).Merge(observable).FirstAsync().ToTask(cancellationToken);
+            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { })
+                .Merge(observable)
+                .FirstAsync()
+                .ToTask(cancellationToken);
         }
 
-        public Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
+        public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType,
+            CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            CBCharacteristic cbCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
+            var writeObservable = Observable.FromEvent<bool>(action =>
+            {
+                Peripheral.WriteValue(NSData.FromArray(value), cbCharacteristic, writeType.ToCharacteristicWriteType());
+            }, _ => { });
+
+            if (writeType == WriteType.WithResponse)
+            {
+                return writeObservable.Merge<bool>(_cbPeripheralDelegate.WroteCharacteristicValueSubject.FirstAsync(x =>
+                {
+                    bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
+                    bool chgarEqual = x.Item2.UUID.Uuid == cbCharacteristic.UUID.Uuid;
+                    return perphEqual && chgarEqual;
+                }).Select(x =>
+                {
+                    if (x.Item3 != null)
+                    {
+                        throw new Exception(x.Item3.LocalizedDescription);
+                    }
+                    return true;
+                }))
+                    .ToTask(cancellationToken);
+            }
+
+            return writeObservable.Merge<bool>(Observable.Return(true)).ToTask(cancellationToken);
         }
     }
 }

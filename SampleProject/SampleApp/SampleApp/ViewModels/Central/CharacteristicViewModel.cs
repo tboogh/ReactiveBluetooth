@@ -26,17 +26,21 @@ namespace SampleApp.ViewModels.Central
         private IDisposable _connectionDisp;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private bool _connected;
+        private string _writeValue;
 
         public CharacteristicViewModel(IPageDialogService pageDialogService)
         {
-            _pageDialogService = pageDialogService;
-            ReadValueCommand = DelegateCommand.FromAsyncHandler(ReadValue).ObservesCanExecute(o => Connected);
             _cancellationTokenSource = new CancellationTokenSource();
+            _pageDialogService = pageDialogService;
+
+            ReadValueCommand = DelegateCommand.FromAsyncHandler(Read)
+                .ObservesCanExecute(o => Connected);
+            WriteValueCommand = DelegateCommand.FromAsyncHandler(Write)
+                .ObservesCanExecute(o => Connected);
         }
 
         public CharacteristicViewModel()
         {
-            
         }
 
         public IDevice Device { get; set; }
@@ -57,6 +61,12 @@ namespace SampleApp.ViewModels.Central
             set { SetProperty(ref _value, value); }
         }
 
+        public string WriteValue
+        {
+            get { return _writeValue; }
+            set { SetProperty(ref _writeValue, value); }
+        }
+
         public bool Connected
         {
             get { return _connected; }
@@ -66,14 +76,10 @@ namespace SampleApp.ViewModels.Central
         public Guid Uuid => _characteristic?.Uuid ?? Guid.Empty;
         public bool CanRead => _characteristic?.Properties.HasFlag(CharacteristicProperty.Read) ?? false;
         public bool CanWrite => _characteristic?.Properties.HasFlag(CharacteristicProperty.Write) ?? false;
-
-        public bool CanNotify
-            =>
-                (_characteristic?.Properties.HasFlag(CharacteristicProperty.Notify) ?? false)
-                || (_characteristic?.Properties.HasFlag(CharacteristicProperty.Indicate) ?? false);
-
+        public bool CanNotify => (_characteristic?.Properties.HasFlag(CharacteristicProperty.Notify) ?? false) || (_characteristic?.Properties.HasFlag(CharacteristicProperty.Indicate) ?? false);
         public CharacteristicProperty Properties => _characteristic?.Properties ?? 0;
         public DelegateCommand ReadValueCommand { get; }
+        public DelegateCommand WriteValueCommand { get; }
 
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
@@ -93,22 +99,32 @@ namespace SampleApp.ViewModels.Central
             }
             if (parameters.ContainsKey("ConnectionObservable"))
             {
-                IObservable<ConnectionState> connectionObservable =
-                    (IObservable<ConnectionState>) parameters["ConnectionObservable"];
+                IObservable<ConnectionState> connectionObservable = (IObservable<ConnectionState>) parameters["ConnectionObservable"];
                 _connectionDisp = connectionObservable.Subscribe(state =>
                 {
                     if (state == ConnectionState.Disconnecting || state == ConnectionState.Disconnected)
                     {
                         Connected = false;
                         _cancellationTokenSource.Cancel();
-                        Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
-                        {
-                            _pageDialogService.DisplayAlertAsync("Disconnected", "Device disconnected", "Ok");
-                        });
+                        Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { _pageDialogService.DisplayAlertAsync("Disconnected", "Device disconnected", "Ok"); });
                     }
                 });
             }
             Connected = true;
+        }
+
+        public void OnAppearing(Page page)
+        {
+        }
+
+        public void OnDisappearing(Page page)
+        {
+        }
+
+        public void PagePopped()
+        {
+            _cancellationTokenSource?.Cancel();
+            _connectionDisp.Dispose();
         }
 
         private void Update()
@@ -120,10 +136,11 @@ namespace SampleApp.ViewModels.Central
             OnPropertyChanged(() => Properties);
         }
 
-        private async Task ReadValue()
+        private async Task Read()
         {
             if (Device == null)
                 return;
+
             try
             {
                 var result = await Device.ReadValue(Characteristic, _cancellationTokenSource.Token);
@@ -136,20 +153,24 @@ namespace SampleApp.ViewModels.Central
             }
         }
 
-        public void OnAppearing(Page page)
+        private async Task Write()
         {
-            
-        }
+            if (Device == null)
+                return;
 
-        public void OnDisappearing(Page page)
-        {
+            var writeType = Properties.HasFlag(CharacteristicProperty.WriteWithoutResponse) ? WriteType.WithoutRespoonse : WriteType.WithResponse;
 
-        }
-
-        public void PagePopped()
-        {
-            _cancellationTokenSource?.Cancel();
-            _connectionDisp.Dispose();
+            try
+            {
+                var result = await Device.WriteValue(Characteristic, Encoding.UTF8.GetBytes(WriteValue), writeType, _cancellationTokenSource.Token);
+                if (result)
+                {
+                    await Read();
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
         }
     }
 }

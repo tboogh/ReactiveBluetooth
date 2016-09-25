@@ -15,12 +15,12 @@
     <StackLayout>
         <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
         <Label Text="{Binding Properties, Converter={StaticResource ChractersticPropertiesToStringConverter}}" />
-      <Label Text="{Binding Value}" />
+        <Label Text="{Binding Value}" />
         <StackLayout Orientation="Horizontal">
-            <Button Text="Read Value" IsEnabled="{Binding CanRead}" Command="{Binding ReadValueCommand}"/>
+            <Button Text="Read Value" IsEnabled="{Binding CanRead}" Command="{Binding ReadValueCommand}" />
             <Button Text="Enable notifications" IsEnabled="{Binding CanNotify}" />
         </StackLayout>
-
+        <Entry Text="{Binding WriteValue, Mode=TwoWay}"></Entry>
         <Button Text="Write Value" IsEnabled="{Binding CanWrite}" />
     </StackLayout>
 </ContentPage>
