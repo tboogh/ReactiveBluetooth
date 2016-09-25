@@ -4,6 +4,7 @@ using System.Linq;
 using CoreBluetooth;
 using Foundation;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 

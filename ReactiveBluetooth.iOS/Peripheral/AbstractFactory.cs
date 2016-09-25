@@ -6,6 +6,7 @@ using CoreBluetooth;
 using Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.Core.Types;
 using ReactiveBluetooth.iOS.Extensions;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
@@ -21,7 +22,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
             _peripheralDelegate = peripheralDelegate;
         }
 
-        public IService CreateService(Guid id, Core.ServiceType type)
+        public IService CreateService(Guid id, ServiceType type)
         {
             CBMutableService mutableService = new CBMutableService(CBUUID.FromString(id.ToString()), type == ServiceType.Primary);
             return new Service(mutableService);

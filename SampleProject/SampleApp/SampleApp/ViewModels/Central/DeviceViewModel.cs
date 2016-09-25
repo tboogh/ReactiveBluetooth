@@ -17,6 +17,7 @@ using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 using SampleApp.Common.Behaviors;
 using SampleApp.Views;
 using Xamarin.Forms;

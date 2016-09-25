@@ -12,6 +12,7 @@ using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
+using ReactiveBluetooth.Core.Types;
 using Object = Java.Lang.Object;
 
 namespace ReactiveBluetooth.Android.Central

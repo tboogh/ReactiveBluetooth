@@ -3,6 +3,7 @@ using Android.Bluetooth;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Android.Central
 {

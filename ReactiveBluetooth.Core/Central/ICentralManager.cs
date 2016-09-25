@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core.Exceptions;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Core.Central
 {

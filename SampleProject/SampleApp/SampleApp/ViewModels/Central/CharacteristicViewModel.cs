@@ -12,6 +12,7 @@ using ReactiveBluetooth.Core.Central;
 using System.Reactive.Linq;
 using System.Threading;
 using Prism.Services;
+using ReactiveBluetooth.Core.Types;
 using SampleApp.Common.Behaviors;
 using Xamarin.Forms;
 

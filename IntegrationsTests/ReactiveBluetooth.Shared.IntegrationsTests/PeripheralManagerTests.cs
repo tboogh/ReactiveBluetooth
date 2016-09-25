@@ -10,6 +10,7 @@ using NUnit.Framework;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
 namespace ReactiveBluetooth.Shared.IntegrationsTests

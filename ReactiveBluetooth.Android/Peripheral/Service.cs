@@ -1,6 +1,7 @@
 using System;
 using Android.Bluetooth;
 using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Android.Peripheral
 {
@@ -14,7 +15,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         }
 
         public Guid Uuid => Guid.Parse(GattService.Uuid.ToString());
-        public Core.ServiceType ServiceType => (Core.ServiceType) GattService.Type;
+        public ServiceType ServiceType => (ServiceType) GattService.Type;
         
         bool IService.AddCharacteristic(ICharacteristic characteristic)
         {

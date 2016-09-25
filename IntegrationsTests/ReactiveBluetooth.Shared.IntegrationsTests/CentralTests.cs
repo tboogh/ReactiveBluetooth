@@ -8,6 +8,7 @@ using NUnit;
 using NUnit.Framework;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Shared.IntegrationsTests
 {

@@ -1,4 +1,4 @@
-﻿namespace ReactiveBluetooth.Core.Central
+﻿namespace ReactiveBluetooth.Core.Types
 {
     public enum ConnectionState
     {

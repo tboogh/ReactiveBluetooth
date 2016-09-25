@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CoreBluetooth;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Extensions;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.iOS.Central

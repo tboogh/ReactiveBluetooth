@@ -7,6 +7,7 @@ using Prism.Mvvm;
 using Prism.Navigation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.Core.Types;
 using SampleApp.Common.Behaviors;
 using Xamarin.Forms;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;

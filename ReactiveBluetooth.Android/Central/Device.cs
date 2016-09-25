@@ -13,6 +13,7 @@ using Android.Content;
 using Android.OS.Storage;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.Android.Central
@@ -86,6 +87,11 @@ namespace ReactiveBluetooth.Android.Central
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
+        }
+
+        public Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

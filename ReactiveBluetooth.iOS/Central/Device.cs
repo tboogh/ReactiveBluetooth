@@ -10,6 +10,7 @@ using CoreBluetooth;
 using Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.iOS.Central
@@ -79,6 +80,11 @@ namespace ReactiveBluetooth.iOS.Central
             }).Select(x => x.Item2.Value?.ToArray());
 
             return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { }).Merge(observable).FirstAsync().ToTask(cancellationToken);
+        }
+
+        public Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

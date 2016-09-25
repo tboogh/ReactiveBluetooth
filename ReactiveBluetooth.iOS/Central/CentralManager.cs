@@ -8,6 +8,7 @@ using CoreBluetooth;
 using CoreFoundation;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.iOS.Central
 {
