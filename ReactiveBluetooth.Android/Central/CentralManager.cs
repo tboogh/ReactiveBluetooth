@@ -58,7 +58,7 @@ namespace ReactiveBluetooth.Android.Central
                 {
                     _bluetoothAdapter.BluetoothLeScanner.StartScan(bleScanCallback);
                 }, action => { _bluetoothAdapter.BluetoothLeScanner.StopScan(bleScanCallback); })
-                    .Merge(bleScanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi)))
+                    .Merge(bleScanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
                     .Merge<IDevice>(bleScanCallback.FailureSubject.Select(failure =>
                     {
                         throw new Exception(failure.ToString());

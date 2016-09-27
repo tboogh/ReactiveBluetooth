@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Prism.Common;
 using Prism.Navigation;
+using Prism.Services;
 using ReactiveBluetooth.Core.Central;
 using SampleApp.Common.Behaviors;
 using SampleApp.ViewModels.Central;
@@ -21,13 +22,15 @@ namespace SampleApp.ViewModels
     {
         private readonly ICentralManager _centralManager;
         private readonly INavigationService _navigationService;
+        private readonly IPageDialogService _pageDialogService;
         private string _state;
         private IDisposable _toggleScanDisposable;
 
-        public CentralModeViewModel(ICentralManager centralManager, INavigationService navigationService)
+        public CentralModeViewModel(ICentralManager centralManager, INavigationService navigationService, IPageDialogService pageDialogService)
         {
             _centralManager = centralManager;
             _navigationService = navigationService;
+            _pageDialogService = pageDialogService;
             _centralManager.State()
                 .Subscribe(state => { State = state.ToString(); });
             ToggleScanCommand = new DelegateCommand(ToggleScan);
@@ -75,7 +78,25 @@ namespace SampleApp.ViewModels
                 return;
             
             _toggleScanDisposable?.Dispose();
-            await _navigationService.NavigateAsync(nameof(DeviceDetailPage), new NavigationParameters() {{nameof(DeviceViewModel), device}});
+
+            await _pageDialogService.DisplayActionSheetAsync(device.Name, ActionSheetButton.CreateButton("Display Advertisedata", DelegateCommand.FromAsyncHandler(async () =>
+            {
+                await _navigationService.NavigateAsync(nameof(AdvertiseDataPage), new NavigationParameters() {
+                    {
+                        nameof(IAdvertisementData), device.Device.AdvertisementData
+
+                    }
+                });
+            })), ActionSheetButton.CreateButton("Connect", DelegateCommand.FromAsyncHandler(async () =>
+            {
+                await _navigationService.NavigateAsync(nameof(DeviceDetailPage), new NavigationParameters() {
+                    {
+                        nameof(DeviceViewModel), device 
+                    
+                    }
+                });
+            })), ActionSheetButton.CreateCancelButton("Cancel", new DelegateCommand(() => {})));
+            
         }
 
         public void OnNavigatedFrom(NavigationParameters parameters)

@@ -19,8 +19,9 @@ namespace ReactiveBluetooth.iOS.Central
     {
         private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
-        public Device(CBPeripheral peripheral, int rssi)
+        public Device(CBPeripheral peripheral, int rssi, IAdvertisementData advertisementData)
         {
+            AdvertisementData = advertisementData;
             Peripheral = peripheral;
             _cbPeripheralDelegate = new PeripheralDelegate.PeripheralDelegate();
             peripheral.Delegate = _cbPeripheralDelegate;
@@ -36,6 +37,7 @@ namespace ReactiveBluetooth.iOS.Central
 
         public string Name => Peripheral.Name;
         public ConnectionState State => (ConnectionState) Peripheral.State;
+        public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
         public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
