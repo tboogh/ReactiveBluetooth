@@ -10,6 +10,7 @@ using CoreBluetooth;
 using Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.iOS.Central
@@ -18,8 +19,9 @@ namespace ReactiveBluetooth.iOS.Central
     {
         private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
-        public Device(CBPeripheral peripheral, int rssi)
+        public Device(CBPeripheral peripheral, int rssi, IAdvertisementData advertisementData)
         {
+            AdvertisementData = advertisementData;
             Peripheral = peripheral;
             _cbPeripheralDelegate = new PeripheralDelegate.PeripheralDelegate();
             peripheral.Delegate = _cbPeripheralDelegate;
@@ -35,6 +37,7 @@ namespace ReactiveBluetooth.iOS.Central
 
         public string Name => Peripheral.Name;
         public ConnectionState State => (ConnectionState) Peripheral.State;
+        public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
         public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
@@ -79,6 +82,11 @@ namespace ReactiveBluetooth.iOS.Central
             }).Select(x => x.Item2.Value?.ToArray());
 
             return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { }).Merge(observable).FirstAsync().ToTask(cancellationToken);
+        }
+
+        public Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

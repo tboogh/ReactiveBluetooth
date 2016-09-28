@@ -36,7 +36,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Central\ConnectionState.cs" />
+    <Compile Include="Central\IAdvertisementData.cs" />
+    <Compile Include="Types\CharacteristicProperty.cs" />
+    <Compile Include="Types\CharacteristicPermission.cs" />
+    <Compile Include="Types\WriteType.cs" />
+    <Compile Include="Types\ConnectionState.cs" />
     <Compile Include="Central\IService.cs" />
     <Compile Include="Central\ManagerState.cs" />
     <Compile Include="Exceptions\AddServiceException.cs" />
@@ -56,7 +60,7 @@
     <Compile Include="Peripheral\IPeripheralManager.cs" />
     <Compile Include="Peripheral\IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceType.cs" />
+    <Compile Include="Types\ServiceType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

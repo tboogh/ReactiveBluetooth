@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CoreBluetooth;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.iOS.Extensions
 {

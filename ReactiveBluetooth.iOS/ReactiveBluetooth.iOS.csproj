@@ -56,6 +56,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Central\AdvertisementData.cs" />
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\CentralManagerDelegate\CentralManagerDelegate.cs" />
     <Compile Include="Central\Characteristic.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Core.Central
 {
@@ -13,6 +14,8 @@ namespace ReactiveBluetooth.Core.Central
 
         ConnectionState State { get; }
 
+        IAdvertisementData AdvertisementData { get; }
+
         Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken);
 
         IObservable<int> Rssi { get; }
@@ -20,5 +23,7 @@ namespace ReactiveBluetooth.Core.Central
         void UpdateRemoteRssi();
 
         Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken);
+
+        Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken);
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Types;
 using Xamarin.Forms;
 
 namespace SampleApp.Common.ValueConverters

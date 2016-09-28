@@ -13,14 +13,16 @@ using Android.Content;
 using Android.OS.Storage;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.Android.Central
 {
     public class Device : IDevice
     {
-        public Device(BluetoothDevice device, int rssi)
+        public Device(BluetoothDevice device, int rssi, AdvertisementData advertisementData)
         {
+            AdvertisementData = advertisementData;
             NativeDevice = device;
             GattCallback = new BleGattCallback();
             var currentRssi = Observable.Return(rssi);
@@ -57,6 +59,7 @@ namespace ReactiveBluetooth.Android.Central
             }
         }
 
+        public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
         public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
@@ -86,6 +89,11 @@ namespace ReactiveBluetooth.Android.Central
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
+        }
+
+        public Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

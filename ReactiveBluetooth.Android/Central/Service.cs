@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
 
 namespace ReactiveBluetooth.Android.Central

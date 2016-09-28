@@ -1,5 +1,6 @@
 ﻿using System;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Core.Peripheral
 {

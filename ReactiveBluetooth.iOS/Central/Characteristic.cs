@@ -3,6 +3,7 @@ using CoreBluetooth;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Extensions;
+using ReactiveBluetooth.Core.Types;
 using ReactiveBluetooth.iOS.Extensions;
 
 namespace ReactiveBluetooth.iOS.Central

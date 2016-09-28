@@ -6,6 +6,7 @@ using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
@@ -20,7 +21,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             _serverCallback = serverCallback;
         }
 
-        public IService CreateService(Guid id, Core.ServiceType type)
+        public IService CreateService(Guid id, ServiceType type)
         {
             var gattService = new BluetoothGattService(UUID.FromString(id.ToString()), (GattServiceType)type);
             return new Service(gattService);

@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Android.Extensions
 {
