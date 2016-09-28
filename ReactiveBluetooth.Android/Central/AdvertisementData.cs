@@ -7,6 +7,7 @@ using Android.Bluetooth.LE;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using ReactiveBluetooth.Core.Central;
@@ -29,11 +30,18 @@ namespace ReactiveBluetooth.Android.Central
         {
             get
             {
-                throw new NotImplementedException(); 
+                SparseArray manufacturerSpecificData = _scanRecord.ManufacturerSpecificData;
+                byte[] data = new byte[manufacturerSpecificData.Size()];
+                for (int i = 0; i < manufacturerSpecificData.Size(); ++i)
+                {
+                    data[i] = (byte) manufacturerSpecificData.Get(i);
+                }
+                return data;
             }
         }
 
-        public List<Guid> ServiceUuids => _scanRecord.ServiceUuids?.Select(x => Guid.Parse(x.Uuid.ToString())).ToList();
+        public List<Guid> ServiceUuids => _scanRecord.ServiceUuids?.Select(x => Guid.Parse(x.Uuid.ToString()))
+            .ToList();
 
         public Dictionary<Guid, byte[]> ServiceData => _scanRecord.ServiceData?.ToDictionary(x => Guid.Parse(x.Key.Uuid.ToString()), x => x.Value);
     }
