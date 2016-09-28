@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Central\IAdvertisementData.cs" />
     <Compile Include="Types\CharacteristicProperty.cs" />
     <Compile Include="Types\CharacteristicPermission.cs" />
     <Compile Include="Types\WriteType.cs" />

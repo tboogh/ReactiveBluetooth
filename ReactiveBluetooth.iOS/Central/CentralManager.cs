@@ -33,7 +33,7 @@ namespace ReactiveBluetooth.iOS.Central
             var scanObservable = Observable.FromEvent<IDevice>(action => { _centralManager.ScanForPeripherals((CBUUID[])null); }, action => { _centralManager.StopScan(); });
             return scanObservable.Merge(_centralManagerDelegate.DiscoveredPeriperhalSubject.Select(x =>
             {
-                Device device = new Device(x.Item2, x.Item4.Int32Value);
+                Device device = new Device(x.Item2, x.Item4.Int32Value, new AdvertisementData(x.Item3));
                 return device;
             }));
 

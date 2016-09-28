@@ -30,6 +30,7 @@ namespace SampleApp
             Container.RegisterTypeForNavigation<CentralPage, CentralModeViewModel>();
             Container.RegisterTypeForNavigation<DeviceDetailPage, DeviceViewModel>();
             Container.RegisterTypeForNavigation<CharacteristicDetailPage, CharacteristicViewModel>();
+            Container.RegisterTypeForNavigation<AdvertiseDataPage, AdvertiseDataViewModel>();
         }
     }
 }

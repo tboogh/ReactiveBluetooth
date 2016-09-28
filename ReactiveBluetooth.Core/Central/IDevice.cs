@@ -14,6 +14,8 @@ namespace ReactiveBluetooth.Core.Central
 
         ConnectionState State { get; }
 
+        IAdvertisementData AdvertisementData { get; }
+
         Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken);
 
         IObservable<int> Rssi { get; }

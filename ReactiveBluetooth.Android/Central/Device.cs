@@ -21,8 +21,9 @@ namespace ReactiveBluetooth.Android.Central
 {
     public class Device : IDevice
     {
-        public Device(BluetoothDevice device, int rssi)
+        public Device(BluetoothDevice device, int rssi, AdvertisementData advertisementData)
         {
+            AdvertisementData = advertisementData;
             NativeDevice = device;
             GattCallback = new BleGattCallback();
             var currentRssi = Observable.Return(rssi);
@@ -59,6 +60,7 @@ namespace ReactiveBluetooth.Android.Central
             }
         }
 
+        public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
         public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
