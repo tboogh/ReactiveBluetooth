@@ -42,9 +42,14 @@ namespace ReactiveBluetooth.iOS.Central
         {
             get
             {
-                NSArray<CBUUID> uuids = (NSArray<CBUUID>) _advertisementData[CBAdvertisement.DataServiceUUIDsKey];
-                return uuids?.Select(x => x.Uuid.ToGuid())
-                    .ToList();
+                NSArray uuids = (NSArray)_advertisementData[CBAdvertisement.DataServiceUUIDsKey];
+                List<Guid> serviceUuids = new List<Guid>();
+                for (nuint i = 0; i < uuids.Count; ++i)
+                {
+                    var uuid = uuids.GetItem<CBUUID>(i);
+                    serviceUuids.Add(uuid.Uuid.ToGuid());
+                }
+                return serviceUuids;
             }
         }
 
