@@ -9,6 +9,7 @@ using System.Text;
 using CoreBluetooth;
 using CoreFoundation;
 using Foundation;
+using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Peripheral;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;

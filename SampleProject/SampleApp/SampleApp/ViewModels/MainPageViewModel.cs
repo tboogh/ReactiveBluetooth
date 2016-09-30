@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Prism.Navigation;
 using Prism.Services;
+using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using SampleApp.Views;
 

@@ -4,6 +4,8 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 using Plugin.CurrentActivity;
+using ReactiveBluetooth.Android.Extensions;
+using ReactiveBluetooth.Core;
 
 namespace ReactiveBluetooth.Android.Common
 {
@@ -15,11 +17,11 @@ namespace ReactiveBluetooth.Android.Common
         {
             _activity = CrossCurrentActivity.Current.Activity;
             _activity.RegisterReceiver(this, new IntentFilter(BluetoothAdapter.ActionStateChanged));
-            StateUpdatedSubject = new BehaviorSubject<State>(BluetoothAdapter.DefaultAdapter.State);
+            StateUpdatedSubject = new BehaviorSubject<ManagerState>(BluetoothAdapter.DefaultAdapter?.State.ToManagerState() ?? ManagerState.Unsupported);
         }
 
 
-        public BehaviorSubject<State> StateUpdatedSubject { get; }
+        public BehaviorSubject<ManagerState> StateUpdatedSubject { get; }
 
         public override void OnReceive(Context context, Intent intent)
         {
@@ -28,7 +30,7 @@ namespace ReactiveBluetooth.Android.Common
             if (action == BluetoothAdapter.ActionStateChanged)
             {
                 State state = (State) intent.GetIntExtra(BluetoothAdapter.ExtraState, BluetoothAdapter.Error);
-                StateUpdatedSubject?.OnNext(state);
+                StateUpdatedSubject?.OnNext(state.ToManagerState());
             }
         }
 
