@@ -71,7 +71,7 @@ namespace SampleApp.ViewModels.Peripheral
             _writeDisposable = writeCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
-                _writeValue = request.Value;
+                SetWriteValue(request.Value);
                 _peripheralManager.SendResponse(request, 0, _writeValue);
             });
             _writeReadDisposable = writeCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
@@ -81,7 +81,7 @@ namespace SampleApp.ViewModels.Peripheral
             _writeWithoutResponseDisposable = writeWithoutResponseCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write without response request. Value: {BitConverter.ToString(request.Value)}");
-                _writeValue = request.Value;
+                SetWriteValue(request.Value);
             });
 
             _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });

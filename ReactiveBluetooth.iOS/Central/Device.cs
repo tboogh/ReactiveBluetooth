@@ -105,8 +105,7 @@ namespace ReactiveBluetooth.iOS.Central
                         throw new Exception(x.Item3.LocalizedDescription);
                     }
                     return true;
-                }))
-                    .ToTask(cancellationToken);
+                })).FirstAsync().ToTask(cancellationToken);
             }
 
             return writeObservable.Merge<bool>(Observable.Return(true)).ToTask(cancellationToken);
