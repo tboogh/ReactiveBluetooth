@@ -47,6 +47,8 @@ namespace SampleApp.ViewModels.Peripheral
             set { SetProperty(ref _advertising, value); }
         }
 
+        public string WriteValue => BitConverter.ToString(_writeValue);
+
         public DelegateCommand AdvertiseCommand { get; }
         public DelegateCommand StopAdvertiseCommand { get; }
 
@@ -58,7 +60,7 @@ namespace SampleApp.ViewModels.Peripheral
             var service = _peripheralManager.Factory.CreateService(Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"), ServiceType.Primary);
             var readCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"), new byte[] {0xB0, 0x06}, CharacteristicPermission.Read, CharacteristicProperty.Read);
 
-            _readDisposable =  readCharacterstic.ReadRequestObservable.Subscribe(request =>
+            _readDisposable = readCharacterstic.ReadRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine("Read request");
                 _peripheralManager.SendResponse(request, 0, new byte[] {0xB0, 0x0B});
@@ -72,23 +74,17 @@ namespace SampleApp.ViewModels.Peripheral
                 _writeValue = request.Value;
                 _peripheralManager.SendResponse(request, 0, _writeValue);
             });
-            _writeReadDisposable = writeCharacterstic.ReadRequestObservable.Subscribe(request =>
-            {
-                _peripheralManager.SendResponse(request, 0, _writeValue);
-            });
+            _writeReadDisposable = writeCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
 
             var writeWithoutResponseCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060003-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.WriteWithoutResponse);
 
-            _writeWithoutResponseDisposable =  writeWithoutResponseCharacterstic.WriteRequestObservable.Subscribe(request =>
+            _writeWithoutResponseDisposable = writeWithoutResponseCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write without response request. Value: {BitConverter.ToString(request.Value)}");
                 _writeValue = request.Value;
             });
 
-            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request =>
-            {
-                _peripheralManager.SendResponse(request, 0, _writeValue);
-            });
+            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
 
             if (!service.AddCharacteristic(writeCharacterstic))
             {
@@ -99,7 +95,7 @@ namespace SampleApp.ViewModels.Peripheral
                 throw new Exception("Failed to add read characteristic");
             }
 
-            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") }}, new List<IService> {service})
+            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62")}}, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });
         }
 
@@ -107,7 +103,8 @@ namespace SampleApp.ViewModels.Peripheral
         {
             _advertiseDisposable?.Dispose();
             _writeDisposable?.Dispose();
-            _readDisposable?.Dispose(); ;
+            _readDisposable?.Dispose();
+            ;
             _writeReadDisposable?.Dispose();
             _stateDisposable?.Dispose();
             _writeWithoutResponseDisposable?.Dispose();
@@ -134,6 +131,12 @@ namespace SampleApp.ViewModels.Peripheral
         public void OnDisappearing(Page page)
         {
             StopAdvertise();
+        }
+
+        private void SetWriteValue(byte[] writeValue)
+        {
+            _writeValue = writeValue;
+            OnPropertyChanged(() => WriteValue);
         }
     }
 }
