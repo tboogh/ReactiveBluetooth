@@ -21,6 +21,7 @@ using Plugin.CurrentActivity;
 using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
+using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Peripheral;
@@ -54,7 +55,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         public IBluetoothAbstractFactory Factory { get; }
 
 
-        public IObservable<ManagerState> State() => _broadcastListener.StateUpdatedSubject.Select(x => x.ToManagerState());
+        public IObservable<ManagerState> State() => _broadcastListener.StateUpdatedSubject;
 
 
         public void Dispose()

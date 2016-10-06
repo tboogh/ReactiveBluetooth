@@ -22,14 +22,17 @@ namespace SampleApp.ViewModels.Peripheral
         private IDisposable _stateDisposable;
         private IDisposable _advertiseDisposable;
         private byte[] _writeValue = new byte[] {0xB0, 0x0B};
+        private IDisposable _writeDisposable;
+        private IDisposable _writeWithoutResponseDisposable;
+        private IDisposable _readDisposable;
+        private IDisposable _writeReadDisposable;
+        private IDisposable _writeWithoutResponseReadDisposable;
 
         public PeripheralModeViewModel(IPeripheralManager peripheralManager)
         {
             _peripheralManager = peripheralManager;
             AdvertiseCommand = new DelegateCommand(StartAdvertise);
             StopAdvertiseCommand = new DelegateCommand(StopAdvertise);
-            _stateDisposable = _peripheralManager.State()
-                .Subscribe(state => { State = state.ToString(); });
         }
 
         public string State
@@ -44,6 +47,8 @@ namespace SampleApp.ViewModels.Peripheral
             set { SetProperty(ref _advertising, value); }
         }
 
+        public string WriteValue => BitConverter.ToString(_writeValue);
+
         public DelegateCommand AdvertiseCommand { get; }
         public DelegateCommand StopAdvertiseCommand { get; }
 
@@ -55,7 +60,7 @@ namespace SampleApp.ViewModels.Peripheral
             var service = _peripheralManager.Factory.CreateService(Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"), ServiceType.Primary);
             var readCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"), new byte[] {0xB0, 0x06}, CharacteristicPermission.Read, CharacteristicProperty.Read);
 
-            readCharacterstic.ReadRequestObservable.Subscribe(request =>
+            _readDisposable = readCharacterstic.ReadRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine("Read request");
                 _peripheralManager.SendResponse(request, 0, new byte[] {0xB0, 0x0B});
@@ -63,16 +68,23 @@ namespace SampleApp.ViewModels.Peripheral
 
             var writeCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.Write);
 
-            writeCharacterstic.WriteRequestObservable.Subscribe(request =>
+            _writeDisposable = writeCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
-                _writeValue = request.Value;
+                SetWriteValue(request.Value);
                 _peripheralManager.SendResponse(request, 0, _writeValue);
             });
-            writeCharacterstic.ReadRequestObservable.Subscribe(request =>
+            _writeReadDisposable = writeCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
+
+            var writeWithoutResponseCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060003-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.WriteWithoutResponse);
+
+            _writeWithoutResponseDisposable = writeWithoutResponseCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
-                _peripheralManager.SendResponse(request, 0, _writeValue);
+                Debug.WriteLine($"Write without response request. Value: {BitConverter.ToString(request.Value)}");
+                SetWriteValue(request.Value);
             });
+
+            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
 
             if (!service.AddCharacteristic(writeCharacterstic))
             {
@@ -82,14 +94,24 @@ namespace SampleApp.ViewModels.Peripheral
             {
                 throw new Exception("Failed to add read characteristic");
             }
-
-            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") }}, new List<IService> {service})
+            if (!service.AddCharacteristic(writeWithoutResponseCharacterstic))
+            {
+                throw new Exception("Failed to add write without response characteristic");
+            }
+            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62")}}, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });
         }
 
         public void StopAdvertise()
         {
             _advertiseDisposable?.Dispose();
+            _writeDisposable?.Dispose();
+            _readDisposable?.Dispose();
+            ;
+            _writeReadDisposable?.Dispose();
+            _stateDisposable?.Dispose();
+            _writeWithoutResponseDisposable?.Dispose();
+            _writeWithoutResponseReadDisposable?.Dispose();
             _advertiseDisposable = null;
             Advertising = false;
         }
@@ -105,12 +127,19 @@ namespace SampleApp.ViewModels.Peripheral
 
         public void OnAppearing(Page page)
         {
-            
+            _stateDisposable = _peripheralManager.State()
+                .Subscribe(state => { State = state.ToString(); });
         }
 
         public void OnDisappearing(Page page)
         {
-            _advertiseDisposable?.Dispose();
+            StopAdvertise();
+        }
+
+        private void SetWriteValue(byte[] writeValue)
+        {
+            _writeValue = writeValue;
+            OnPropertyChanged(() => WriteValue);
         }
     }
 }

@@ -42,7 +42,7 @@
     <Compile Include="Types\WriteType.cs" />
     <Compile Include="Types\ConnectionState.cs" />
     <Compile Include="Central\IService.cs" />
-    <Compile Include="Central\ManagerState.cs" />
+    <Compile Include="ManagerState.cs" />
     <Compile Include="Exceptions\AddServiceException.cs" />
     <Compile Include="Exceptions\AdvertisingNotSupportedException.cs" />
     <Compile Include="Exceptions\DiscoverDeviceException.cs" />

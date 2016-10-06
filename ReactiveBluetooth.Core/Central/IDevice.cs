@@ -24,6 +24,6 @@ namespace ReactiveBluetooth.Core.Central
 
         Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken);
 
-        Task WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken);
+        Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken);
     }
 }

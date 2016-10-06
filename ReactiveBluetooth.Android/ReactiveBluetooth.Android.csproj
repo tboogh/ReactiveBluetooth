@@ -75,6 +75,7 @@
     <Compile Include="Extensions\GattPermissionExtensions.cs" />
     <Compile Include="Extensions\GattPropertyExtensions.cs" />
     <Compile Include="Extensions\StateExtentions.cs" />
+    <Compile Include="Extensions\WriteTypeExtensions.cs" />
     <Compile Include="Peripheral\AbstractFactory.cs" />
     <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />

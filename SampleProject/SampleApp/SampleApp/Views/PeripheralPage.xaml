@@ -22,5 +22,6 @@
         </Label>
         <Button Text="Start Advertising" Command="{Binding AdvertiseCommand}" />
         <Button Text="Stop Advertising" Command="{Binding StopAdvertiseCommand}" />
+        <Label Text="{Binding WriteValue}" />
     </StackLayout>
 </ContentPage>

@@ -33,7 +33,7 @@ namespace Issue_14
             base.ViewWillAppear(animated);
             _stateDisp = _centralManager.State().SubscribeOn(SynchronizationContext.Current).Subscribe(state =>
             {
-                if (state == ReactiveBluetooth.Core.Central.ManagerState.PoweredOn)
+                if (state == (ReactiveBluetooth.Core.ManagerState) ManagerState.PoweredOn)
                 {
                     _scanDisp?.Dispose();
                     _scanDisp = _centralManager.ScanForDevices().Distinct(x => x.Uuid).SubscribeOn(SynchronizationContext.Current).Subscribe(device =>

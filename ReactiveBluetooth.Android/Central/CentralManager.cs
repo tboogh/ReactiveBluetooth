@@ -10,6 +10,7 @@ using Android.Content;
 using Plugin.CurrentActivity;
 using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Extensions;
+using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Types;
@@ -39,12 +40,8 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<ManagerState> State()
         {
-            return _broadcastListener.StateUpdatedSubject.Select(state =>
-            {
-                var s = state.ToManagerState();
-                return s;
-            })
-                .StartWith(_bluetoothAdapter.State.ToManagerState());
+            return _broadcastListener.StateUpdatedSubject;
+            //.StartWith(_bluetoothAdapter?.State.ToManagerState() ?? ManagerState.Unsupported);
         }
 
         public IObservable<IDevice> ScanForDevices()
