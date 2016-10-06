@@ -75,7 +75,17 @@ namespace SampleApp.ViewModels.Central
 
         public Guid Uuid => _characteristic?.Uuid ?? Guid.Empty;
         public bool CanRead => _characteristic?.Properties.HasFlag(CharacteristicProperty.Read) ?? false;
-        public bool CanWrite => _characteristic?.Properties.HasFlag(CharacteristicProperty.Write) ?? false;
+
+        public bool CanWrite
+        {
+            get
+            {
+                var write = _characteristic?.Properties.HasFlag(CharacteristicProperty.Write) ?? false;
+                var writeWithouResponse = _characteristic?.Properties.HasFlag(CharacteristicProperty.WriteWithoutResponse) ?? false;
+                return write || writeWithouResponse;
+            }
+        }
+
         public bool CanNotify => (_characteristic?.Properties.HasFlag(CharacteristicProperty.Notify) ?? false) || (_characteristic?.Properties.HasFlag(CharacteristicProperty.Indicate) ?? false);
         public CharacteristicProperty Properties => _characteristic?.Properties ?? 0;
         public DelegateCommand ReadValueCommand { get; }

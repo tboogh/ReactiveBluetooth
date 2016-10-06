@@ -101,7 +101,7 @@ namespace ReactiveBluetooth.Android.Central
                 gattCharacteristic.WriteType = writeType.ToGattWriteType();
                 gattCharacteristic.SetValue(value);
 
-                Gatt.WriteCharacteristic(gattCharacteristic);
+                var result = Gatt.WriteCharacteristic(gattCharacteristic);
             }, _ => { });
 
             if (writeType == WriteType.WithResponse)

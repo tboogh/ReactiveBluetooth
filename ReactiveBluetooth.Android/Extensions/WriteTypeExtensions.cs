@@ -21,9 +21,9 @@ namespace ReactiveBluetooth.Android.Extensions
             switch (writeType)
             {
                 case WriteType.WithoutRespoonse:
-                    return GattWriteType.Default;
-                case WriteType.WithResponse:
                     return GattWriteType.NoResponse;
+                case WriteType.WithResponse:
+                    return GattWriteType.Default;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(writeType), writeType, null);
             }

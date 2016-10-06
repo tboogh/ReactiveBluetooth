@@ -94,7 +94,10 @@ namespace SampleApp.ViewModels.Peripheral
             {
                 throw new Exception("Failed to add read characteristic");
             }
-
+            if (!service.AddCharacteristic(writeWithoutResponseCharacterstic))
+            {
+                throw new Exception("Failed to add write without response characteristic");
+            }
             _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62")}}, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });
         }
