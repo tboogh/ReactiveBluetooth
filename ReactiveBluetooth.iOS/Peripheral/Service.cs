@@ -17,6 +17,12 @@ namespace ReactiveBluetooth.iOS.Peripheral
             MutableService = mutableService;
         }
 
+        public Service(Guid id, ServiceType type)
+        {
+            CBMutableService mutableService = new CBMutableService(CBUUID.FromString(id.ToString()), type == ServiceType.Primary);
+            MutableService = mutableService;
+        }
+
         public CBMutableService MutableService { get; }
         public Guid Uuid => Guid.Parse(MutableService.UUID.ToString());
         public ServiceType ServiceType => MutableService.Primary ? ServiceType.Primary : ServiceType.Secondary;

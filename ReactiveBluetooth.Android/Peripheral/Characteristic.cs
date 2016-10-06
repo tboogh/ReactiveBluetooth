@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.Bluetooth;
+using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core;
@@ -13,8 +14,16 @@ namespace ReactiveBluetooth.Android.Peripheral
 {
     public class Characteristic : ICharacteristic
     {
-        public Characteristic(BluetoothGattCharacteristic characteristic, IServerCallback serverCallback)
+        public Characteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property, IServerCallback serverCallback)
         {
+            var nativePermissions = permission.ToGattPermission();
+            var nativeProperties = property.ToGattProperty();
+
+            var characteristic = new BluetoothGattCharacteristic(UUID.FromString(uuid.ToString()), nativeProperties, nativePermissions);
+            if (!characteristic.SetValue(value))
+            {
+                throw new Exception("Failed to set characteristic value");
+            }
             GattCharacteristic = characteristic;
 
             ReadRequestObservable = serverCallback.CharacteristicReadRequestSubject

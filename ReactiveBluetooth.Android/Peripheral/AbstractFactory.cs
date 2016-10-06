@@ -21,10 +21,9 @@ namespace ReactiveBluetooth.Android.Peripheral
             _serverCallback = serverCallback;
         }
 
-        public IService CreateService(Guid id, ServiceType type)
+        public IService CreateService(Guid uuid, ServiceType type)
         {
-            var gattService = new BluetoothGattService(UUID.FromString(id.ToString()), (GattServiceType)type);
-            return new Service(gattService);
+            return new Service(uuid, type);
         }
 
         /// <summary>
@@ -38,22 +37,13 @@ namespace ReactiveBluetooth.Android.Peripheral
         /// <returns></returns>
         public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property)
         {
-            var nativePermissions = permission.ToGattPermission();
-            var nativeProperties = property.ToGattProperty();
-
-            var bluetoothGattCharacteristic = new BluetoothGattCharacteristic(UUID.FromString(uuid.ToString()), nativeProperties, nativePermissions);
-
-            Characteristic characteristic = new Characteristic(bluetoothGattCharacteristic, _serverCallback);
-
-            if (!bluetoothGattCharacteristic.SetValue(value))
-            {
-                throw new Exception("Failed to set characteristic value");
-            }
+            Characteristic characteristic = new Characteristic(uuid, value, permission, property, _serverCallback);
             return characteristic;
         }
 
-        
-
-        
+        public IDescriptor CreateDescriptor(Guid uuid, byte[] value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

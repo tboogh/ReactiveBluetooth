@@ -22,29 +22,20 @@ namespace ReactiveBluetooth.iOS.Peripheral
             _peripheralDelegate = peripheralDelegate;
         }
 
-        public IService CreateService(Guid id, ServiceType type)
+        public IService CreateService(Guid uuid, ServiceType type)
         {
-            CBMutableService mutableService = new CBMutableService(CBUUID.FromString(id.ToString()), type == ServiceType.Primary);
-            return new Service(mutableService);
+            
+            return new Service(uuid, type);
         }
 
         public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property)
         {
-            var nativePermissions = permission.ToCBAttributePermission();
-            var nativeProperties = property.ToCBCharacteristicProperty();
-
-            NSData nsData = null;
-            if (value != null)
-            {
-                NSData.FromArray(value);
-            }
-
-            CBMutableCharacteristic mutableCharacteristic = new CBMutableCharacteristic(CBUUID.FromString(uuid.ToString()), nativeProperties, nsData, nativePermissions);
-            return new Characteristic(mutableCharacteristic, _peripheralDelegate);
+            return new Characteristic(uuid, value, permission, property, _peripheralDelegate);
         }
 
-        
-
-        
+        public IDescriptor CreateDescriptor(Guid uuid, byte[] value)
+        {
+            return new Descriptor(uuid, value);
+        }
     }
 }

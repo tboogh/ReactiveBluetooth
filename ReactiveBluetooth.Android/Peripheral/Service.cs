@@ -1,5 +1,6 @@
 using System;
 using Android.Bluetooth;
+using Java.Util;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 
@@ -9,8 +10,10 @@ namespace ReactiveBluetooth.Android.Peripheral
     {
         public BluetoothGattService GattService { get; }
 
-        public Service(BluetoothGattService gattService)
+        
+        public Service(Guid id, ServiceType type)
         {
+            var gattService = new BluetoothGattService(UUID.FromString(id.ToString()), (GattServiceType)type);
             GattService = gattService;
         }
 
