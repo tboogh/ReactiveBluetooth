@@ -60,6 +60,7 @@
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\CentralManagerDelegate\CentralManagerDelegate.cs" />
     <Compile Include="Central\Characteristic.cs" />
+    <Compile Include="Central\Descriptor.cs" />
     <Compile Include="Central\Device.cs" />
     <Compile Include="Central\PeripheralDelegate\PeripheralDelegate.cs" />
     <Compile Include="Extensions\CBAttributePermissionsExtensions.cs" />

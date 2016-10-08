@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Central\AdvertisementData.cs" />
+    <Compile Include="Central\Descriptor.cs" />
     <Compile Include="Common\BroadcastListener.cs" />
     <Compile Include="Central\BleGattCallback.cs" />
     <Compile Include="Central\BleScanCallback.cs" />

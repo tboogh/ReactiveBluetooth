@@ -94,29 +94,66 @@ namespace ReactiveBluetooth.Android.Central
 
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
-            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic)characteristic).GattCharacteristic;
+            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).GattCharacteristic;
 
             var writeObservable = Observable.FromEvent<bool>(action =>
             {
                 gattCharacteristic.WriteType = writeType.ToGattWriteType();
-                gattCharacteristic.SetValue(value);
+
+                var setValueResult = gattCharacteristic.SetValue(value);
+                if (!setValueResult)
+                    action(false);
 
                 var result = Gatt.WriteCharacteristic(gattCharacteristic);
+                if (!result)
+                    action(false);
             }, _ => { });
 
             if (writeType == WriteType.WithResponse)
             {
-                return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic).Select(
-                    x =>
+                return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
+                    .Select(x =>
                     {
                         if (x.Item3 != GattStatus.Success)
                         {
                             throw new Exception($"Failed to write characteristic: {x.Item3.ToString()}");
                         }
                         return true;
-                    })).Take(1).ToTask(cancellationToken);
+                    }))
+                    .Take(1)
+                    .ToTask(cancellationToken);
             }
-            return writeObservable.Merge(Observable.Return(true)).Take(1).ToTask(cancellationToken);
+            return writeObservable.Merge(Observable.Return(true))
+                .Take(1)
+                .ToTask(cancellationToken);
+        }
+
+        public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
+        {
+            BluetoothGattDescriptor gattDescriptor = ((Descriptor) descriptor).NativeDescriptor;
+
+            var writeObservable = Observable.FromEvent<bool>(action =>
+            {
+                var result = gattDescriptor.SetValue(value);
+                if (!result)
+                    action(false);
+
+                var writeResult = Gatt.WriteDescriptor(gattDescriptor);
+                if (!writeResult)
+                    action(false);
+            }, _ => { });
+
+            return writeObservable.Merge(GattCallback.DescriptorWriteSubject.FirstAsync(x => x.Item2 == gattDescriptor)
+                .Select(x =>
+                {
+                    if (x.Item3 != GattStatus.Success)
+                    {
+                        throw new Exception($"Failed to write desciptor: {x.Item3.ToString()}");
+                    }
+                    return true;
+                }))
+                .Take(1)
+                .ToTask(cancellationToken);
         }
     }
 }
