@@ -26,16 +26,21 @@ namespace ReactiveBluetooth.iOS.Peripheral
             }
 
             CBMutableCharacteristic mutableCharacteristic = new CBMutableCharacteristic(CBUUID.FromString(uuid.ToString()), nativeProperties, nsData, nativePermissions);
-            MutableCharacteristic = mutableCharacteristic;
+            NativeCharacteristic = mutableCharacteristic;
 
-            ReadRequestObservable = peripheralDelegate.ReadRequestReceivedSubject.Where(x => x.AttRequest.Characteristic.UUID == MutableCharacteristic.UUID).Select(x => new AttRequest(this, x.AttRequest)).AsObservable();
+            ReadRequestObservable = peripheralDelegate.ReadRequestReceivedSubject.Where(x => x.AttRequest.Characteristic.UUID == NativeCharacteristic.UUID).Select(x => new AttRequest(this, x.AttRequest)).AsObservable();
             WriteRequestObservable = peripheralDelegate.WriteRequestsReceivedSubject.SelectMany(received => received.Requests.Select(x => new AttRequest(this, x)).ToObservable()).Where(x => x.Characteristic.Uuid == Uuid).AsObservable();
         }
 
-        public Guid Uuid => Guid.Parse(MutableCharacteristic.UUID.ToString());
-        public CharacteristicProperty Properties => MutableCharacteristic.Properties.ToCharacteristicProperty();
-        public CharacteristicPermission Permissions => MutableCharacteristic.Permissions.ToCharacteristicPermission();
-        public CBMutableCharacteristic MutableCharacteristic { get; }
+        public Guid Uuid => Guid.Parse(NativeCharacteristic.UUID.ToString());
+        public CharacteristicProperty Properties => NativeCharacteristic.Properties.ToCharacteristicProperty();
+
+        public IDescriptor[] Descriptors => NativeCharacteristic.Descriptors.Select(x => new Descriptor(x))
+           .Cast<IDescriptor>()
+           .ToArray();
+
+        public CharacteristicPermission Permissions => NativeCharacteristic.Permissions.ToCharacteristicPermission();
+        public CBMutableCharacteristic NativeCharacteristic { get; }
         public IObservable<IAttRequest> ReadRequestObservable { get; }
         public IObservable<IAttRequest> WriteRequestObservable { get; }
 

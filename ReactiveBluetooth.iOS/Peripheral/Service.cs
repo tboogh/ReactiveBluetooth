@@ -31,7 +31,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
         {
             List<CBCharacteristic> characteristics = MutableService.Characteristics?.ToList() ?? new List<CBCharacteristic>();
             var nativeCharacteristic = (Characteristic) characteristic;
-            characteristics.Add(nativeCharacteristic.MutableCharacteristic);
+            characteristics.Add(nativeCharacteristic.NativeCharacteristic);
 
             MutableService.Characteristics = characteristics.ToArray();
             return true;

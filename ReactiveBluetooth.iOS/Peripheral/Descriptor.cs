@@ -12,11 +12,19 @@ namespace ReactiveBluetooth.iOS.Peripheral
     {
         public Descriptor(Guid uuid, byte[] value)
         {
-            MutableDescriptor = new CBMutableDescriptor(CBUUID.FromString(uuid.ToString()), NSData.FromArray(value));
+            NativeDescriptor = new CBMutableDescriptor(CBUUID.FromString(uuid.ToString()), NSData.FromArray(value));
         }
 
-        public Guid Uuid => MutableDescriptor.UUID.Uuid.ToGuid();
+        public Descriptor(CBDescriptor descriptor)
+        {
+            NativeDescriptor = descriptor;
+        }
 
-        public CBMutableDescriptor MutableDescriptor { get; }
+        public Guid Uuid => NativeDescriptor.UUID.Uuid.ToGuid();
+
+        /// <summary>
+        /// CBMutableDescriptor has no writeable properties (last checked in iOS 10)
+        /// </summary>
+        public CBDescriptor NativeDescriptor { get; }
     }
 }

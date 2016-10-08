@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.Bluetooth;
@@ -38,6 +39,10 @@ namespace ReactiveBluetooth.Android.Peripheral
         public BluetoothGattCharacteristic GattCharacteristic { get; }
         public Guid Uuid => Guid.Parse(GattCharacteristic.Uuid.ToString());
         public CharacteristicProperty Properties => GattCharacteristic.Properties.ToCharacteristicProperty();
+        public IDescriptor[] Descriptors => GattCharacteristic.Descriptors.Select(x => new Descriptor(x))
+           .Cast<IDescriptor>()
+           .ToArray();
+
         public CharacteristicPermission Permissions => GattCharacteristic.Permissions.ToCharacteristicPermission();
         public IObservable<IAttRequest> ReadRequestObservable { get; }
         public IObservable<IAttRequest> WriteRequestObservable { get; }

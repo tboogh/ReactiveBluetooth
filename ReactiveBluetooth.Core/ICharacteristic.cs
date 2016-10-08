@@ -9,5 +9,7 @@ namespace ReactiveBluetooth.Core
         Guid Uuid { get; }
 
         CharacteristicProperty Properties { get; }
+
+        IDescriptor[] Descriptors { get; }
     }
 }
