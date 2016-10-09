@@ -41,9 +41,10 @@ namespace ReactiveBluetooth.Android.Peripheral
             return characteristic;
         }
 
-        public IDescriptor CreateDescriptor(Guid uuid, byte[] value)
+        public IDescriptor CreateDescriptor(Guid uuid, byte[] value, DescriptorPermission permission)
         {
-            throw new NotImplementedException();
+            Descriptor descriptor = new Descriptor(uuid, value, permission);
+            return descriptor;
         }
     }
 }

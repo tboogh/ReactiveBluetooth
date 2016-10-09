@@ -33,7 +33,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
             return new Characteristic(uuid, value, permission, property, _peripheralDelegate);
         }
 
-        public IDescriptor CreateDescriptor(Guid uuid, byte[] value)
+        public IDescriptor CreateDescriptor(Guid uuid, byte[] value, DescriptorPermission permission)
         {
             return new Descriptor(uuid, value);
         }

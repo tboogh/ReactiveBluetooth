@@ -10,8 +10,10 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Java.Util;
+using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Extensions;
+using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Android.Peripheral
 {
@@ -22,11 +24,11 @@ namespace ReactiveBluetooth.Android.Peripheral
             NativeDescriptor = descriptor;
         }
 
-        public Descriptor(Guid uuid)
+        public Descriptor(Guid uuid, byte[] value, DescriptorPermission permission)
         {
-            BluetoothGattDescriptor gattDescriptor = new BluetoothGattDescriptor(UUID.FromString(uuid.ToString()), GattDescriptorPermission.Read);
+            BluetoothGattDescriptor gattDescriptor = new BluetoothGattDescriptor(UUID.FromString(uuid.ToString()), permission.ToGattPermission());
+            gattDescriptor.SetValue(value);
             NativeDescriptor = gattDescriptor;
-            throw new NotImplementedException("Implementation not completed");
         }
 
         public Guid Uuid => NativeDescriptor.Uuid.ToString()
