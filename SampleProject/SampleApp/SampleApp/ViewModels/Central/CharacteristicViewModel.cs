@@ -159,6 +159,9 @@ namespace SampleApp.ViewModels.Central
             OnPropertyChanged(() => Properties);
 
             Descriptors.Clear();
+            if (_characteristic.Descriptors == null)
+                return;
+
             foreach (var descriptor in _characteristic.Descriptors)
             {
                 Descriptors.Add(new DescriptorViewModel(descriptor));
