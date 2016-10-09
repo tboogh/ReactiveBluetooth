@@ -24,7 +24,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         {
             var nativeCharacteristic = (Characteristic) characteristic;
 
-            return GattService.AddCharacteristic(nativeCharacteristic.GattCharacteristic);
+            return GattService.AddCharacteristic(nativeCharacteristic.NativeCharacteristic);
         }
     }
 }

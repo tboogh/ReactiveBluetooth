@@ -25,7 +25,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             {
                 throw new Exception("Failed to set characteristic value");
             }
-            GattCharacteristic = characteristic;
+            NativeCharacteristic = characteristic;
 
             ReadRequestObservable = serverCallback.CharacteristicReadRequestSubject
                 .Where(x => x.Item4.Uuid == characteristic.Uuid)
@@ -36,14 +36,20 @@ namespace ReactiveBluetooth.Android.Peripheral
                 .Select(request => new AttRequest(this, request.Item6, request.Item7, request.Item2, request.Item1));
         }
 
-        public BluetoothGattCharacteristic GattCharacteristic { get; }
-        public Guid Uuid => Guid.Parse(GattCharacteristic.Uuid.ToString());
-        public CharacteristicProperty Properties => GattCharacteristic.Properties.ToCharacteristicProperty();
-        public IDescriptor[] Descriptors => GattCharacteristic.Descriptors?.Select(x => new Descriptor(x))
+        public BluetoothGattCharacteristic NativeCharacteristic { get; }
+        public Guid Uuid => Guid.Parse(NativeCharacteristic.Uuid.ToString());
+        public CharacteristicProperty Properties => NativeCharacteristic.Properties.ToCharacteristicProperty();
+        public IDescriptor[] Descriptors => NativeCharacteristic.Descriptors?.Select(x => new Descriptor(x))
            .Cast<IDescriptor>()
            .ToArray();
 
-        public CharacteristicPermission Permissions => GattCharacteristic.Permissions.ToCharacteristicPermission();
+        public CharacteristicPermission Permissions => NativeCharacteristic.Permissions.ToCharacteristicPermission();
+        public void AddDescriptor(IDescriptor descriptor)
+        {
+            var nativeDescriptor = ((Descriptor) descriptor).NativeDescriptor;
+            NativeCharacteristic.AddDescriptor(nativeDescriptor);
+        }
+
         public IObservable<IAttRequest> ReadRequestObservable { get; }
         public IObservable<IAttRequest> WriteRequestObservable { get; }
     }
