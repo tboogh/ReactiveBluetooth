@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Prism.Commands;
-using Prism.Events;
 using Prism.Mvvm;
 using Prism.Navigation;
+using Prism.Services;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
-using System.Reactive.Linq;
-using System.Threading;
-using Prism.Services;
 using ReactiveBluetooth.Core.Types;
 using SampleApp.Common.Behaviors;
 using Xamarin.Forms;
@@ -20,27 +17,36 @@ namespace SampleApp.ViewModels.Central
 {
     public class CharacteristicViewModel : BindableBase, INavigationAware, IPageAppearingAware, INavigationBackAware
     {
+        private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly IPageDialogService _pageDialogService;
         private ICharacteristic _characteristic;
-        private string _value;
-        private IDisposable _connectionDisp;
-        private readonly CancellationTokenSource _cancellationTokenSource;
         private bool _connected;
+        private IDisposable _connectionDisp;
+        private string _value;
         private string _writeValue;
 
-        public CharacteristicViewModel(IPageDialogService pageDialogService)
+        public CharacteristicViewModel(IPageDialogService pageDialogService) : this()
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _pageDialogService = pageDialogService;
 
-            ReadValueCommand = DelegateCommand.FromAsyncHandler(Read)
-                .ObservesCanExecute(o => Connected);
-            WriteValueCommand = DelegateCommand.FromAsyncHandler(Write)
-                .ObservesCanExecute(o => Connected);
+            ReadValueCommand = new DelegateCommand(() =>
+            {
+                var read = Read();
+            }).ObservesCanExecute(o => Connected);
+            WriteValueCommand = new DelegateCommand(() =>
+            {
+                var write = Write();
+            }).ObservesCanExecute(o => Connected);
+            ToggleNotificationsCommands = new DelegateCommand(() =>
+            {
+                var toggle = ToggleNotifications();
+            });
         }
 
         public CharacteristicViewModel()
         {
+            Descriptors = new ObservableCollection<DescriptorViewModel>();
         }
 
         public IDevice Device { get; set; }
@@ -88,8 +94,10 @@ namespace SampleApp.ViewModels.Central
 
         public bool CanNotify => (_characteristic?.Properties.HasFlag(CharacteristicProperty.Notify) ?? false) || (_characteristic?.Properties.HasFlag(CharacteristicProperty.Indicate) ?? false);
         public CharacteristicProperty Properties => _characteristic?.Properties ?? 0;
+        public ObservableCollection<DescriptorViewModel> Descriptors { get; }
         public DelegateCommand ReadValueCommand { get; }
         public DelegateCommand WriteValueCommand { get; }
+        public DelegateCommand ToggleNotificationsCommands { get; }
 
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
@@ -99,17 +107,17 @@ namespace SampleApp.ViewModels.Central
         {
             if (parameters.ContainsKey(nameof(ICharacteristic)))
             {
-                ICharacteristic characteristic = (ICharacteristic) parameters[nameof(ICharacteristic)];
+                var characteristic = (ICharacteristic) parameters[nameof(ICharacteristic)];
                 Characteristic = characteristic;
             }
             if (parameters.ContainsKey(nameof(IDevice)))
             {
-                IDevice device = (IDevice) parameters[nameof(IDevice)];
+                var device = (IDevice) parameters[nameof(IDevice)];
                 Device = device;
             }
             if (parameters.ContainsKey("ConnectionObservable"))
             {
-                IObservable<ConnectionState> connectionObservable = (IObservable<ConnectionState>) parameters["ConnectionObservable"];
+                var connectionObservable = (IObservable<ConnectionState>) parameters["ConnectionObservable"];
                 _connectionDisp = connectionObservable.Subscribe(state =>
                 {
                     if (state == ConnectionState.Disconnecting || state == ConnectionState.Disconnected)
@@ -123,6 +131,12 @@ namespace SampleApp.ViewModels.Central
             Connected = true;
         }
 
+        public void PagePopped()
+        {
+            _cancellationTokenSource?.Cancel();
+            _connectionDisp.Dispose();
+        }
+
         public void OnAppearing(Page page)
         {
         }
@@ -131,10 +145,9 @@ namespace SampleApp.ViewModels.Central
         {
         }
 
-        public void PagePopped()
+        public Task ToggleNotifications()
         {
-            _cancellationTokenSource?.Cancel();
-            _connectionDisp.Dispose();
+            throw new NotImplementedException();
         }
 
         private void Update()
@@ -144,6 +157,12 @@ namespace SampleApp.ViewModels.Central
             OnPropertyChanged(() => CanWrite);
             OnPropertyChanged(() => CanNotify);
             OnPropertyChanged(() => Properties);
+
+            Descriptors.Clear();
+            foreach (var descriptor in _characteristic.Descriptors)
+            {
+                Descriptors.Add(new DescriptorViewModel(descriptor));
+            }
         }
 
         private async Task Read()

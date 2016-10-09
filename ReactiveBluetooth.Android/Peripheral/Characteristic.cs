@@ -39,7 +39,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         public BluetoothGattCharacteristic GattCharacteristic { get; }
         public Guid Uuid => Guid.Parse(GattCharacteristic.Uuid.ToString());
         public CharacteristicProperty Properties => GattCharacteristic.Properties.ToCharacteristicProperty();
-        public IDescriptor[] Descriptors => GattCharacteristic.Descriptors.Select(x => new Descriptor(x))
+        public IDescriptor[] Descriptors => GattCharacteristic.Descriptors?.Select(x => new Descriptor(x))
            .Cast<IDescriptor>()
            .ToArray();
 

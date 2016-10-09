@@ -20,7 +20,7 @@ namespace ReactiveBluetooth.iOS.Central
         public Guid Uuid => NativeCharacteristic.UUID.Uuid.ToGuid();
         public CharacteristicProperty Properties => NativeCharacteristic.Properties.ToCharacteristicProperty();
 
-        public IDescriptor[] Descriptors => NativeCharacteristic.Descriptors.Select(x => new Descriptor(x))
+        public IDescriptor[] Descriptors => NativeCharacteristic.Descriptors?.Select(x => new Descriptor(x))
             .Cast<IDescriptor>()
             .ToArray();
     }
