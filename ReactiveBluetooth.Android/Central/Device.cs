@@ -86,7 +86,20 @@ namespace ReactiveBluetooth.Android.Central
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).GattCharacteristic;
             var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                 .Select(x => x.Item2.GetValue());
+            
             return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { })
+                .Merge(observable)
+                .FirstAsync()
+                .ToTask(cancellationToken);
+        }
+
+        public Task<byte[]> ReadValue(IDescriptor descriptor, CancellationToken cancellationToken)
+        {
+            BluetoothGattDescriptor nativeDescriptor = ((Descriptor)descriptor).NativeDescriptor;
+            var observable = GattCallback.DescriptorReadSubject.FirstAsync(x => x.Item2 == nativeDescriptor)
+                .Select(x => x.Item2.GetValue());
+
+            return Observable.FromEvent<byte[]>(action => Gatt.ReadDescriptor(nativeDescriptor), _ => { })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);

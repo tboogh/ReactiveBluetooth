@@ -79,6 +79,27 @@ namespace ReactiveBluetooth.iOS.Central
                 .ToTask(cancellationToken);
         }
 
+        public Task<byte[]> ReadValue(IDescriptor descriptor, CancellationToken cancellationToken)
+        {
+            CBDescriptor nativeDescriptor = ((Descriptor) descriptor).NativeDescriptor;
+            var observable = _cbPeripheralDelegate.UpdatedValueSubject.FirstAsync(x =>
+            {
+                bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
+                bool descriptorEqual = x.Item2.UUID.Uuid == nativeDescriptor.UUID.Uuid;
+                return perphEqual && descriptorEqual;
+            })
+                .Select(x =>
+                {
+                    NSData data = (NSData) x.Item2.Value;
+                    return data?.ToArray();
+                });
+
+            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(nativeDescriptor); }, action => { })
+                .Merge(observable)
+                .FirstAsync()
+                .ToTask(cancellationToken);
+        }
+
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
             CBCharacteristic cbCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
@@ -117,7 +138,8 @@ namespace ReactiveBluetooth.iOS.Central
                 bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
                 bool desciptorEqual = x.Item2.UUID.Uuid == nativeDescriptor.UUID.Uuid;
                 return perphEqual && desciptorEqual;
-            }).Select(tuple =>
+            })
+                .Select(tuple =>
                 {
                     if (tuple.Item3 != null)
                     {

@@ -7,7 +7,6 @@ using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using ReactiveBluetooth.iOS.Extensions;
-using ReactiveBluetooth.iOS.Peripheral.PeripheralManagerDelegate;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
 
 namespace ReactiveBluetooth.iOS.Peripheral
@@ -50,11 +49,6 @@ namespace ReactiveBluetooth.iOS.Peripheral
             var descriptors = NativeCharacteristic.Descriptors.ToList();
             descriptors.Add(nativeDescriptor);
             NativeCharacteristic.Descriptors = descriptors.ToArray();
-        }
-
-        public void Dispose()
-        {
-            
         }
     }
 }

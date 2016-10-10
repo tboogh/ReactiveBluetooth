@@ -23,6 +23,7 @@ namespace ReactiveBluetooth.Core.Central
         void UpdateRemoteRssi();
 
         Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken);
+        Task<byte[]> ReadValue(IDescriptor descriptor, CancellationToken cancellationToken);
 
         Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken);
         Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken);
