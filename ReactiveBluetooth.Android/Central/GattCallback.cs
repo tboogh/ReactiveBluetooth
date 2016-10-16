@@ -4,9 +4,9 @@ using Android.Bluetooth;
 
 namespace ReactiveBluetooth.Android.Central
 {
-    public class BleGattCallback : BluetoothGattCallback
+    public class GattCallback : BluetoothGattCallback
     {
-        public BleGattCallback()
+        public GattCallback()
         {
             CharacteristicChangedSubject = new Subject<Tuple<BluetoothGatt, BluetoothGattCharacteristic>>();
             ConnectionStateChange = new Subject<ProfileState>();

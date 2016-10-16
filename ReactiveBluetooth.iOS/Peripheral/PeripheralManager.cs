@@ -18,7 +18,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
 {
     public class PeripheralManager : IPeripheralManager
     {
-        private CBPeripheralManager _peripheralManager;
+        private readonly CBPeripheralManager _peripheralManager;
         private readonly PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
 
         public PeripheralManager()

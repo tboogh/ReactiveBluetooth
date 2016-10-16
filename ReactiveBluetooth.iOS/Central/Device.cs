@@ -10,6 +10,7 @@ using CoreBluetooth;
 using Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Types;
 using ReactiveBluetooth.iOS.Extensions;
 using IService = ReactiveBluetooth.Core.Central.IService;
@@ -102,15 +103,15 @@ namespace ReactiveBluetooth.iOS.Central
 
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
-            CBCharacteristic cbCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            var writeObservable = Observable.FromEvent<bool>(action => { Peripheral.WriteValue(NSData.FromArray(value), cbCharacteristic, writeType.ToCharacteristicWriteType()); }, _ => { });
+            CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
+            var writeObservable = Observable.FromEvent<bool>(action => { Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType()); }, _ => { });
 
             if (writeType == WriteType.WithResponse)
             {
                 return writeObservable.Merge<bool>(_cbPeripheralDelegate.WroteCharacteristicValueSubject.FirstAsync(x =>
                 {
                     bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
-                    bool chgarEqual = x.Item2.UUID.Uuid == cbCharacteristic.UUID.Uuid;
+                    bool chgarEqual = x.Item2.UUID.Uuid == nativeCharacteristic.UUID.Uuid;
                     return perphEqual && chgarEqual;
                 })
                     .Select(x =>
@@ -148,6 +149,26 @@ namespace ReactiveBluetooth.iOS.Central
                     return true;
                 }))
                 .ToTask(cancellationToken);
+        }
+
+        public IObservable<byte[]> Notifications(ICharacteristic characteristic)
+        {
+            CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
+
+            IObservable<byte[]> enableNotificationObservable = Observable.FromEvent<byte[]>(action => { Peripheral.SetNotifyValue(true, nativeCharacteristic); }, action => { Peripheral.SetNotifyValue(false, nativeCharacteristic); });
+
+            var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Select(x => x.Item2.Value.ToArray());
+            var stateUpdatedObservable = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Select(x =>
+            {
+                if (x.Item3 != null)
+                {
+                    throw new NotificationException(x.Item3.LocalizedDescription);
+                }
+                return x.Item2.Value.ToArray();
+            });
+            return enableNotificationObservable
+                .Merge(valueUpdatedObservable)
+                .Merge(stateUpdatedObservable);
         }
     }
 }

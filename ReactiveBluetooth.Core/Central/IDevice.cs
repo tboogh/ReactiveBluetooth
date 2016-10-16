@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core.Types;
@@ -27,5 +28,7 @@ namespace ReactiveBluetooth.Core.Central
 
         Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken);
         Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken);
+
+        IObservable<byte[]> Notifications(ICharacteristic characteristic);
     }
 }

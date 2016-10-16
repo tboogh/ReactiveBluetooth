@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,10 +39,7 @@ namespace SampleApp.ViewModels.Central
             {
                 var write = Write();
             }).ObservesCanExecute(o => Connected);
-            ToggleNotificationsCommands = new DelegateCommand(() =>
-            {
-                var toggle = ToggleNotifications();
-            });
+            ToggleNotificationsCommands = new DelegateCommand(ToggleNotifications);
         }
 
         public CharacteristicViewModel()
@@ -145,9 +143,10 @@ namespace SampleApp.ViewModels.Central
         {
         }
 
-        public Task ToggleNotifications()
+        public void ToggleNotifications()
         {
-            throw new NotImplementedException();
+            var observable = Device.Notifications(Characteristic)
+                .Subscribe(bytes => { Value = BitConverter.ToString(bytes); });
         }
 
         private void Update()

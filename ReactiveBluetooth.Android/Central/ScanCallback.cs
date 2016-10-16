@@ -4,12 +4,12 @@ using Android.Bluetooth.LE;
 
 namespace ReactiveBluetooth.Android.Central
 {
-    public class BleScanCallback : ScanCallback
+    public class ScanCallback : global::Android.Bluetooth.LE.ScanCallback
     {
         public Subject<Tuple<ScanCallbackType, ScanResult>> ScanResultSubject { get; }
         public Subject<ScanFailure> FailureSubject { get; }
 
-        public BleScanCallback()
+        public ScanCallback()
         {
             ScanResultSubject = new Subject<Tuple<ScanCallbackType, ScanResult>>();
             FailureSubject = new Subject<ScanFailure>();

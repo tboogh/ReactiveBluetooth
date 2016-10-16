@@ -66,8 +66,8 @@
     <Compile Include="Central\AdvertisementData.cs" />
     <Compile Include="Central\Descriptor.cs" />
     <Compile Include="Common\BroadcastListener.cs" />
-    <Compile Include="Central\BleGattCallback.cs" />
-    <Compile Include="Central\BleScanCallback.cs" />
+    <Compile Include="Central\GattCallback.cs" />
+    <Compile Include="Central\ScanCallback.cs" />
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />

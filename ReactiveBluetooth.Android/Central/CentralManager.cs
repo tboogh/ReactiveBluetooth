@@ -49,14 +49,14 @@ namespace ReactiveBluetooth.Android.Central
             if (_discoverObservable == null)
             {
                 // Store this and return the same someone else subscribes
-                BleScanCallback bleScanCallback = new BleScanCallback();
+                ScanCallback scanCallback = new ScanCallback();
 
                 _discoverObservable = Observable.FromEvent<IDevice>(action =>
                 {
-                    _bluetoothAdapter.BluetoothLeScanner.StartScan(bleScanCallback);
-                }, action => { _bluetoothAdapter.BluetoothLeScanner.StopScan(bleScanCallback); })
-                    .Merge(bleScanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
-                    .Merge<IDevice>(bleScanCallback.FailureSubject.Select(failure =>
+                    _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
+                }, action => { _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback); })
+                    .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
+                    .Merge<IDevice>(scanCallback.FailureSubject.Select(failure =>
                     {
                         throw new Exception(failure.ToString());
                         return default(Device);
