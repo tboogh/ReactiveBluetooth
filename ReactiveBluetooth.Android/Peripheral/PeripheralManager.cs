@@ -46,6 +46,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         public PeripheralManager(IServerCallback serverCallback = null, IBluetoothAbstractFactory bluetoothAbstractFactory = null)
         {
             _serverCallback = serverCallback ?? new ServerCallback();
+
             Factory = bluetoothAbstractFactory ?? new AbstractFactory(_serverCallback);
 
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
@@ -60,8 +61,8 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public void Dispose()
         {
-            _gattServer.Close();
-            _broadcastListener.Dispose();
+            _gattServer?.Close();
+            _broadcastListener?.Dispose();
             _broadcastListener = null;
         }
 
@@ -72,7 +73,9 @@ namespace ReactiveBluetooth.Android.Peripheral
                 return _startAdvertisingObservable;
             }
 
-            
+            var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
+            _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback)_serverCallback);
+
             if (_bluetoothAdapter.State.ToManagerState() == ManagerState.PoweredOff)
             {
                 throw new Exception("Device is off");
@@ -117,12 +120,6 @@ namespace ReactiveBluetooth.Android.Peripheral
                     observer.OnNext(true);
                 });
 
-                if (_gattServer == null)
-                {
-                    var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
-                    _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback) _serverCallback);
-                }
-
                 foreach (var service in services)
                 {
                     AddService(service);
@@ -131,10 +128,10 @@ namespace ReactiveBluetooth.Android.Peripheral
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
                 return Disposable.Create(() =>
                 {
-                    errorDisposable.Dispose();
-                    successDisposable.Dispose();
-                    _gattServer.Close();
-                    _bluetoothLeAdvertiser.StopAdvertising(callback);
+                    errorDisposable?.Dispose();
+                    successDisposable?.Dispose();
+                    _gattServer?.Close();
+                    _bluetoothLeAdvertiser?.StopAdvertising(callback);
                     _startAdvertisingObservable = null;
                 });
             });
@@ -171,7 +168,13 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public IObservable<bool> AddService(IService service)
         {
-            var nativeService = ((Service) service).GattService;
+            var androidService = ((Service) service);
+            foreach (var characteristic in androidService.Characteristics)
+            {
+                var androidCharacteristic = (Characteristic) characteristic;
+                androidCharacteristic.GattServer = _gattServer;
+            }
+            var nativeService = androidService.GattService;
             var result = _gattServer?.AddService(nativeService);
             return Observable.Return(result ?? false);
         }
@@ -190,7 +193,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         public bool SendResponse(IAttRequest request, int offset, byte[] value)
         {
             AttRequest attRequest = (AttRequest) request;
-            return _gattServer.SendResponse(attRequest.BluetoothDevice, attRequest.RequestId, GattStatus.Success, offset, value);
+            return _gattServer != null && _gattServer.SendResponse(attRequest.BluetoothDevice, attRequest.RequestId, GattStatus.Success, offset, value);
         }
     }
 }

@@ -108,7 +108,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
         public bool SendResponse(IAttRequest request, int offset, byte[] value)
         {
             var attRequest = (AttRequest) request;
-            var r = attRequest.CBAttRequest;
+            var r = attRequest.CbAttRequest;
             r.Value = NSData.FromArray(value);
             
             _peripheralManager.RespondToRequest(r, CBATTError.Success);

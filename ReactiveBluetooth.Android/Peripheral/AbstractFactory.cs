@@ -5,6 +5,7 @@ using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
@@ -15,7 +16,7 @@ namespace ReactiveBluetooth.Android.Peripheral
     public class AbstractFactory : IBluetoothAbstractFactory
     {
         private readonly IServerCallback _serverCallback;
-
+        
         public AbstractFactory(IServerCallback serverCallback)
         {
             _serverCallback = serverCallback;
@@ -38,12 +39,17 @@ namespace ReactiveBluetooth.Android.Peripheral
         public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property)
         {
             Characteristic characteristic = new Characteristic(uuid, value, permission, property, _serverCallback);
+            if (property.HasFlag(CharacteristicProperty.Notify))
+            {
+                var descriptor = new Descriptor("2902".ToGuid(), null, DescriptorPermission.Read | DescriptorPermission.Write, _serverCallback);
+                characteristic.AddDescriptor(descriptor);
+            }
             return characteristic;
         }
 
         public IDescriptor CreateDescriptor(Guid uuid, byte[] value, DescriptorPermission permission)
         {
-            Descriptor descriptor = new Descriptor(uuid, value, permission);
+            Descriptor descriptor = new Descriptor(uuid, value, permission, _serverCallback);
             return descriptor;
         }
     }

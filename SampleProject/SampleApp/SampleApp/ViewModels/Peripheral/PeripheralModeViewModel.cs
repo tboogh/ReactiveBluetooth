@@ -6,6 +6,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Navigation;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using SampleApp.Common.Behaviors;
@@ -86,6 +87,8 @@ namespace SampleApp.ViewModels.Peripheral
 
             _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
 
+            var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify);
+
             if (!service.AddCharacteristic(writeCharacterstic))
             {
                 throw new Exception("Failed to add write characteristic");
@@ -97,6 +100,10 @@ namespace SampleApp.ViewModels.Peripheral
             if (!service.AddCharacteristic(writeWithoutResponseCharacterstic))
             {
                 throw new Exception("Failed to add write without response characteristic");
+            }
+            if (!service.AddCharacteristic(notifyCharacteristic))
+            {
+                throw new Exception("Failed to notify characteristic");
             }
             _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62")}}, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });

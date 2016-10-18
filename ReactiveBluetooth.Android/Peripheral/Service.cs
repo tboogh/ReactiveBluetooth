@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Android.Bluetooth;
 using Java.Util;
 using ReactiveBluetooth.Core.Peripheral;
@@ -15,6 +16,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         {
             var gattService = new BluetoothGattService(UUID.FromString(id.ToString()), (GattServiceType)type);
             GattService = gattService;
+            Characteristics = new List<ICharacteristic>();
         }
 
         public Guid Uuid => Guid.Parse(GattService.Uuid.ToString());
@@ -22,9 +24,12 @@ namespace ReactiveBluetooth.Android.Peripheral
         
         bool IService.AddCharacteristic(ICharacteristic characteristic)
         {
+            Characteristics.Add(characteristic);
             var nativeCharacteristic = (Characteristic) characteristic;
 
             return GattService.AddCharacteristic(nativeCharacteristic.NativeCharacteristic);
         }
+
+        public List<ICharacteristic> Characteristics { get; }
     }
 }

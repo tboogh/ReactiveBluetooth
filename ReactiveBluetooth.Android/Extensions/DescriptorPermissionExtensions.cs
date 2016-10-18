@@ -18,19 +18,19 @@ namespace ReactiveBluetooth.Android.Extensions
         public static GattDescriptorPermission ToGattPermission(this DescriptorPermission permission)
         {
             GattDescriptorPermission nativePermissions = 0;
-            if (permission.HasFlag(CharacteristicPermission.Read))
+            if (permission.HasFlag(DescriptorPermission.Read))
             {
                 nativePermissions |= GattDescriptorPermission.Read;
             }
-            if (permission.HasFlag(CharacteristicPermission.ReadEncrypted))
+            if (permission.HasFlag(DescriptorPermission.ReadEncrypted))
             {
                 nativePermissions |= GattDescriptorPermission.ReadEncrypted;
             }
-            if (permission.HasFlag(CharacteristicPermission.Write))
+            if (permission.HasFlag(DescriptorPermission.Write))
             {
                 nativePermissions |= GattDescriptorPermission.Write;
             }
-            if (permission.HasFlag(CharacteristicPermission.WriteEncrypted))
+            if (permission.HasFlag(DescriptorPermission.WriteEncrypted))
             {
                 nativePermissions |= GattDescriptorPermission.WriteEncrypted;
             }

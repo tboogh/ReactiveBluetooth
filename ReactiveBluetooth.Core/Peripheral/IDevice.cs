@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ReactiveBluetooth.Core.Peripheral
 {
-    public interface IAttRequest
+    public interface IDevice
     {
-        int Offset { get; }
-        byte[] Value { get; }
+        Guid Uuid { get; }
     }
 }

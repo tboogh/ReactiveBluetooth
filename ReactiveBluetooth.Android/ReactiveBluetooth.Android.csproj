@@ -82,6 +82,7 @@
     <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
     <Compile Include="Peripheral\Descriptor.cs" />
+    <Compile Include="Peripheral\Device.cs" />
     <Compile Include="Peripheral\GattServer\IServerCallback.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
     <Compile Include="Peripheral\GattServer\ServerCallback.cs" />

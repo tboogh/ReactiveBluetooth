@@ -11,6 +11,7 @@ using Android.Views;
 using Android.Widget;
 using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
+using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Types;
@@ -24,7 +25,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             NativeDescriptor = descriptor;
         }
 
-        public Descriptor(Guid uuid, byte[] value, DescriptorPermission permission)
+        public Descriptor(Guid uuid, byte[] value, DescriptorPermission permission, IServerCallback serverCallback)
         {
             BluetoothGattDescriptor gattDescriptor = new BluetoothGattDescriptor(UUID.FromString(uuid.ToString()), permission.ToGattPermission());
             gattDescriptor.SetValue(value);

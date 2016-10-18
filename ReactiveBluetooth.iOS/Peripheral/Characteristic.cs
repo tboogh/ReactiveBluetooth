@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using ReactiveBluetooth.iOS.Extensions;
@@ -27,8 +28,10 @@ namespace ReactiveBluetooth.iOS.Peripheral
             CBMutableCharacteristic mutableCharacteristic = new CBMutableCharacteristic(CBUUID.FromString(uuid.ToString()), nativeProperties, nsData, nativePermissions);
             NativeCharacteristic = mutableCharacteristic;
 
-            ReadRequestObservable = peripheralDelegate.ReadRequestReceivedSubject.Where(x => x.AttRequest.Characteristic.UUID == NativeCharacteristic.UUID).Select(x => new AttRequest(this, x.AttRequest)).AsObservable();
-            WriteRequestObservable = peripheralDelegate.WriteRequestsReceivedSubject.SelectMany(received => received.Requests.Select(x => new AttRequest(this, x)).ToObservable()).Where(x => x.Characteristic.Uuid == Uuid).AsObservable();
+            ReadRequestObservable = peripheralDelegate.ReadRequestReceivedSubject.Where(x => x.AttRequest.Characteristic.UUID == NativeCharacteristic.UUID).Select(x => new AttRequest(x.AttRequest)).AsObservable();
+            WriteRequestObservable = peripheralDelegate.WriteRequestsReceivedSubject.SelectMany(received => received.Requests.Where(y => y.Characteristic.UUID.Uuid.ToGuid() == Uuid).Select(x => new AttRequest(x)).ToObservable()).AsObservable();
+            Subscribed = peripheralDelegate.CharacteristicSubscribedSubject.Where(x => x.Characteristic.UUID == NativeCharacteristic.UUID).Select(x => new Device(x.Central)).AsObservable();
+            Unsubscribed = peripheralDelegate.CharacteristicUnsubscribedSubject.Where(x => x.Characteristic.UUID == NativeCharacteristic.UUID).Select(x => new Device(x.Central)).AsObservable();
         }
 
         public Guid Uuid => Guid.Parse(NativeCharacteristic.UUID.ToString());
@@ -42,6 +45,8 @@ namespace ReactiveBluetooth.iOS.Peripheral
         public CBMutableCharacteristic NativeCharacteristic { get; }
         public IObservable<IAttRequest> ReadRequestObservable { get; }
         public IObservable<IAttRequest> WriteRequestObservable { get; }
+        public IObservable<IDevice> Subscribed { get; }
+        public IObservable<IDevice> Unsubscribed { get; }
 
         public void AddDescriptor(IDescriptor descriptor)
         {

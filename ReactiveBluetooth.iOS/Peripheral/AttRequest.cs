@@ -8,15 +8,13 @@ namespace ReactiveBluetooth.iOS.Peripheral
 {
     public class AttRequest : IAttRequest
     {
-        public ICharacteristic Characteristic { get; }
-        public int Offset => (int) CBAttRequest.Offset;
-        public byte[] Value => CBAttRequest.Value.ToArray();
-        public CBATTRequest CBAttRequest { get; }
+        public int Offset => (int) CbAttRequest.Offset;
+        public byte[] Value => CbAttRequest.Value.ToArray();
+        public CBATTRequest CbAttRequest { get; }
 
-        public AttRequest(ICharacteristic characteristic, CBATTRequest cbattRequest)
+        public AttRequest(CBATTRequest cbattRequest)
         {
-            Characteristic = characteristic;
-            CBAttRequest = cbattRequest;
+            CbAttRequest = cbattRequest;
         }
     }
 }

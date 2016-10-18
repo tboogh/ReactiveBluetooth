@@ -7,14 +7,19 @@ using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
 
 namespace ReactiveBluetooth.Android.Peripheral
 {
-    public class Characteristic : ICharacteristic
+    public class Characteristic : ICharacteristic, IDisposable
     {
+        public BluetoothGattServer GattServer { get; set; }
+        private readonly IDisposable _descriptorReadDisposable;
+        private IDisposable _descriptorWriteDisposable;
+
         public Characteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property, IServerCallback serverCallback)
         {
             var nativePermissions = permission.ToGattPermission();
@@ -29,11 +34,21 @@ namespace ReactiveBluetooth.Android.Peripheral
 
             ReadRequestObservable = serverCallback.CharacteristicReadRequestSubject
                 .Where(x => x.Item4.Uuid == characteristic.Uuid)
-                .Select(request => new AttRequest(this, request.Item3, null, request.Item2, request.Item1));
+                .Select(request => new AttRequest(this, request.Item3, null, request.Item2, request.Item1)).AsObservable(); ;
 
             WriteRequestObservable = serverCallback.CharacteristicWriteRequestSubject
                 .Where(x => x.Item3.Uuid == characteristic.Uuid)
-                .Select(request => new AttRequest(this, request.Item6, request.Item7, request.Item2, request.Item1));
+                .Select(request => new AttRequest(this, request.Item6, request.Item7, request.Item2, request.Item1)).AsObservable(); ;
+
+            _descriptorReadDisposable = serverCallback.DescriptorReadRequestSubject.Where(x => Guid.Parse(x.Item4.Uuid.ToString()) == "2902".ToGuid())
+                .Subscribe(tuple =>
+                {
+                    GattServer.SendResponse(tuple.Item1, tuple.Item2, GattStatus.Success, 0, null);
+                });
+
+            Subscribed = serverCallback.DescriptorWriteRequestSubject.Where(x => x.Item3.Uuid.ToString()
+                .ToGuid() == "2902".ToGuid())
+                .Select(x => new Device(x.Item1)).AsObservable();
         }
 
         public BluetoothGattCharacteristic NativeCharacteristic { get; }
@@ -43,6 +58,7 @@ namespace ReactiveBluetooth.Android.Peripheral
            .Cast<IDescriptor>()
            .ToArray();
 
+        public IObservable<IDevice> Unsubscribed { get; }
         public CharacteristicPermission Permissions => NativeCharacteristic.Permissions.ToCharacteristicPermission();
         public void AddDescriptor(IDescriptor descriptor)
         {
@@ -52,5 +68,10 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public IObservable<IAttRequest> ReadRequestObservable { get; }
         public IObservable<IAttRequest> WriteRequestObservable { get; }
+        public IObservable<IDevice> Subscribed { get; }
+        public void Dispose()
+        {
+            _descriptorReadDisposable?.Dispose();
+        }
     }
 }

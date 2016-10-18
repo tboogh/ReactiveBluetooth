@@ -9,7 +9,5 @@ namespace ReactiveBluetooth.Core
     public interface IDescriptor
     {
         Guid Uuid { get; }
-
-        
     }
 }
