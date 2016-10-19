@@ -49,6 +49,8 @@ namespace ReactiveBluetooth.Android.Peripheral
             Subscribed = serverCallback.DescriptorWriteRequestSubject.Where(x => x.Item3.Uuid.ToString()
                 .ToGuid() == "2902".ToGuid())
                 .Select(x => new Device(x.Item1)).AsObservable();
+
+            Unsubscribed = System.Reactive.Linq.Observable.Return<IDevice>(null);
         }
 
         public BluetoothGattCharacteristic NativeCharacteristic { get; }

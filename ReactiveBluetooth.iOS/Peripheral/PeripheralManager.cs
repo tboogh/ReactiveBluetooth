@@ -12,6 +12,8 @@ using Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Peripheral;
+using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
+using IDevice = ReactiveBluetooth.Core.Peripheral.IDevice;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
 namespace ReactiveBluetooth.iOS.Peripheral
@@ -113,6 +115,13 @@ namespace ReactiveBluetooth.iOS.Peripheral
             
             _peripheralManager.RespondToRequest(r, CBATTError.Success);
             return true;
+        }
+
+        public bool Notify(IDevice device, ICharacteristic characteristic, byte[] value)
+        {
+            Device androidDevice = (Device)device;
+            Characteristic androidCharacteristic = (Characteristic)characteristic;
+            return _peripheralManager.UpdateValue(NSData.FromArray(value), androidCharacteristic.NativeCharacteristic, new[] {androidDevice.NativeCentral});
         }
     }
 }
