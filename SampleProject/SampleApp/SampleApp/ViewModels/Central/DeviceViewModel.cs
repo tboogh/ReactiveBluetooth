@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using Prism.Common;
 using Prism.Navigation;
 using Prism.Services;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Types;
