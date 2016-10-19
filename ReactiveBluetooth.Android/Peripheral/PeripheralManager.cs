@@ -25,6 +25,8 @@ using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Peripheral;
+using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
+using IDevice = ReactiveBluetooth.Core.Peripheral.IDevice;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
 
 namespace ReactiveBluetooth.Android.Peripheral
@@ -194,6 +196,19 @@ namespace ReactiveBluetooth.Android.Peripheral
         {
             AttRequest attRequest = (AttRequest) request;
             return _gattServer != null && _gattServer.SendResponse(attRequest.BluetoothDevice, attRequest.RequestId, GattStatus.Success, offset, value);
+        }
+
+        public bool Notify(IDevice device, ICharacteristic characteristic, byte[] value)
+        {
+            Device androidDevice = (Device) device;
+            Characteristic androidCharacteristic = (Characteristic) characteristic;
+            var setValue = androidCharacteristic.NativeCharacteristic.SetValue(value);
+            if (!setValue)
+                throw new Exception("SetValue failed");
+
+            var indicate = false;
+            var result = _gattServer.NotifyCharacteristicChanged(androidDevice.NativeDevice, androidCharacteristic.NativeCharacteristic, indicate);
+            return result;
         }
     }
 }
