@@ -183,9 +183,11 @@ namespace ReactiveBluetooth.Android.Central
                 {
                     throw new NotificationException("SetCharacteristicNotification enable failed");
                 }
+                var uuid = UUID.FromString("2902".ToGuid().ToString());
+                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(uuid);
+                if (characteristicConfigDescriptor == null)
+                    return;
 
-                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(UUID.FromString("2909".ToGuid()
-                    .ToString()));
                 characteristicConfigDescriptor.SetValue(BluetoothGattDescriptor.EnableNotificationValue.ToArray());
                 if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))
                 {
