@@ -58,7 +58,6 @@ namespace SampleApp.ViewModels.Central
         private IDevice _device;
         private IDisposable _connectionStateDisposable;
         private ConnectionState _connectionState;
-        private DeviceViewModel _deviceViewModel;
         private CancellationTokenSource _cancellationTokenSource;
         private IObservable<ConnectionState> _connectObservable;
 
@@ -123,7 +122,7 @@ namespace SampleApp.ViewModels.Central
         public async Task Connect()
         {
             _connectionStateDisposable?.Dispose();
-            _connectObservable = _centralManager.ConnectToDevice(_deviceViewModel.Device)
+            _connectObservable = _centralManager.ConnectToDevice(Device)
                 .SubscribeOn(SynchronizationContext.Current);
             try
             {
@@ -189,15 +188,13 @@ namespace SampleApp.ViewModels.Central
 
         public void OnNavigatedTo(NavigationParameters parameters)
         {
-            if (parameters.ContainsKey(nameof(DeviceViewModel)))
+            if (parameters.ContainsKey(nameof(IDevice)))
             {
-                DeviceViewModel deviceViewModel = (DeviceViewModel) parameters[nameof(DeviceViewModel)];
-                _deviceViewModel = deviceViewModel;
-                Device = deviceViewModel.Device;
+                IDevice device = (IDevice) parameters[nameof(IDevice)];
+                Device = device;
                 ConnectionState = Device.State;
-                
-                Task.Factory.StartNew(Connect, CancellationToken.None, TaskCreationOptions.None,
-                    TaskScheduler.FromCurrentSynchronizationContext());
+
+				var task = Connect();
             }
         }
 
