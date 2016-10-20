@@ -18,7 +18,7 @@ namespace ReactiveBluetooth.Android.Central
         public override void OnScanFailed(ScanFailure errorCode)
         {
             base.OnScanFailed(errorCode);
-            FailureSubject.OnNext(errorCode);
+            FailureSubject.OnError(new Exception(errorCode.ToString()));
         }
 
         public override void OnScanResult(ScanCallbackType callbackType, ScanResult result)
