@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "Plugin.CurrentActivity": "1.0.1",
+    "Plugin.CurrentActivity": "1.0.1"
   },
   "frameworks": {
     "MonoAndroid,Version=v6.0": {}
