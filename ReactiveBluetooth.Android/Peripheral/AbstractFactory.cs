@@ -39,7 +39,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property)
         {
             Characteristic characteristic = new Characteristic(uuid, value, permission, property, _serverCallback);
-            if (property.HasFlag(CharacteristicProperty.Notify))
+            if (property.HasFlag(CharacteristicProperty.Notify) || property.HasFlag(CharacteristicProperty.Indicate))
             {
                 var descriptor = new Descriptor("2902".ToGuid(), null, DescriptorPermission.Read | DescriptorPermission.Write, _serverCallback);
                 characteristic.AddDescriptor(descriptor);

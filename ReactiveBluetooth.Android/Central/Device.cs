@@ -213,7 +213,7 @@ namespace ReactiveBluetooth.Android.Central
                     throw new NotificationException("SetCharacteristicNotification disable failed");
                 }
 
-                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(UUID.FromString("2909".ToGuid()
+                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(UUID.FromString("2902".ToGuid()
                     .ToString()));
                 characteristicConfigDescriptor.SetValue(BluetoothGattDescriptor.DisableNotificationValue.ToArray());
                 if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))

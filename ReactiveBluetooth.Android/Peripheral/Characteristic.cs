@@ -11,6 +11,7 @@ using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
+using Observable = System.Reactive.Linq.Observable;
 
 namespace ReactiveBluetooth.Android.Peripheral
 {
@@ -50,7 +51,7 @@ namespace ReactiveBluetooth.Android.Peripheral
                 .ToGuid() == "2902".ToGuid())
                 .Select(x => new Device(x.Item1)).AsObservable();
 
-            Unsubscribed = System.Reactive.Linq.Observable.Return<IDevice>(null);
+            Unsubscribed = Observable.Return<IDevice>(null);
         }
 
         public BluetoothGattCharacteristic NativeCharacteristic { get; }

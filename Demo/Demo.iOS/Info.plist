@@ -23,9 +23,9 @@
 	<key>MinimumOSVersion</key>
 	<string>9.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>Demo</string>
+	<string>RxBle Demo</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.yourcompany.Demo</string>
+	<string>com.boogh.reactivebluetooth.demo</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>CFBundleIconFiles</key>
