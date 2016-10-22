@@ -120,7 +120,8 @@ namespace Demo.ViewModels.Peripheral
             {
                 _indicateSubscribedDevices.Remove(device);
             });
-
+            indicateCharacteristic.ReadRequestObservable.Subscribe(request =>
+            { _peripheralManager.SendResponse(request, 0, new byte[] {0xF0, 0xCC, 0xEE}); });
             if (!service.AddCharacteristic(writeCharacterstic))
             {
                 throw new Exception("Failed to add write characteristic");

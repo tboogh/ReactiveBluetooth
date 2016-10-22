@@ -47,8 +47,14 @@ namespace ReactiveBluetooth.Android.Peripheral
                     GattServer.SendResponse(tuple.Item1, tuple.Item2, GattStatus.Success, 0, null);
                 });
 
-            Subscribed = serverCallback.DescriptorWriteRequestSubject.Where(x => x.Item3.Uuid.ToString()
-                .ToGuid() == "2902".ToGuid())
+            Subscribed = serverCallback.DescriptorWriteRequestSubject.Where(x =>
+            {
+                var desc = x.Item3.Uuid.ToString()
+                    .ToGuid() == "2902".ToGuid();
+                var chara = x.Item3.Characteristic.Uuid == characteristic.Uuid;
+
+                return desc && chara;
+            })
                 .Select(x => new Device(x.Item1)).AsObservable();
 
             Unsubscribed = Observable.Return<IDevice>(null);
