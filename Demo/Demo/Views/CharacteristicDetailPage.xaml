@@ -3,13 +3,13 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
-             xmlns:valueConverters="clr-namespace:SampleApp.Common.ValueConverters;assembly=SampleApp"
+             xmlns:valueConverters1="clr-namespace:Demo.Common.ValueConverters;assembly=Demo"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="Demo.Views.CharacteristicDetailPage">
     <ContentPage.Resources>
         <ResourceDictionary>
-            <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
-            <valueConverters:CharactersticPropertiesToStringConverter x:Key="ChractersticPropertiesToStringConverter" />
+            <valueConverters1:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
+            <valueConverters1:CharactersticPropertiesToStringConverter x:Key="ChractersticPropertiesToStringConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <StackLayout>
