@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ReactiveBluetooth.Android</RootNamespace>
-    <AssemblyName>ReactiveBluetooth.Android</AssemblyName>
+    <RootNamespace>ReactiveBluetooth.Android.PCL</RootNamespace>
+    <AssemblyName>ReactiveBluetooth.Android.PCL</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -65,21 +65,87 @@
   <ItemGroup>
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\**\*.cs">
-      <Link>Central\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\**\*.cs">
-      <Link>Peripheral\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-	<Compile Include="..\..\..\ReactiveBluetooth.Android\Common\**\*.cs">
-      <Link>Common\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\**\*.cs">
-      <Link>Extensions\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\*.cs">
       <Link>%(Filename)%(Extension)</Link>
     </Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\AdvertisementData.cs">
+	  <Link>Central\.\\AdvertisementData.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\CentralManager.cs">
+	  <Link>Central\.\\CentralManager.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Characteristic.cs">
+	  <Link>Central\.\\Characteristic.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Descriptor.cs">
+	  <Link>Central\.\\Descriptor.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Device.cs">
+	  <Link>Central\.\\Device.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\GattCallback.cs">
+	  <Link>Central\.\\GattCallback.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\ScanCallback.cs">
+	  <Link>Central\.\\ScanCallback.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Service.cs">
+	  <Link>Central\.\\Service.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\GattServer\IServerCallback.cs">
+	  <Link>Peripheral\GattServer\\IServerCallback.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\GattServer\ServerCallback.cs">
+	  <Link>Peripheral\GattServer\\ServerCallback.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\AbstractFactory.cs">
+	  <Link>Peripheral\.\\AbstractFactory.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\AttRequest.cs">
+	  <Link>Peripheral\.\\AttRequest.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Characteristic.cs">
+	  <Link>Peripheral\.\\Characteristic.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Descriptor.cs">
+	  <Link>Peripheral\.\\Descriptor.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Device.cs">
+	  <Link>Peripheral\.\\Device.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\PeripheralManager.cs">
+	  <Link>Peripheral\.\\PeripheralManager.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Service.cs">
+	  <Link>Peripheral\.\\Service.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\StartAdvertiseCallback.cs">
+	  <Link>Peripheral\.\\StartAdvertiseCallback.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Common\BroadcastListener.cs">
+	  <Link>Common\.\\BroadcastListener.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\CharacteristicPermissionExtensions.cs">
+	  <Link>Extensions\.\\CharacteristicPermissionExtensions.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\CharacteristicPropertiesExtensions.cs">
+	  <Link>Extensions\.\\CharacteristicPropertiesExtensions.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\DescriptorPermissionExtensions.cs">
+	  <Link>Extensions\.\\DescriptorPermissionExtensions.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\GattPermissionExtensions.cs">
+	  <Link>Extensions\.\\GattPermissionExtensions.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\GattPropertyExtensions.cs">
+	  <Link>Extensions\.\\GattPropertyExtensions.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\StateExtentions.cs">
+	  <Link>Extensions\.\\StateExtentions.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\WriteTypeExtensions.cs">
+	  <Link>Extensions\.\\WriteTypeExtensions.cs</Link>
+	</Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -89,9 +155,9 @@
     <AndroidResource Include="Resources\Values\Strings.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{43c7a016-7616-407e-92ba-662e2cde505c}</Project>
-      <Name>ReactiveBluetooth.Core</Name>
+    <ProjectReference Include="..\ReactiveBluetooth.Core.PCL\ReactiveBluetooth.Core.PCL.csproj">
+      <Project>{43C7A016-7616-407E-92BA-662E2CDE505C}</Project>
+      <Name>ReactiveBluetooth.Core.PCL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

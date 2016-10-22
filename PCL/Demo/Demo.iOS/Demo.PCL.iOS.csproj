@@ -176,19 +176,17 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{43c7a016-7616-407e-92ba-662e2cde505c}</Project>
-      <Name>ReactiveBluetooth.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.iOS\ReactiveBluetooth.iOS.csproj">
-      <Project>{65ba3b71-d62d-4d05-b29a-7b8981a2aef0}</Project>
-      <Name>ReactiveBluetooth.iOS</Name>
-      <IsAppExtension>false</IsAppExtension>
-      <IsWatchApp>false</IsWatchApp>
-    </ProjectReference>
     <ProjectReference Include="..\Demo\Demo.PCL.csproj">
       <Project>{ee2c329d-7454-433d-94b5-a7a40fed83bd}</Project>
       <Name>Demo.PCL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.Core.PCL\ReactiveBluetooth.Core.PCL.csproj">
+      <Project>{43C7A016-7616-407E-92BA-662E2CDE505C}</Project>
+      <Name>ReactiveBluetooth.Core.PCL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.iOS.PCL\ReactiveBluetooth.iOS.PCL.csproj">
+      <Project>{65BA3B71-D62D-4D05-B29A-7B8981A2AEF0}</Project>
+      <Name>ReactiveBluetooth.iOS.PCL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

@@ -55,11 +55,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.PCL.iOS", "PCL\Demo\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.PCL.UWP", "PCL\Demo\Demo.UWP\Demo.PCL.UWP.csproj", "{6956A6C4-C357-4955-8949-9DEFD3A6496B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Core", "PCL\ReactiveBluetooth\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj", "{43C7A016-7616-407E-92BA-662E2CDE505C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Core.PCL", "PCL\ReactiveBluetooth\ReactiveBluetooth.Core.PCL\ReactiveBluetooth.Core.PCL.csproj", "{43C7A016-7616-407E-92BA-662E2CDE505C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.iOS", "PCL\ReactiveBluetooth\ReactiveBluetooth.iOS\ReactiveBluetooth.iOS.csproj", "{65BA3B71-D62D-4D05-B29A-7B8981A2AEF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.iOS.PCL", "PCL\ReactiveBluetooth\ReactiveBluetooth.iOS.PCL\ReactiveBluetooth.iOS.PCL.csproj", "{65BA3B71-D62D-4D05-B29A-7B8981A2AEF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Android", "PCL\ReactiveBluetooth\ReactiveBluetooth.Android\ReactiveBluetooth.Android.csproj", "{2029B98C-D0CE-40E2-97A9-9826F8B8E33F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Android.PCL", "PCL\ReactiveBluetooth\ReactiveBluetooth.Android.PCL\ReactiveBluetooth.Android.PCL.csproj", "{2029B98C-D0CE-40E2-97A9-9826F8B8E33F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

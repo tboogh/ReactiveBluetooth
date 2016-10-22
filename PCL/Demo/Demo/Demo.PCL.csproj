@@ -36,28 +36,106 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-	<Compile Include="..\..\..\Demo\Demo\Common\**\*.cs">
-      <Link>Common\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\..\..\Demo\Demo\ViewModels\**\*.cs">
-      <Link>ViewModels\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-	<Compile Include="..\..\..\Demo\Demo\Views\**\*.cs">
-      <Link>Views\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\**\*.xaml">
-		<Link>Views\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
-	<Compile Include="..\..\..\Demo\Demo\*.cs">
-      <Link>%(Filename)%(Extension)</Link>
-    </Compile>
-	<EmbeddedResource Include="..\..\..\Demo\Demo\*.xaml">
-		<Link>%(Filename)%(Extension)</Link>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
+	<Compile Include="..\..\..\Demo\Demo\Common\Behaviors\ListViewItemSelectedBehaviour.cs">
+	  <Link>Common\Behaviors\\ListViewItemSelectedBehaviour.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Common\Behaviors\PageAppearingBehavior.cs">
+	  <Link>Common\Behaviors\\PageAppearingBehavior.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Common\ValueConverters\CharactersticPropertiesToStringConverter.cs">
+	  <Link>Common\ValueConverters\\CharactersticPropertiesToStringConverter.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Common\ValueConverters\GuidToStringValueConverter.cs">
+	  <Link>Common\ValueConverters\\GuidToStringValueConverter.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Central\AdvertiseDataViewModel.cs">
+	  <Link>ViewModels\Central\\AdvertiseDataViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Central\CentralModeViewModel.cs">
+	  <Link>ViewModels\Central\\CentralModeViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Central\CharacteristicViewModel.cs">
+	  <Link>ViewModels\Central\\CharacteristicViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Central\DescriptorViewModel.cs">
+	  <Link>ViewModels\Central\\DescriptorViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Central\DeviceViewModel.cs">
+	  <Link>ViewModels\Central\\DeviceViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Central\ServiceViewModel.cs">
+	  <Link>ViewModels\Central\\ServiceViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\Peripheral\PeripheralModeViewModel.cs">
+	  <Link>ViewModels\Peripheral\\PeripheralModeViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\ViewModels\MainPageViewModel.cs">
+	  <Link>ViewModels\.\\MainPageViewModel.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\AdvertiseDataPage.xaml.cs">
+	  <Link>Views\.\\AdvertiseDataPage.xaml.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\CentralPage.xaml.cs">
+	  <Link>Views\.\\CentralPage.xaml.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\CharacteristicDetailPage.xaml.cs">
+	  <Link>Views\.\\CharacteristicDetailPage.xaml.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\DeviceDetailPage.xaml.cs">
+	  <Link>Views\.\\DeviceDetailPage.xaml.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\MainNavigationPage.xaml.cs">
+	  <Link>Views\.\\MainNavigationPage.xaml.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\MainPage.xaml.cs">
+	  <Link>Views\.\\MainPage.xaml.cs</Link>
+	</Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\PeripheralPage.xaml.cs">
+	  <Link>Views\.\\PeripheralPage.xaml.cs</Link>
+	</Compile>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\AdvertiseDataPage.xaml">
+	  <Link>Views\.\\AdvertiseDataPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\CentralPage.xaml">
+	  <Link>Views\.\\CentralPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\CharacteristicDetailPage.xaml">
+	  <Link>Views\.\\CharacteristicDetailPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\DeviceDetailPage.xaml">
+	  <Link>Views\.\\DeviceDetailPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\MainNavigationPage.xaml">
+	  <Link>Views\.\\MainNavigationPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\MainPage.xaml">
+	  <Link>Views\.\\MainPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\PeripheralPage.xaml">
+	  <Link>Views\.\\PeripheralPage.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
+	<Compile Include="..\..\..\Demo\Demo\App.xaml.cs">
+	  <Link>App.xaml.cs</Link>
+	</Compile>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\App.xaml">
+	  <Link>App.xaml</Link>
+	  <SubType>Designer</SubType>
+	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	</EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -113,9 +191,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{43c7a016-7616-407e-92ba-662e2cde505c}</Project>
-      <Name>ReactiveBluetooth.Core</Name>
+    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.Core.PCL\ReactiveBluetooth.Core.PCL.csproj">
+      <Project>{43C7A016-7616-407E-92BA-662E2CDE505C}</Project>
+      <Name>ReactiveBluetooth.Core.PCL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
