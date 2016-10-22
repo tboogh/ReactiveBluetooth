@@ -15,13 +15,14 @@ using Xamarin.Forms;
 
 namespace Demo.ViewModels.Central
 {
-    public class CharacteristicViewModel : BindableBase, INavigationAware, IPageAppearingAware, INavigationBackAware
+    public class CharacteristicViewModel : BindableBase, INavigationAware, IPageAppearingAware, INavigationBackAware, IDisposable
     {
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly IPageDialogService _pageDialogService;
         private ICharacteristic _characteristic;
         private bool _connected;
         private IDisposable _connectionDisp;
+		private IDisposable _notifyDisposable;
         private string _value;
         private string _writeValue;
 
@@ -144,8 +145,13 @@ namespace Demo.ViewModels.Central
 
         public void ToggleNotifications()
         {
-            var observable = Device.Notifications(Characteristic)
-                .Subscribe(bytes => { Value = BitConverter.ToString(bytes); });
+        	if (_notifyDisposable != null){
+        		_notifyDisposable?.Dispose();
+				_notifyDisposable = null;
+			} else {
+				_notifyDisposable = Device.Notifications(Characteristic)
+                	.Subscribe(bytes => { Value = BitConverter.ToString(bytes); });
+			}
         }
 
         private void Update()
@@ -202,5 +208,13 @@ namespace Demo.ViewModels.Central
             {
             }
         }
-    }
+
+		
+
+		
+		public void Dispose() {
+			_notifyDisposable?.Dispose();
+		}
+		
+	}
 }

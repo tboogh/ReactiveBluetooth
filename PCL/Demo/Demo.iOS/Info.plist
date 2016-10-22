@@ -22,8 +22,6 @@
 	</array>
 	<key>MinimumOSVersion</key>
 	<string>6.0</string>
-	<key>CFBundleDisplayName</key>
-	<string>Demo</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.boogh.reactivebluetooth.rxble.pcl</string>
 	<key>CFBundleVersion</key>
@@ -50,5 +48,7 @@
 	<string>LaunchScreen</string>
 	<key>CFBundleShortVersionString</key>
 	<string></string>
+	<key>CFBundleName</key>
+	<string>RxBLE Demo.PCL</string>
 </dict>
 </plist>
