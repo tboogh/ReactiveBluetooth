@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:valueConverters="clr-namespace:SampleApp.Common.ValueConverters;assembly=SampleApp"
+             xmlns:central="clr-namespace:ReactiveBluetooth.Core.Central;assembly=ReactiveBluetooth.Core"
+             xmlns:behaviors="clr-namespace:SampleApp.Common.Behaviors;assembly=SampleApp"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="Demo.Views.DeviceDetailPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Behaviors>
+        <behaviors:PageAppearingBehavior />
+    </ContentPage.Behaviors>
+
+    <ListView Header="{Binding .}"
+              ItemsSource="{Binding Services}"
+              IsGroupingEnabled="True"
+              GroupDisplayBinding="{Binding Key}">
+        <ListView.Behaviors>
+            <behaviors:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding ItemSelectedCommand}" />
+        </ListView.Behaviors>
+        <ListView.HeaderTemplate>
+            <DataTemplate>
+                <StackLayout>
+                    <Label Text="{Binding Name}" />
+                    <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
+                    <Label Text="{Binding Rssi}" />
+                    <Label Text="{Binding ConnectionState}" />
+                </StackLayout>
+            </DataTemplate>
+        </ListView.HeaderTemplate>
+        <ListView.GroupHeaderTemplate>
+            <DataTemplate>
+                <TextCell Text="{Binding Key.Uuid, Converter={StaticResource GuidToStringValueConverter}}"
+                          TextColor="Blue" />
+            </DataTemplate>
+        </ListView.GroupHeaderTemplate>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <TextCell Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</ContentPage>
