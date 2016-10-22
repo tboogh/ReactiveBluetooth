@@ -56,83 +56,20 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\AdvertisementData.cs">
-      <Link>Central\AdvertisementData.cs</Link>
+    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\**\*.cs">
+      <Link>Central\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\CentralManager.cs">
-      <Link>Central\CentralManager.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\**\*.cs">
+      <Link>Peripheral\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\CentralManagerDelegate\CentralManagerDelegate.cs">
-      <Link>Central\CentralManagerDelegate\CentralManagerDelegate.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.iOS\Common\**\*.cs">
+      <Link>Common\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\Characteristic.cs">
-      <Link>Central\Characteristic.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.iOS\Extensions\**\*.cs">
+      <Link>Extensions\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\Descriptor.cs">
-      <Link>Central\Descriptor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\Device.cs">
-      <Link>Central\Device.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\PeripheralDelegate\PeripheralDelegate.cs">
-      <Link>Central\PeripheralDelegate\PeripheralDelegate.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Extensions\CBAttributePermissionsExtensions.cs">
-      <Link>Extensions\CBAttributePermissionsExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Extensions\CBCharacteristicPropertiesExtensions.cs">
-      <Link>Extensions\CBCharacteristicPropertiesExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Extensions\CharacteristicPermissionExtensions.cs">
-      <Link>Extensions\CharacteristicPermissionExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Extensions\CharacteristicPropertyExtensions.cs">
-      <Link>Extensions\CharacteristicPropertyExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Extensions\WriteTypeExtension.cs">
-      <Link>Extensions\WriteTypeExtension.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\AbstractFactory.cs">
-      <Link>Peripheral\AbstractFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\AttRequest.cs">
-      <Link>Peripheral\AttRequest.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\Characteristic.cs">
-      <Link>Peripheral\Characteristic.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\Descriptor.cs">
-      <Link>Peripheral\Descriptor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\Device.cs">
-      <Link>Peripheral\Device.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\PeripheralManager.cs">
-      <Link>Peripheral\PeripheralManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\PeripheralManagerDelegate\CharacteristicSubscriptionChange.cs">
-      <Link>Peripheral\PeripheralManagerDelegate\CharacteristicSubscriptionChange.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\PeripheralManagerDelegate\PeripheralManagerDelegate.cs">
-      <Link>Peripheral\PeripheralManagerDelegate\PeripheralManagerDelegate.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\PeripheralManagerDelegate\ReadRequestReceived.cs">
-      <Link>Peripheral\PeripheralManagerDelegate\ReadRequestReceived.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\PeripheralManagerDelegate\ServiceAdded.cs">
-      <Link>Peripheral\PeripheralManagerDelegate\ServiceAdded.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\PeripheralManagerDelegate\WriteRequestsReceived.cs">
-      <Link>Peripheral\PeripheralManagerDelegate\WriteRequestsReceived.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Peripheral\Service.cs">
-      <Link>Peripheral\Service.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Properties\AssemblyInfo.cs">
-      <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.iOS\Central\Service.cs">
-      <Link>Central\Service.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.iOS\*.cs">
+      <Link>%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

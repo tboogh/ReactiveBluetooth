@@ -35,85 +35,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Central\IDevice.cs">
-      <Link>Central\IDevice.cs</Link>
+    <Compile Include="..\..\..\ReactiveBluetooth.Core\Central\**\*.cs">
+      <Link>Central\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-	<Compile Include="..\..\..\ReactiveBluetooth.Core\Central\IAdvertisementData.cs">
-      <Link>Central\IAdvertisementData.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\**\*.cs">
+      <Link>Peripheral\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\NotificationException.cs" >
-      <Link>CExceptions\NotificationException.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\**\*.cs">
+      <Link>Exceptions\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\IDescriptor.cs" >
+	<Compile Include="..\..\..\ReactiveBluetooth.Core\Extensions\**\*.cs">
+      <Link>Extensions\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\IDevice.cs">
-      <Link>Peripheral\IDevice.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.Core\Types\**\*.cs">
+      <Link>Types\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Types\CharacteristicProperty.cs">
-      <Link>Types\CharacteristicProperty.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Types\CharacteristicPermission.cs">
-      <Link>Types\CharacteristicPermission.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Types\DescriptorPermission.cs">
-      <Link>Types\DescriptorPermission.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Types\WriteType.cs">
-      <Link>Types\WriteType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Types\ConnectionState.cs">
-      <Link>Types\ConnectionState.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Central\IService.cs">
-      <Link>Central\IService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\ManagerState.cs">
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\AddServiceException.cs">
-      <Link>Exceptions\AddServiceException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\AdvertisingNotSupportedException.cs">
-      <Link>Exceptions\AdvertisingNotSupportedException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\DiscoverDeviceException.cs">
-      <Link>Exceptions\DiscoverDeviceException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\FailedToConnectException.cs">
-      <Link>Exceptions\FailedToConnectException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Exceptions\AdvertiseException.cs">
-      <Link>Exceptions\AdvertiseException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Extensions\GuidExtensions.cs">
-      <Link>Extensions\GuidExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\AdvertisingOptions.cs">
-      <Link>Peripheral\AdvertisingOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\IAttRequest.cs">
-      <Link>Peripheral\IAttRequest.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\IBluetoothAbstractFactory.cs">
-      <Link>Peripheral\IBluetoothAbstractFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Central\ICentralManager.cs">
-      <Link>Central\ICentralManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\ICharacteristic.cs">
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\IService.cs">
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\ICharacteristic.cs">
-      <Link>Peripheral\ICharacteristic.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\IPeripheralManager.cs">
-      <Link>Peripheral\IPeripheralManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Peripheral\IService.cs" >
-      <Link>Peripheral\IService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ReactiveBluetooth.Core\Types\ServiceType.cs" >
-      <Link>Types\ServiceType.cs</Link>
+	<Compile Include="..\..\..\ReactiveBluetooth.Core\*.cs">
+      <Link>%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
