@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit;
 using NUnit.Framework;
@@ -112,12 +113,11 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            //var services = await device.DiscoverServices().Timeout(Timeout)
-            //    .FirstAsync();
+            var services = await device.DiscoverServices(CancellationToken.None);
             //await service.DisconnectDevice(device);
 
-            //Assert.NotNull(services);
-            //Assert.IsNotEmpty(services);
+            Assert.NotNull(services);
+            Assert.IsNotEmpty(services);
         }
 
         [Test]
@@ -128,18 +128,17 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            //var services = await device.DiscoverServices().Timeout(Timeout)
-            //    .FirstAsync();
-            ////await service.DisconnectDevice(device);
+            var services = await device.DiscoverServices(CancellationToken.None);
+            //await service.DisconnectDevice(device);
 
-            //if (services.Count == 0)
-            //{
-            //    throw new Exception("Check test device services");
-            //}
+            if (services.Count == 0)
+            {
+                throw new Exception("Check test device services");
+            }
 
-            //var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
-            //Assert.NotNull(testService?.Uuid);
+            Assert.NotNull(testService?.Uuid);
         }
 
         [Test]
@@ -149,16 +148,16 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            //var services = await device.DiscoverServices().Timeout(Timeout).FirstAsync();
-            //var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+            var services = await device.DiscoverServices(CancellationToken.None);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
-            //var characteristics = await testService.DiscoverCharacteristics().Timeout(Timeout).FirstAsync();
+            var characteristics = await testService.DiscoverCharacteristics(CancellationToken.None);
 
-            //var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
+            var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
 
-            ////await testSetup.Item1.DisconnectDevice(device);
+            //await testSetup.Item1.DisconnectDevice(device);
 
-            //Assert.NotNull(testCharacterstic);
+            Assert.NotNull(testCharacterstic);
         }
 
         [Test]
@@ -168,17 +167,17 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var device = testSetup.Item2;
 
 
-            //var services = await device.DiscoverServices().Timeout(Timeout).FirstAsync();
-            //var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+            var services = await device.DiscoverServices(CancellationToken.None);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
-            //var characteristics = await testService.DiscoverCharacteristics().Timeout(Timeout).FirstAsync();
+            var characteristics = await testService.DiscoverCharacteristics(CancellationToken.None);
 
-            //var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
+            var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
 
-            ////await testSetup.Item1.DisconnectDevice(device);
+            //await testSetup.Item1.DisconnectDevice(device);
 
-            //var value = await device.ReadValue(testCharacterstic).Timeout(Timeout).FirstAsync();
-            //Assert.AreEqual(new byte[] { 0xB0, 0x06 }, value);
+            var value = await device.ReadValue(testCharacterstic, CancellationToken.None);
+            Assert.AreEqual(new byte[] { 0xB0, 0x06 }, value);
         }
 
         private async Task<Tuple<ICentralManager, IDevice>> ConnectToTestDevice()

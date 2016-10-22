@@ -91,7 +91,7 @@ namespace SampleApp.ViewModels
             {
                 await _navigationService.NavigateAsync(nameof(DeviceDetailPage), new NavigationParameters() {
                     {
-                        nameof(DeviceViewModel), device 
+                        nameof(IDevice), device.Device 
                     
                     }
                 });

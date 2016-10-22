@@ -37,41 +37,23 @@
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
-    <Reference Include="Plugin.CurrentActivity, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Plugin.CurrentActivity.1.0.1\lib\MonoAndroid10\Plugin.CurrentActivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Reactive.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Core.3.0.0\lib\netstandard1.3\System.Reactive.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=3.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Interfaces.3.0.0\lib\netstandard1.0\System.Reactive.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=3.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Linq.3.0.0\lib\netstandard1.3\System.Reactive.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=3.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.PlatformServices.3.0.0\lib\netstandard1.3\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Central\AdvertisementData.cs" />
+    <Compile Include="Central\Descriptor.cs" />
     <Compile Include="Common\BroadcastListener.cs" />
-    <Compile Include="Central\BleGattCallback.cs" />
-    <Compile Include="Central\BleScanCallback.cs" />
+    <Compile Include="Central\GattCallback.cs" />
+    <Compile Include="Central\ScanCallback.cs" />
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
     <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
     <Compile Include="Extensions\CharacteristicPropertiesExtensions.cs" />
+    <Compile Include="Extensions\DescriptorPermissionExtensions.cs" />
     <Compile Include="Extensions\GattPermissionExtensions.cs" />
     <Compile Include="Extensions\GattPropertyExtensions.cs" />
     <Compile Include="Extensions\StateExtentions.cs" />
@@ -79,6 +61,8 @@
     <Compile Include="Peripheral\AbstractFactory.cs" />
     <Compile Include="Peripheral\AttRequest.cs" />
     <Compile Include="Peripheral\Characteristic.cs" />
+    <Compile Include="Peripheral\Descriptor.cs" />
+    <Compile Include="Peripheral\Device.cs" />
     <Compile Include="Peripheral\GattServer\IServerCallback.cs" />
     <Compile Include="Peripheral\PeripheralManager.cs" />
     <Compile Include="Peripheral\GattServer\ServerCallback.cs" />
@@ -90,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="project.json" />
     <None Include="Resources\AboutResources.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +86,6 @@
       <Name>ReactiveBluetooth.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

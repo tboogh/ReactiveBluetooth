@@ -37,8 +37,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Central\IAdvertisementData.cs" />
+    <Compile Include="Exceptions\NotificationException.cs" />
+    <Compile Include="IDescriptor.cs" />
+    <Compile Include="Peripheral\IDevice.cs" />
     <Compile Include="Types\CharacteristicProperty.cs" />
     <Compile Include="Types\CharacteristicPermission.cs" />
+    <Compile Include="Types\DescriptorPermission.cs" />
     <Compile Include="Types\WriteType.cs" />
     <Compile Include="Types\ConnectionState.cs" />
     <Compile Include="Central\IService.cs" />

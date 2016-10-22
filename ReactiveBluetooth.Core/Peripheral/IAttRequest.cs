@@ -8,7 +8,6 @@ namespace ReactiveBluetooth.Core.Peripheral
 {
     public interface IAttRequest
     {
-        ICharacteristic Characteristic { get; }
         int Offset { get; }
         byte[] Value { get; }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Core
@@ -9,5 +8,7 @@ namespace ReactiveBluetooth.Core
         Guid Uuid { get; }
 
         CharacteristicProperty Properties { get; }
+
+        IDescriptor[] Descriptors { get; }
     }
 }

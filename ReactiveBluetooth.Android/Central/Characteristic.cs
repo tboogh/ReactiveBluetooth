@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Android.Bluetooth;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core;
@@ -11,12 +12,16 @@ namespace ReactiveBluetooth.Android.Central
     {
         public Characteristic(BluetoothGattCharacteristic characteristic)
         {
-            GattCharacteristic = characteristic;
+            NativeCharacteristic = characteristic;
         }
 
-        public BluetoothGattCharacteristic GattCharacteristic { get; }
+        public BluetoothGattCharacteristic NativeCharacteristic { get; }
 
-        public Guid Uuid => Guid.Parse(GattCharacteristic.Uuid.ToString());
-        public CharacteristicProperty Properties => GattCharacteristic.Properties.ToCharacteristicProperty();
+        public Guid Uuid => Guid.Parse(NativeCharacteristic.Uuid.ToString());
+        public CharacteristicProperty Properties => NativeCharacteristic.Properties.ToCharacteristicProperty();
+
+        public IDescriptor[] Descriptors => NativeCharacteristic.Descriptors.Select(x => new Descriptor(x))
+            .Cast<IDescriptor>()
+            .ToArray();
     }
 } 

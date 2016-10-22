@@ -6,7 +6,8 @@ namespace ReactiveBluetooth.Core.Peripheral
 {
     public interface IBluetoothAbstractFactory
     {
-        IService CreateService(Guid id, ServiceType type);
+        IService CreateService(Guid uuid, ServiceType type);
         ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property);
+        IDescriptor CreateDescriptor(Guid uuid, byte[] value, DescriptorPermission permission);
     }
 }

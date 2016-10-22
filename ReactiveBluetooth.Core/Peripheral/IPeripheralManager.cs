@@ -27,5 +27,7 @@ namespace ReactiveBluetooth.Core.Peripheral
         void RemoveAllServices();
 
         bool SendResponse(IAttRequest request, int offset, byte[] value);
+
+        bool Notify(IDevice device, ICharacteristic characteristic, byte[] value);
     }
 }

@@ -9,5 +9,7 @@ namespace ReactiveBluetooth.Core.Peripheral
     public interface IService : Core.IService
     {
         bool AddCharacteristic(ICharacteristic characteristic);
+
+        List<ICharacteristic> Characteristics { get; }
     }
 }

@@ -11,11 +11,15 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 using Android.OS.Storage;
+using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.Core.Exceptions;
+using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Types;
 using IService = ReactiveBluetooth.Core.Central.IService;
+using Observable = System.Reactive.Linq.Observable;
 
 namespace ReactiveBluetooth.Android.Central
 {
@@ -25,7 +29,7 @@ namespace ReactiveBluetooth.Android.Central
         {
             AdvertisementData = advertisementData;
             NativeDevice = device;
-            GattCallback = new BleGattCallback();
+            GattCallback = new GattCallback();
             var currentRssi = Observable.Return(rssi);
             var callbackRssi = GattCallback.ReadRemoteRssiSubject.Select(x => x.Item2);
             Rssi = currentRssi.Merge(callbackRssi);
@@ -33,7 +37,7 @@ namespace ReactiveBluetooth.Android.Central
 
         public BluetoothDevice NativeDevice { get; }
         public BluetoothGatt Gatt { get; set; }
-        public BleGattCallback GattCallback { get; }
+        public GattCallback GattCallback { get; }
         public string Name => NativeDevice.Name;
 
         public Guid Uuid
@@ -83,10 +87,23 @@ namespace ReactiveBluetooth.Android.Central
 
         public Task<byte[]> ReadValue(ICharacteristic characteristic, CancellationToken cancellationToken)
         {
-            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).GattCharacteristic;
+            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
             var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                 .Select(x => x.Item2.GetValue());
+            
             return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { })
+                .Merge(observable)
+                .FirstAsync()
+                .ToTask(cancellationToken);
+        }
+
+        public Task<byte[]> ReadValue(IDescriptor descriptor, CancellationToken cancellationToken)
+        {
+            BluetoothGattDescriptor nativeDescriptor = ((Descriptor)descriptor).NativeDescriptor;
+            var observable = GattCallback.DescriptorReadSubject.FirstAsync(x => x.Item2 == nativeDescriptor)
+                .Select(x => x.Item2.GetValue());
+
+            return Observable.FromEvent<byte[]>(action => Gatt.ReadDescriptor(nativeDescriptor), _ => { })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -94,29 +111,120 @@ namespace ReactiveBluetooth.Android.Central
 
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
-            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic)characteristic).GattCharacteristic;
+            BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
 
             var writeObservable = Observable.FromEvent<bool>(action =>
             {
                 gattCharacteristic.WriteType = writeType.ToGattWriteType();
-                gattCharacteristic.SetValue(value);
+
+                var setValueResult = gattCharacteristic.SetValue(value);
+                if (!setValueResult)
+                    action(false);
 
                 var result = Gatt.WriteCharacteristic(gattCharacteristic);
+                if (!result)
+                    action(false);
             }, _ => { });
 
             if (writeType == WriteType.WithResponse)
             {
-                return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic).Select(
-                    x =>
+                return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
+                    .Select(x =>
                     {
                         if (x.Item3 != GattStatus.Success)
                         {
                             throw new Exception($"Failed to write characteristic: {x.Item3.ToString()}");
                         }
                         return true;
-                    })).Take(1).ToTask(cancellationToken);
+                    }))
+                    .Take(1)
+                    .ToTask(cancellationToken);
             }
-            return writeObservable.Merge(Observable.Return(true)).Take(1).ToTask(cancellationToken);
+            return writeObservable.Merge(Observable.Return(true))
+                .Take(1)
+                .ToTask(cancellationToken);
+        }
+
+        public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
+        {
+            BluetoothGattDescriptor gattDescriptor = ((Descriptor) descriptor).NativeDescriptor;
+
+            var writeObservable = Observable.FromEvent<bool>(action =>
+            {
+                var result = gattDescriptor.SetValue(value);
+                if (!result)
+                    action(false);
+
+                var writeResult = Gatt.WriteDescriptor(gattDescriptor);
+                if (!writeResult)
+                    action(false);
+            }, _ => { });
+
+            return writeObservable.Merge(GattCallback.DescriptorWriteSubject.FirstAsync(x => x.Item2 == gattDescriptor)
+                .Select(x =>
+                {
+                    if (x.Item3 != GattStatus.Success)
+                    {
+                        throw new Exception($"Failed to write desciptor: {x.Item3.ToString()}");
+                    }
+                    return true;
+                }))
+                .Take(1)
+                .ToTask(cancellationToken);
+        }
+
+        public IObservable<byte[]> Notifications(ICharacteristic characteristic)
+        {
+            BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
+
+            IObservable<byte[]> notificationObservable = Observable.FromEvent<byte[]>(action =>
+            {
+                IList<byte> enableNotificationValue = null;
+                if (characteristic.Properties.HasFlag(CharacteristicProperty.Notify))
+                {
+                    enableNotificationValue = BluetoothGattDescriptor.EnableNotificationValue;
+                } else if (characteristic.Properties.HasFlag(CharacteristicProperty.Indicate))
+                {
+                    enableNotificationValue = BluetoothGattDescriptor.EnableIndicationValue;
+                }
+                if (enableNotificationValue == null)
+                {
+                    throw new NotificationException("Characteristic does not support notifications");
+                }
+
+                var uuid = UUID.FromString("2902".ToGuid().ToString());
+                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(uuid);
+                if (characteristicConfigDescriptor == null)
+                    return;
+                
+                characteristicConfigDescriptor.SetValue(enableNotificationValue.ToArray());
+                if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))
+                {
+                    throw new NotificationException("WriteDescriptor enable failed");
+                }
+
+                if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
+                {
+                    throw new NotificationException("SetCharacteristicNotification enable failed");
+                }
+            }, action =>
+            {
+                if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
+                {
+                    throw new NotificationException("SetCharacteristicNotification disable failed");
+                }
+
+                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(UUID.FromString("2902".ToGuid()
+                    .ToString()));
+                characteristicConfigDescriptor.SetValue(BluetoothGattDescriptor.DisableNotificationValue.ToArray());
+                if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))
+                {
+                    throw new NotificationException("WriteDescriptor disable failed");
+                }
+            });
+
+            
+            return notificationObservable.Merge(GattCallback.CharacteristicChangedSubject.Select(x => x.Item2.GetValue()));
         }
     }
 }

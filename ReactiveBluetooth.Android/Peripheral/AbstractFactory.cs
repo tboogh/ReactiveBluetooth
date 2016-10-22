@@ -5,6 +5,7 @@ using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
 using ReactiveBluetooth.Android.Peripheral.GattServer;
 using ReactiveBluetooth.Core;
+using ReactiveBluetooth.Core.Extensions;
 using ReactiveBluetooth.Core.Peripheral;
 using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
@@ -15,16 +16,15 @@ namespace ReactiveBluetooth.Android.Peripheral
     public class AbstractFactory : IBluetoothAbstractFactory
     {
         private readonly IServerCallback _serverCallback;
-
+        
         public AbstractFactory(IServerCallback serverCallback)
         {
             _serverCallback = serverCallback;
         }
 
-        public IService CreateService(Guid id, ServiceType type)
+        public IService CreateService(Guid uuid, ServiceType type)
         {
-            var gattService = new BluetoothGattService(UUID.FromString(id.ToString()), (GattServiceType)type);
-            return new Service(gattService);
+            return new Service(uuid, type);
         }
 
         /// <summary>
@@ -38,22 +38,19 @@ namespace ReactiveBluetooth.Android.Peripheral
         /// <returns></returns>
         public ICharacteristic CreateCharacteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property)
         {
-            var nativePermissions = permission.ToGattPermission();
-            var nativeProperties = property.ToGattProperty();
-
-            var bluetoothGattCharacteristic = new BluetoothGattCharacteristic(UUID.FromString(uuid.ToString()), nativeProperties, nativePermissions);
-
-            Characteristic characteristic = new Characteristic(bluetoothGattCharacteristic, _serverCallback);
-
-            if (!bluetoothGattCharacteristic.SetValue(value))
+            Characteristic characteristic = new Characteristic(uuid, value, permission, property, _serverCallback);
+            if (property.HasFlag(CharacteristicProperty.Notify) || property.HasFlag(CharacteristicProperty.Indicate))
             {
-                throw new Exception("Failed to set characteristic value");
+                var descriptor = new Descriptor("2902".ToGuid(), null, DescriptorPermission.Read | DescriptorPermission.Write, _serverCallback);
+                characteristic.AddDescriptor(descriptor);
             }
             return characteristic;
         }
 
-        
-
-        
+        public IDescriptor CreateDescriptor(Guid uuid, byte[] value, DescriptorPermission permission)
+        {
+            Descriptor descriptor = new Descriptor(uuid, value, permission, _serverCallback);
+            return descriptor;
+        }
     }
 }

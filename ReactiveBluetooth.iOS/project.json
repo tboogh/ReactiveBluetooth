@@ -1,0 +1,10 @@
+{
+  "supports": {},
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "System.Reactive": "3.0.0"
+  },
+  "frameworks": {
+    "Xamarin.iOS,Version=v1.0" :  {} 
+  }
+}
