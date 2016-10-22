@@ -19,7 +19,7 @@ namespace Demo
 
         protected override void OnInitialized()
         {
-            NavigationService.NavigateAsync($"/{nameof(MainNavigationPage)}/{nameof(MainPage)}");
+            var task = NavigationService.NavigateAsync($"/{nameof(MainNavigationPage)}/{nameof(MainPage)}");
         }
 
         protected override void RegisterTypes()

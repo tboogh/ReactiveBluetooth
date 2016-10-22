@@ -8,6 +8,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Demo.Views;
 using Microsoft.Practices.Unity;
 using Plugin.CurrentActivity;
 using Prism.Unity;
@@ -19,7 +20,7 @@ using ReactiveBluetooth.Core.Peripheral;
 
 namespace Demo.Droid
 {
-    [Activity(Label = "Demo", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle bundle)
@@ -29,7 +30,7 @@ namespace Demo.Droid
 
             base.OnCreate(bundle);
 
-            global::Xamarin.Forms.Forms.Init(this, bundle);
+            global::Xamarin.Forms.Forms.Init(this, bundle);            
             var app = new App(new PlatformInitializer());
             LoadApplication(app);
         }
