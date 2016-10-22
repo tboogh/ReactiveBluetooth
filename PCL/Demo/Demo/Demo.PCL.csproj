@@ -35,20 +35,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="App.xaml.cs" />
-    <Compile Include="Common\Behaviors\ListViewItemSelectedBehaviour.cs" />
-    <Compile Include="Common\Behaviors\PageAppearingBehavior.cs" />
-    <Compile Include="Common\ValueConverters\CharactersticPropertiesToStringConverter.cs" />
-    <Compile Include="Common\ValueConverters\GuidToStringValueConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\Central\AdvertiseDataViewModel.cs" />
-    <Compile Include="ViewModels\Central\CentralModeViewModel.cs" />
-    <Compile Include="ViewModels\Central\CharacteristicViewModel.cs" />
-    <Compile Include="ViewModels\Central\DescriptorViewModel.cs" />
-    <Compile Include="ViewModels\Central\DeviceViewModel.cs" />
-    <Compile Include="ViewModels\Central\ServiceViewModel.cs" />
-    <Compile Include="ViewModels\MainPageViewModel.cs" />
-    <Compile Include="ViewModels\Peripheral\PeripheralModeViewModel.cs" />
+	<Compile Include="..\..\..\Demo\Demo\Common\**\*.cs">
+      <Link>Common\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\..\..\Demo\Demo\ViewModels\**\*.cs">
+      <Link>ViewModels\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+	<Compile Include="..\..\..\Demo\Demo\Views\**\*.cs">
+      <Link>Views\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\**\*.xaml">
+		<Link>Views\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+	<Compile Include="..\..\..\Demo\Demo\*.cs">
+      <Link>%(Filename)%(Extension)</Link>
+    </Compile>
+	<EmbeddedResource Include="..\..\..\Demo\Demo\*.xaml">
+		<Link>%(Filename)%(Extension)</Link>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -102,36 +111,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Views\AdvertiseDataPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\CentralPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\CharacteristicDetailPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\DeviceDetailPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\MainNavigationPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\MainPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\PeripheralPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">

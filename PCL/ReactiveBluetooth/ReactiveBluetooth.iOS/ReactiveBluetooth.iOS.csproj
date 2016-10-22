@@ -138,5 +138,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
+      <Project>{43c7a016-7616-407e-92ba-662e2cde505c}</Project>
+      <Name>ReactiveBluetooth.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
