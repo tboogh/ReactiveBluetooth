@@ -69,28 +69,28 @@
       <Link>%(Filename)%(Extension)</Link>
     </Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\AdvertisementData.cs">
-	  <Link>Central\.\\AdvertisementData.cs</Link>
+	  <Link>Central\AdvertisementData.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\CentralManager.cs">
-	  <Link>Central\.\\CentralManager.cs</Link>
+	  <Link>Central\CentralManager.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Characteristic.cs">
-	  <Link>Central\.\\Characteristic.cs</Link>
+	  <Link>Central\Characteristic.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Descriptor.cs">
-	  <Link>Central\.\\Descriptor.cs</Link>
+	  <Link>Central\Descriptor.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Device.cs">
-	  <Link>Central\.\\Device.cs</Link>
+	  <Link>Central\Device.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\GattCallback.cs">
-	  <Link>Central\.\\GattCallback.cs</Link>
+	  <Link>Central\GattCallback.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\ScanCallback.cs">
-	  <Link>Central\.\\ScanCallback.cs</Link>
+	  <Link>Central\ScanCallback.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Central\Service.cs">
-	  <Link>Central\.\\Service.cs</Link>
+	  <Link>Central\Service.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\GattServer\IServerCallback.cs">
 	  <Link>Peripheral\GattServer\\IServerCallback.cs</Link>
@@ -99,52 +99,52 @@
 	  <Link>Peripheral\GattServer\\ServerCallback.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\AbstractFactory.cs">
-	  <Link>Peripheral\.\\AbstractFactory.cs</Link>
+	  <Link>Peripheral\AbstractFactory.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\AttRequest.cs">
-	  <Link>Peripheral\.\\AttRequest.cs</Link>
+	  <Link>Peripheral\AttRequest.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Characteristic.cs">
-	  <Link>Peripheral\.\\Characteristic.cs</Link>
+	  <Link>Peripheral\Characteristic.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Descriptor.cs">
-	  <Link>Peripheral\.\\Descriptor.cs</Link>
+	  <Link>Peripheral\Descriptor.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Device.cs">
-	  <Link>Peripheral\.\\Device.cs</Link>
+	  <Link>Peripheral\Device.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\PeripheralManager.cs">
-	  <Link>Peripheral\.\\PeripheralManager.cs</Link>
+	  <Link>Peripheral\PeripheralManager.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\Service.cs">
-	  <Link>Peripheral\.\\Service.cs</Link>
+	  <Link>Peripheral\Service.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Peripheral\StartAdvertiseCallback.cs">
-	  <Link>Peripheral\.\\StartAdvertiseCallback.cs</Link>
+	  <Link>Peripheral\StartAdvertiseCallback.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Common\BroadcastListener.cs">
-	  <Link>Common\.\\BroadcastListener.cs</Link>
+	  <Link>Common\BroadcastListener.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\CharacteristicPermissionExtensions.cs">
-	  <Link>Extensions\.\\CharacteristicPermissionExtensions.cs</Link>
+	  <Link>Extensions\CharacteristicPermissionExtensions.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\CharacteristicPropertiesExtensions.cs">
-	  <Link>Extensions\.\\CharacteristicPropertiesExtensions.cs</Link>
+	  <Link>Extensions\CharacteristicPropertiesExtensions.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\DescriptorPermissionExtensions.cs">
-	  <Link>Extensions\.\\DescriptorPermissionExtensions.cs</Link>
+	  <Link>Extensions\DescriptorPermissionExtensions.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\GattPermissionExtensions.cs">
-	  <Link>Extensions\.\\GattPermissionExtensions.cs</Link>
+	  <Link>Extensions\GattPermissionExtensions.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\GattPropertyExtensions.cs">
-	  <Link>Extensions\.\\GattPropertyExtensions.cs</Link>
+	  <Link>Extensions\GattPropertyExtensions.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\StateExtentions.cs">
-	  <Link>Extensions\.\\StateExtentions.cs</Link>
+	  <Link>Extensions\StateExtentions.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\ReactiveBluetooth.Android\Extensions\WriteTypeExtensions.cs">
-	  <Link>Extensions\.\\WriteTypeExtensions.cs</Link>
+	  <Link>Extensions\WriteTypeExtensions.cs</Link>
 	</Compile>
   </ItemGroup>
   <ItemGroup>

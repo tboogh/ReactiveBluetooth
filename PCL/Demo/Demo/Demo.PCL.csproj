@@ -70,61 +70,61 @@
 	  <Link>ViewModels\Peripheral\\PeripheralModeViewModel.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\ViewModels\MainPageViewModel.cs">
-	  <Link>ViewModels\.\\MainPageViewModel.cs</Link>
+	  <Link>ViewModels\MainPageViewModel.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\AdvertiseDataPage.xaml.cs">
-	  <Link>Views\.\\AdvertiseDataPage.xaml.cs</Link>
+	  <Link>Views\AdvertiseDataPage.xaml.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\CentralPage.xaml.cs">
-	  <Link>Views\.\\CentralPage.xaml.cs</Link>
+	  <Link>Views\CentralPage.xaml.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\CharacteristicDetailPage.xaml.cs">
-	  <Link>Views\.\\CharacteristicDetailPage.xaml.cs</Link>
+	  <Link>Views\CharacteristicDetailPage.xaml.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\DeviceDetailPage.xaml.cs">
-	  <Link>Views\.\\DeviceDetailPage.xaml.cs</Link>
+	  <Link>Views\DeviceDetailPage.xaml.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\MainNavigationPage.xaml.cs">
-	  <Link>Views\.\\MainNavigationPage.xaml.cs</Link>
+	  <Link>Views\MainNavigationPage.xaml.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\MainPage.xaml.cs">
-	  <Link>Views\.\\MainPage.xaml.cs</Link>
+	  <Link>Views\MainPage.xaml.cs</Link>
 	</Compile>
 	<Compile Include="..\..\..\Demo\Demo\Views\PeripheralPage.xaml.cs">
-	  <Link>Views\.\\PeripheralPage.xaml.cs</Link>
+	  <Link>Views\PeripheralPage.xaml.cs</Link>
 	</Compile>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\AdvertiseDataPage.xaml">
-	  <Link>Views\.\\AdvertiseDataPage.xaml</Link>
+	  <Link>Views\AdvertiseDataPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\CentralPage.xaml">
-	  <Link>Views\.\\CentralPage.xaml</Link>
+	  <Link>Views\CentralPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\CharacteristicDetailPage.xaml">
-	  <Link>Views\.\\CharacteristicDetailPage.xaml</Link>
+	  <Link>Views\CharacteristicDetailPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\DeviceDetailPage.xaml">
-	  <Link>Views\.\\DeviceDetailPage.xaml</Link>
+	  <Link>Views\DeviceDetailPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\MainNavigationPage.xaml">
-	  <Link>Views\.\\MainNavigationPage.xaml</Link>
+	  <Link>Views\MainNavigationPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\MainPage.xaml">
-	  <Link>Views\.\\MainPage.xaml</Link>
+	  <Link>Views\MainPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>
 	<EmbeddedResource Include="..\..\..\Demo\Demo\Views\PeripheralPage.xaml">
-	  <Link>Views\.\\PeripheralPage.xaml</Link>
+	  <Link>Views\PeripheralPage.xaml</Link>
 	  <SubType>Designer</SubType>
 	  <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	</EmbeddedResource>

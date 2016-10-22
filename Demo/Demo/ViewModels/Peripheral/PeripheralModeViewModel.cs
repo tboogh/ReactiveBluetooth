@@ -97,7 +97,7 @@ namespace Demo.ViewModels.Peripheral
 
             _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
 
-            var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0064004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify);
+            var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0064004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify | CharacteristicProperty.Read);
 
             _notifySubscribedDisposable = notifyCharacteristic.Subscribed.Subscribe(device =>
             {
@@ -109,10 +109,11 @@ namespace Demo.ViewModels.Peripheral
                 _notifySubscribedDevices.Remove(device);
             });
 
-            var indicateCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0064005-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Indicate);
+            var indicateCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0064005-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Indicate | CharacteristicProperty.Read);
             _indicateSubscribedDisposable = indicateCharacteristic.Subscribed.Subscribe(device =>
             {
                 _indicateSubscribedDevices.Add(device);
+                
             });
 
             _indicateUnsubscribedDisposable = indicateCharacteristic.Unsubscribed.Subscribe(device =>

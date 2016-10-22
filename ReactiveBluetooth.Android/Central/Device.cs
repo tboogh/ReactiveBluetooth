@@ -192,10 +192,6 @@ namespace ReactiveBluetooth.Android.Central
                     throw new NotificationException("Characteristic does not support notifications");
                 }
 
-                if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
-                {
-                    throw new NotificationException("SetCharacteristicNotification enable failed");
-                }
                 var uuid = UUID.FromString("2902".ToGuid().ToString());
                 var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(uuid);
                 if (characteristicConfigDescriptor == null)
@@ -205,6 +201,11 @@ namespace ReactiveBluetooth.Android.Central
                 if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))
                 {
                     throw new NotificationException("WriteDescriptor enable failed");
+                }
+
+                if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
+                {
+                    throw new NotificationException("SetCharacteristicNotification enable failed");
                 }
             }, action =>
             {
