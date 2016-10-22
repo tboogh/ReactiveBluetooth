@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:behaviors1="clr-namespace:Demo.Common.Behaviors;assembly=Demo"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="Demo.Views.PeripheralPage">
+    <ContentPage.Behaviors>
+        <behaviors1:PageAppearingBehavior />
+    </ContentPage.Behaviors>
+    <StackLayout>
+        <Label Text="Peripheral Mode" FontSize="Large" />
+        <Label Text="State" />
+        <Label Text="{Binding State}" />
+        <Label Text="Not Advertising">
+            <Label.Triggers>
+                <DataTrigger TargetType="Label" Binding="{Binding Advertising}" Value="True">
+                    <Setter Property="Text" Value="Advertising" />
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
+        <Button Text="Start Advertising" Command="{Binding AdvertiseCommand}" />
+        <Button Text="Stop Advertising" Command="{Binding StopAdvertiseCommand}" />
+        <Label Text="{Binding WriteValue}" />
+    </StackLayout>
+</ContentPage>
