@@ -119,9 +119,9 @@ namespace ReactiveBluetooth.iOS.Peripheral
 
         public bool Notify(IDevice device, ICharacteristic characteristic, byte[] value)
         {
-            Device androidDevice = (Device)device;
-            Characteristic androidCharacteristic = (Characteristic)characteristic;
-            return _peripheralManager.UpdateValue(NSData.FromArray(value), androidCharacteristic.NativeCharacteristic, new[] {androidDevice.NativeCentral});
+            Device iosDevice = (Device)device;
+            Characteristic iosCharacteristic = (Characteristic)characteristic;
+            return _peripheralManager.UpdateValue(NSData.FromArray(value), iosCharacteristic.NativeCharacteristic, new[] {iosDevice.NativeCentral});
         }
     }
 }

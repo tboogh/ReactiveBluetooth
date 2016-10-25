@@ -150,7 +150,13 @@ namespace Demo.ViewModels.Central
 				_notifyDisposable = null;
 			} else {
 				_notifyDisposable = Device.Notifications(Characteristic)
-                	.Subscribe(bytes => { Value = BitConverter.ToString(bytes); });
+                	.Subscribe(bytes => {
+						if (bytes != null) {
+							Value = BitConverter.ToString(bytes);
+						} else {
+							Value = "(null)";
+						}
+					 });
 			}
         }
 
