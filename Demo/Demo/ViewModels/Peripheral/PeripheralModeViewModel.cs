@@ -151,21 +151,25 @@ namespace Demo.ViewModels.Peripheral
 
             var t = Task.Run(async () =>
             {
-                do
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+				do
+				{
+					await Task.Delay(TimeSpan.FromSeconds(1));
 
-                    foreach (var subscribedDevice in _notifySubscribedDevices)
-                    {
-                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, BitConverter.GetBytes(DateTime.Now.Second)))
-                        {
-                            // delay until write is ready
-                        }
-                    }
-                    
-                    foreach (var subscribedDevice in _indicateSubscribedDevices)
-                    {
-                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, BitConverter.GetBytes(60 - DateTime.Now.Second)))
+					foreach (var subscribedDevice in _notifySubscribedDevices)
+					{
+						var byteValue = BitConverter.GetBytes(DateTime.Now.Second);
+						notifyCharacteristic.Value = byteValue;
+						if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, byteValue))
+						{
+							// delay until write is ready
+						}
+					}
+
+					foreach (var subscribedDevice in _indicateSubscribedDevices)
+					{
+						var byteValue = BitConverter.GetBytes(60 - DateTime.Now.Second);
+						indicateCharacteristic.Value = byteValue;
+						if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, byteValue))
                         {
                             // delay until write is ready
                         }
