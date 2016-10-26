@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core.Exceptions;
@@ -23,7 +24,7 @@ namespace ReactiveBluetooth.Core.Central
         /// Starts a scan for BLE devices, stops scanning when the <see cref="IObservable{IDevice}"/> is completely disposed
         /// </summary>
         /// <returns>An observable with <see cref="IDevice"/> discovered over time</returns>
-        IObservable<IDevice> ScanForDevices();
+        IObservable<IDevice> ScanForDevices(IList<Guid> serviceGuids = null);
 
         /// <summary>
         /// Tries to connect to a <see cref="IDevice"/>

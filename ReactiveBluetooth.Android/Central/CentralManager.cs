@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -8,6 +10,8 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Content;
+using Android.OS;
+using Java.Util;
 using Plugin.CurrentActivity;
 using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Extensions;
@@ -16,6 +20,7 @@ using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Types;
 using Object = Java.Lang.Object;
+using Observable = System.Reactive.Linq.Observable;
 
 namespace ReactiveBluetooth.Android.Central
 {
@@ -42,10 +47,9 @@ namespace ReactiveBluetooth.Android.Central
         public IObservable<ManagerState> State()
         {
             return _broadcastListener.StateUpdatedSubject;
-            //.StartWith(_bluetoothAdapter?.State.ToManagerState() ?? ManagerState.Unsupported);
         }
 
-        public IObservable<IDevice> ScanForDevices()
+        public IObservable<IDevice> ScanForDevices(IList<Guid> serviceUuids = null)
         {
             if (_discoverObservable == null)
             {
@@ -54,8 +58,28 @@ namespace ReactiveBluetooth.Android.Central
 
                 _discoverObservable = Observable.FromEvent<IDevice>(action =>
                 {
-                    _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
-                }, action => { _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback); })
+                    var scanFilters = serviceUuids?.Select(x =>
+                    {
+                        var scanFilterBuilder = new ScanFilter.Builder();
+                        scanFilterBuilder.SetServiceUuid(new ParcelUuid(UUID.FromString(x.ToString())));
+                        return scanFilterBuilder.Build();
+                    }).ToArray();
+                    if (scanFilters != null)
+                    {
+                        var scanSettings = new ScanSettings.Builder().Build();
+
+                        _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
+                    }
+                    else
+                    {
+                        _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
+                    }
+                    
+                }, action =>
+                {
+                    _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback); 
+                    
+                })
                     .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
                     .Merge(scanCallback.FailureSubject.Select(failure => default(Device)));
             }
