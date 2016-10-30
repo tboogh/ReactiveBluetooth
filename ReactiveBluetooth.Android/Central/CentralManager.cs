@@ -29,11 +29,9 @@ namespace ReactiveBluetooth.Android.Central
         private readonly BluetoothAdapter _bluetoothAdapter;
         private IObservable<IDevice> _discoverObservable;
         private BroadcastListener _broadcastListener;
-        private BluetoothManager _bluetoothManager;
-
+        
         public CentralManager()
         {
-            _bluetoothManager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             _broadcastListener = new BroadcastListener();
         }
