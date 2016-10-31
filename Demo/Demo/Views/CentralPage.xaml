@@ -13,6 +13,7 @@
     <StackLayout>
         <Label Text="{Binding State}" />
         <Button Text="Toggle Scan" Command="{Binding ToggleScanCommand}" />
+        <Button Text="Toggle Service Scan" Command="{Binding ToggleServiceScanCommand}" />
         <ListView x:Name="ListView" ItemsSource="{Binding Devices}">
             <ListView.Behaviors>
                 <behaviors1:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding DeviceSelectedCommand}"

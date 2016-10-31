@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Demo.Common.Behaviors;
@@ -28,10 +29,12 @@ namespace Demo.ViewModels.Central
             _centralManager.State()
                 .Subscribe(state => { State = state.ToString(); });
             ToggleScanCommand = new DelegateCommand(ToggleScan);
+            ToggleServiceScanCommand = new DelegateCommand(ToggleServiceScan);
             DeviceSelectedCommand = new DelegateCommand<DeviceViewModel>(ItemSelected);
             Devices = new ObservableCollection<DeviceViewModel>();
         }
 
+        public DelegateCommand ToggleServiceScanCommand { get; }
         public DelegateCommand<DeviceViewModel> DeviceSelectedCommand { get; }
         public DelegateCommand ToggleScanCommand { get; }
         public ObservableCollection<DeviceViewModel> Devices { get; }
@@ -53,6 +56,29 @@ namespace Demo.ViewModels.Central
             {
                 Devices.Clear();
                 _toggleScanDisposable = _centralManager.ScanForDevices()
+                    .Subscribe(device =>
+                    {
+                        var currentDevice = Devices.FirstOrDefault(x => x.Uuid == device.Uuid);
+                        if (currentDevice == null)
+                        {
+                            currentDevice = new DeviceViewModel(_centralManager);
+                            Devices.Add(currentDevice);
+                        }
+                        currentDevice.Device = device;
+                    });
+            }
+        }
+
+        private void ToggleServiceScan()
+        {
+            if (_toggleScanDisposable != null)
+            {
+                _toggleScanDisposable.Dispose();
+                _toggleScanDisposable = null;
+            } else
+            {
+                Devices.Clear();
+                _toggleScanDisposable = _centralManager.ScanForDevices(new List<Guid>() { Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") })
                     .Subscribe(device =>
                     {
                         var currentDevice = Devices.FirstOrDefault(x => x.Uuid == device.Uuid);
