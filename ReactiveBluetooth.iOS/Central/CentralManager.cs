@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -29,9 +31,12 @@ namespace ReactiveBluetooth.iOS.Central
             return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
         }
 
-        public IObservable<IDevice> ScanForDevices()
+        public IObservable<IDevice> ScanForDevices(IList<Guid> serviceUuid = null)
         {
-            var scanObservable = Observable.FromEvent<IDevice>(action => { _centralManager.ScanForPeripherals((CBUUID[])null); }, action => { _centralManager.StopScan(); });
+            CBUUID[] cbuuids = serviceUuid?.Select(x => CBUUID.FromString(x.ToString()))
+                .ToArray();
+
+            var scanObservable = Observable.FromEvent<IDevice>(action => { _centralManager.ScanForPeripherals(cbuuids); }, action => { _centralManager.StopScan(); });
             return scanObservable.Merge(_centralManagerDelegate.DiscoveredPeriperhalSubject.Select(x =>
             {
                 Device device = new Device(x.Item2, x.Item4.Int32Value, new AdvertisementData(x.Item3));

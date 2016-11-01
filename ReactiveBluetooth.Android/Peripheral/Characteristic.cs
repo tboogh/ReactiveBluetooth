@@ -19,7 +19,6 @@ namespace ReactiveBluetooth.Android.Peripheral
     {
         public BluetoothGattServer GattServer { get; set; }
         private readonly IDisposable _descriptorReadDisposable;
-        private IDisposable _descriptorWriteDisposable;
 
         public Characteristic(Guid uuid, byte[] value, CharacteristicPermission permission, CharacteristicProperty property, IServerCallback serverCallback)
         {

@@ -2,6 +2,9 @@
 
 namespace ReactiveBluetooth.Core.Types
 {
+    /// <summary>
+    /// Characteristic properties
+    /// </summary>
     [Flags]
     public enum CharacteristicProperty
     {

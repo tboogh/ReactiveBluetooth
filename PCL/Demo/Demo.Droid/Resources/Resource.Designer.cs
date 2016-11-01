@@ -28,6 +28,8 @@ namespace Demo.Droid
 		{
 			global::ReactiveBluetooth.Android.Resource.String.ApplicationName = global::Demo.Droid.Resource.String.ApplicationName;
 			global::ReactiveBluetooth.Android.Resource.String.Hello = global::Demo.Droid.Resource.String.Hello;
+			global::ReactiveBluetooth.Android.PCL.Resource.String.ApplicationName = global::Demo.Droid.Resource.String.ApplicationName;
+			global::ReactiveBluetooth.Android.PCL.Resource.String.Hello = global::Demo.Droid.Resource.String.Hello;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::Demo.Droid.Resource.Attribute.actionBarSize;
 		}
 		
