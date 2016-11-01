@@ -181,6 +181,10 @@
     <AndroidResource Include="Resources\values\styles.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveBluetooth\ReactiveBluetooth.Core.PCL\ReactiveBluetooth.Core.PCL.csproj">
+      <Project>{43c7a016-7616-407e-92ba-662e2cde505c}</Project>
+      <Name>ReactiveBluetooth.Core.PCL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Demo\Demo.PCL.csproj">
       <Project>{ee2c329d-7454-433d-94b5-a7a40fed83bd}</Project>
       <Name>Demo.PCL</Name>
