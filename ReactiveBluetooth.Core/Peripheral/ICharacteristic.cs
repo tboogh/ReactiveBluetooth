@@ -18,5 +18,7 @@ namespace ReactiveBluetooth.Core.Peripheral
         CharacteristicPermission Permissions { get; }
 
         void AddDescriptor(IDescriptor descriptor);
+
+		byte[] Value { get; set; }
     }
 }

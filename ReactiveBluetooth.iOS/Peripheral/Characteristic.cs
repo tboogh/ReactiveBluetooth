@@ -47,7 +47,17 @@ namespace ReactiveBluetooth.iOS.Peripheral
         public IObservable<IAttRequest> WriteRequestObservable { get; }
         public IObservable<IDevice> Subscribed { get; }
         public IObservable<IDevice> Unsubscribed { get; }
-
+		public byte[] Value
+		{
+			get
+			{
+				return NativeCharacteristic.Value.ToArray();
+			}
+			set
+			{
+				NativeCharacteristic.Value = NSData.FromArray(value);
+			}
+		}
         public void AddDescriptor(IDescriptor descriptor)
         {
             var nativeDescriptor = ((Descriptor)descriptor).NativeDescriptor;
