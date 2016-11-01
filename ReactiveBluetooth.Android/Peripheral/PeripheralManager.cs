@@ -25,6 +25,7 @@ using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Peripheral;
+using ReactiveBluetooth.Core.Types;
 using ICharacteristic = ReactiveBluetooth.Core.Peripheral.ICharacteristic;
 using IDevice = ReactiveBluetooth.Core.Peripheral.IDevice;
 using IService = ReactiveBluetooth.Core.Peripheral.IService;
@@ -202,11 +203,15 @@ namespace ReactiveBluetooth.Android.Peripheral
         {
             Device androidDevice = (Device) device;
             Characteristic androidCharacteristic = (Characteristic) characteristic;
-            var setValue = androidCharacteristic.NativeCharacteristic.SetValue(value);
-            if (!setValue)
-                throw new Exception("SetValue failed");
-
-            var indicate = false;
+            
+            bool indicate = androidCharacteristic.Properties.HasFlag(CharacteristicProperty.Indicate);
+            if (!indicate)
+            {
+                if (androidCharacteristic.Properties.HasFlag(CharacteristicProperty.Notify))
+                {
+                    throw new NotSupportedException("Characteristic does not support Notify or Indicate");
+                }
+            }
             var result = _gattServer.NotifyCharacteristicChanged(androidDevice.NativeDevice, androidCharacteristic.NativeCharacteristic, indicate);
             return result;
         }
