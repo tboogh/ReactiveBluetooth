@@ -77,7 +77,20 @@ namespace ReactiveBluetooth.Android.Peripheral
         public IObservable<IAttRequest> ReadRequestObservable { get; }
         public IObservable<IAttRequest> WriteRequestObservable { get; }
         public IObservable<IDevice> Subscribed { get; }
-        public void Dispose()
+
+		public byte[] Value
+		{
+			get
+			{
+				return NativeCharacteristic.GetValue();
+			}
+			set
+			{
+				NativeCharacteristic.SetValue(value);
+			}
+		}
+
+		public void Dispose()
         {
             _descriptorReadDisposable?.Dispose();
         }

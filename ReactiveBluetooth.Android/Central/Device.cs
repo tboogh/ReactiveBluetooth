@@ -177,7 +177,7 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
 
-            IObservable<byte[]> notificationObservable = Observable.FromEvent<byte[]>(action =>
+            IObservable<byte[]> notificationObservable = Observable.FromEvent<byte[]>(async action =>
             {
                 IList<byte> enableNotificationValue = null;
                 if (characteristic.Properties.HasFlag(CharacteristicProperty.Notify))
@@ -192,17 +192,15 @@ namespace ReactiveBluetooth.Android.Central
                     throw new NotificationException("Characteristic does not support notifications");
                 }
 
-                var uuid = UUID.FromString("2902".ToGuid().ToString());
-                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(uuid);
+                var uuid = "2902".ToGuid();
+
+                var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
                 if (characteristicConfigDescriptor == null)
                     return;
-                
-                characteristicConfigDescriptor.SetValue(enableNotificationValue.ToArray());
-                if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))
-                {
-                    throw new NotificationException("WriteDescriptor enable failed");
-                }
 
+
+                await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), CancellationToken.None);
+                
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
                 {
                     throw new NotificationException("SetCharacteristicNotification enable failed");

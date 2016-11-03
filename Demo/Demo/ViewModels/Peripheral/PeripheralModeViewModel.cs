@@ -32,11 +32,13 @@ namespace Demo.ViewModels.Peripheral
         private CancellationTokenSource _notifyLoopCancellationTokenSource;
         private IDisposable _indicateSubscribedDisposable;
         private IDisposable _indicateUnsubscribedDisposable;
-
+		private IDisposable _notifyReadDisposable;
+		
 		private readonly IList<IDevice> _notifySubscribedDevices;
 		private readonly IList<IDevice> _indicateSubscribedDevices;
+		byte[] _timeValue;
 
-        public PeripheralModeViewModel(IPeripheralManager peripheralManager)
+		public PeripheralModeViewModel(IPeripheralManager peripheralManager)
         {
             _peripheralManager = peripheralManager;
             _notifySubscribedDevices = new List<IDevice>();
@@ -99,6 +101,10 @@ namespace Demo.ViewModels.Peripheral
 
             var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify | CharacteristicProperty.Read);
 
+			_notifyReadDisposable = notifyCharacteristic.ReadRequestObservable.Subscribe(request => {
+				_peripheralManager.SendResponse(request, 0, _timeValue);
+			});
+			
             _notifySubscribedDisposable = notifyCharacteristic.Subscribed.Subscribe(device =>
             {
                 _notifySubscribedDevices.Add(device);
@@ -120,8 +126,10 @@ namespace Demo.ViewModels.Peripheral
             {
                 _indicateSubscribedDevices.Remove(device);
             });
+            
             indicateCharacteristic.ReadRequestObservable.Subscribe(request =>
-            { _peripheralManager.SendResponse(request, 0, new byte[] {0xF0, 0xCC, 0xEE}); });
+            { _peripheralManager.SendResponse(request, 0, _timeValue); 
+});
             if (!service.AddCharacteristic(writeCharacterstic))
             {
                 throw new Exception("Failed to add write characteristic");
@@ -154,10 +162,10 @@ namespace Demo.ViewModels.Peripheral
                 do
                 {
                     await Task.Delay(TimeSpan.FromSeconds(1));
-
+					_timeValue = BitConverter.GetBytes(DateTime.Now.Second);
                     foreach (var subscribedDevice in _notifySubscribedDevices)
                     {
-                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, BitConverter.GetBytes(DateTime.Now.Second)))
+                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, _timeValue))
                         {
                             // delay until write is ready
                         }
@@ -165,7 +173,7 @@ namespace Demo.ViewModels.Peripheral
                     
                     foreach (var subscribedDevice in _indicateSubscribedDevices)
                     {
-                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, BitConverter.GetBytes(60 - DateTime.Now.Second)))
+                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, _timeValue))
                         {
                             // delay until write is ready
                         }
@@ -189,7 +197,7 @@ namespace Demo.ViewModels.Peripheral
             _notifyUnsubscribedDisposable?.Dispose();
             _indicateSubscribedDisposable?.Dispose();
             _indicateUnsubscribedDisposable?.Dispose();
-
+			_notifyReadDisposable?.Dispose();
             _notifySubscribedDevices.Clear();
 
             _notifyLoopCancellationTokenSource?.Cancel();
