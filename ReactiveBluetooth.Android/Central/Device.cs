@@ -97,6 +97,12 @@ namespace ReactiveBluetooth.Android.Central
                 .ToTask(cancellationToken);
         }
 
+        /// <summary>
+        /// Reads a value from a descriptor
+        /// </summary>
+        /// <param name="descriptor"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task<byte[]> ReadValue(IDescriptor descriptor, CancellationToken cancellationToken)
         {
             BluetoothGattDescriptor nativeDescriptor = ((Descriptor)descriptor).NativeDescriptor;
@@ -109,6 +115,14 @@ namespace ReactiveBluetooth.Android.Central
                 .ToTask(cancellationToken);
         }
 
+        /// <summary>
+        /// Writes a value to a characterstic
+        /// </summary>
+        /// <param name="characteristic">The characterstic whose value is to be written</param>
+        /// <param name="value">The value to be written</param>
+        /// <param name="writeType">The type of write to be executed. See <see cref="WriteType"/> for possible types. Defaults to <see cref="WriteType.WithoutRespoonse"/></param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel the write operation</param>
+        /// <returns>Task with result of write operation</returns>
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
@@ -145,6 +159,13 @@ namespace ReactiveBluetooth.Android.Central
                 .ToTask(cancellationToken);
         }
 
+        /// <summary>
+        ///  Writes a value to a descriptor
+        /// </summary>
+        /// <param name="descriptor">The descriptor whose value is to be written</param>
+        /// <param name="value">The value that is to be written</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel the write operation</param>
+        /// <returns>Task with result of write operation</returns>
         public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
         {
             BluetoothGattDescriptor gattDescriptor = ((Descriptor) descriptor).NativeDescriptor;
@@ -173,6 +194,13 @@ namespace ReactiveBluetooth.Android.Central
                 .ToTask(cancellationToken);
         }
 
+        /// <summary>
+        /// Subscribing to this will enable notifications on the <param name="characteristic">characteristic</param>. When it is disposed notifications will be disabled on the characterstic.
+        /// If the characteristic supports both <see cref="CharacteristicProperty.Notify"/> and <see cref="CharacteristicProperty.Indicate"/> it will use <see cref="CharacteristicProperty.Notify"/>
+        /// </summary>
+        /// <param name="characteristic">The characteristic to enable notifications on</param>
+        /// <returns>Observable that is updated with characteristic values</returns>
+        /// <exception cref="NotificationException">Thrown if characteristic does not support notifiying or indicating, also thrown if operation fails</exception>
         public IObservable<byte[]> Notifications(ICharacteristic characteristic)
         {
             BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
@@ -198,9 +226,15 @@ namespace ReactiveBluetooth.Android.Central
                 if (characteristicConfigDescriptor == null)
                     return;
 
-
-                await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), CancellationToken.None);
-                
+                CancellationTokenSource cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                try
+                {
+                    await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), cancellationToken.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    throw new NotificationException("SetCharacteristicNotification enable failed");
+                }
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
                 {
                     throw new NotificationException("SetCharacteristicNotification enable failed");
