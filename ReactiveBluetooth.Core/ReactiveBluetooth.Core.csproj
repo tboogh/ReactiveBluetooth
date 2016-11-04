@@ -42,6 +42,7 @@
     <Compile Include="Peripheral\IDevice.cs" />
     <Compile Include="Types\CharacteristicProperty.cs" />
     <Compile Include="Types\CharacteristicPermission.cs" />
+    <Compile Include="Types\ConnectionPriority.cs" />
     <Compile Include="Types\DescriptorPermission.cs" />
     <Compile Include="Types\WriteType.cs" />
     <Compile Include="Types\ConnectionState.cs" />
@@ -69,7 +70,6 @@
   <ItemGroup>
     <None Include="project.json" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

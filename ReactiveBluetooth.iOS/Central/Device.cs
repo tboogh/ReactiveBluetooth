@@ -177,5 +177,10 @@ namespace ReactiveBluetooth.iOS.Central
                 .Merge(valueUpdatedObservable)
                 .Merge(stateUpdatedObservable);
         }
+
+        public bool RequestConnectionPriority(ConnectionPriority priority)
+        {
+            return true;
+        }
     }
 }
