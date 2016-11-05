@@ -54,12 +54,12 @@ namespace ReactiveBluetooth.Android.Peripheral
                 var chara = x.Item3.Characteristic.Uuid == characteristic.Uuid;
                 if (desc && chara)
                 {
-                    var dValue = characteristic.GetValue();
+                    var dValue = x.Item3.GetValue();
                     
                 }
                 if (desc && chara)
                 {
-                    GattServer.SendResponse(x.Item1, x.Item2, GattStatus.Success, 0, characteristic.GetValue());
+                    GattServer.SendResponse(x.Item1, x.Item2, GattStatus.Success, 0, null);
                 }
                 return desc && chara;
             })
