@@ -198,26 +198,24 @@ namespace ReactiveBluetooth.Android.Central
                 if (characteristicConfigDescriptor == null)
                     return;
 
-
-                await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), CancellationToken.None);
+                CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
                 
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
                 {
                     throw new NotificationException("SetCharacteristicNotification enable failed");
                 }
-            }, action =>
+            }, async action =>
             {
+                var uuid = "2902".ToGuid();
+                var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
+
+                CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                await WriteValue(characteristicConfigDescriptor, BluetoothGattDescriptor.DisableNotificationValue.ToArray(), timeoutSource.Token);
+
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
                 {
                     throw new NotificationException("SetCharacteristicNotification disable failed");
-                }
-
-                var characteristicConfigDescriptor = nativeCharacteristic.GetDescriptor(UUID.FromString("2902".ToGuid()
-                    .ToString()));
-                characteristicConfigDescriptor.SetValue(BluetoothGattDescriptor.DisableNotificationValue.ToArray());
-                if (!Gatt.WriteDescriptor(characteristicConfigDescriptor))
-                {
-                    throw new NotificationException("WriteDescriptor disable failed");
                 }
             });
 

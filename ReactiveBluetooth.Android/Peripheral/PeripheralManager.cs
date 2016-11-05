@@ -207,7 +207,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             bool indicate = androidCharacteristic.Properties.HasFlag(CharacteristicProperty.Indicate);
             if (!indicate)
             {
-                if (androidCharacteristic.Properties.HasFlag(CharacteristicProperty.Notify))
+                if (!androidCharacteristic.Properties.HasFlag(CharacteristicProperty.Notify))
                 {
                     throw new NotSupportedException("Characteristic does not support Notify or Indicate");
                 }

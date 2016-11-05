@@ -32,18 +32,17 @@ namespace Demo.ViewModels.Peripheral
         private CancellationTokenSource _notifyLoopCancellationTokenSource;
         private IDisposable _indicateSubscribedDisposable;
         private IDisposable _indicateUnsubscribedDisposable;
-		private IDisposable _notifyReadDisposable;
-		
-		private readonly IList<IDevice> _notifySubscribedDevices;
-		private readonly IList<IDevice> _indicateSubscribedDevices;
-		byte[] _timeValue;
+        private IDisposable _notifyReadDisposable;
+        private readonly IList<IDevice> _notifySubscribedDevices;
+        private readonly IList<IDevice> _indicateSubscribedDevices;
+        byte[] _timeValue;
 
-		public PeripheralModeViewModel(IPeripheralManager peripheralManager)
+        public PeripheralModeViewModel(IPeripheralManager peripheralManager)
         {
             _peripheralManager = peripheralManager;
             _notifySubscribedDevices = new List<IDevice>();
-			_indicateSubscribedDevices = new List<IDevice>();
-			
+            _indicateSubscribedDevices = new List<IDevice>();
+
             AdvertiseCommand = new DelegateCommand(StartAdvertise);
             StopAdvertiseCommand = new DelegateCommand(StopAdvertise);
         }
@@ -61,7 +60,6 @@ namespace Demo.ViewModels.Peripheral
         }
 
         public string WriteValue => BitConverter.ToString(_writeValue);
-
         public DelegateCommand AdvertiseCommand { get; }
         public DelegateCommand StopAdvertiseCommand { get; }
 
@@ -101,35 +99,21 @@ namespace Demo.ViewModels.Peripheral
 
             var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify | CharacteristicProperty.Read);
 
-			_notifyReadDisposable = notifyCharacteristic.ReadRequestObservable.Subscribe(request => {
-				_peripheralManager.SendResponse(request, 0, _timeValue);
-			});
-			
+            _notifyReadDisposable = notifyCharacteristic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _timeValue); });
+
             _notifySubscribedDisposable = notifyCharacteristic.Subscribed.Subscribe(device =>
             {
                 _notifySubscribedDevices.Add(device);
             });
 
-            _notifyUnsubscribedDisposable = notifyCharacteristic.Unsubscribed.Subscribe(device =>
-            {
-                _notifySubscribedDevices.Remove(device);
-            });
+            _notifyUnsubscribedDisposable = notifyCharacteristic.Unsubscribed.Subscribe(device => { _notifySubscribedDevices.Remove(device); });
 
             var indicateCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060005-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Indicate | CharacteristicProperty.Read);
-            _indicateSubscribedDisposable = indicateCharacteristic.Subscribed.Subscribe(device =>
-            {
-                _indicateSubscribedDevices.Add(device);
-                
-            });
+            _indicateSubscribedDisposable = indicateCharacteristic.Subscribed.Subscribe(device => { _indicateSubscribedDevices.Add(device); });
 
-            _indicateUnsubscribedDisposable = indicateCharacteristic.Unsubscribed.Subscribe(device =>
-            {
-                _indicateSubscribedDevices.Remove(device);
-            });
-            
-            indicateCharacteristic.ReadRequestObservable.Subscribe(request =>
-            { _peripheralManager.SendResponse(request, 0, _timeValue); 
-});
+            _indicateUnsubscribedDisposable = indicateCharacteristic.Unsubscribed.Subscribe(device => { _indicateSubscribedDevices.Remove(device); });
+
+            indicateCharacteristic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _timeValue); });
             if (!service.AddCharacteristic(writeCharacterstic))
             {
                 throw new Exception("Failed to add write characteristic");
@@ -150,8 +134,8 @@ namespace Demo.ViewModels.Peripheral
             {
                 throw new Exception("Failed to indicate characteristic");
             }
-            
-            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62")}}, new List<IService> {service})
+
+            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {service.Uuid}}, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });
 
             _notifyLoopCancellationTokenSource?.Cancel();
@@ -162,7 +146,9 @@ namespace Demo.ViewModels.Peripheral
                 do
                 {
                     await Task.Delay(TimeSpan.FromSeconds(1));
-					_timeValue = BitConverter.GetBytes(DateTime.Now.Second);
+                    _timeValue = BitConverter.GetBytes(DateTime.Now.Second);
+                    notifyCharacteristic.Value = _timeValue;
+                    indicateCharacteristic.Value = _timeValue;
                     foreach (var subscribedDevice in _notifySubscribedDevices)
                     {
                         if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, _timeValue))
@@ -170,7 +156,7 @@ namespace Demo.ViewModels.Peripheral
                             // delay until write is ready
                         }
                     }
-                    
+
                     foreach (var subscribedDevice in _indicateSubscribedDevices)
                     {
                         if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, _timeValue))
@@ -188,7 +174,7 @@ namespace Demo.ViewModels.Peripheral
             _advertiseDisposable?.Dispose();
             _writeDisposable?.Dispose();
             _readDisposable?.Dispose();
-            
+
             _writeReadDisposable?.Dispose();
             _stateDisposable?.Dispose();
             _writeWithoutResponseDisposable?.Dispose();
@@ -197,11 +183,11 @@ namespace Demo.ViewModels.Peripheral
             _notifyUnsubscribedDisposable?.Dispose();
             _indicateSubscribedDisposable?.Dispose();
             _indicateUnsubscribedDisposable?.Dispose();
-			_notifyReadDisposable?.Dispose();
+            _notifyReadDisposable?.Dispose();
             _notifySubscribedDevices.Clear();
 
             _notifyLoopCancellationTokenSource?.Cancel();
-            
+
             _advertiseDisposable = null;
             Advertising = false;
         }
@@ -234,7 +220,6 @@ namespace Demo.ViewModels.Peripheral
 
         public void Dispose()
         {
-            
         }
     }
 }

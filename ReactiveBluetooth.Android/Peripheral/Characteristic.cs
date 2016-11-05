@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using Android.Bluetooth;
 using Java.Util;
 using ReactiveBluetooth.Android.Extensions;
@@ -51,7 +52,15 @@ namespace ReactiveBluetooth.Android.Peripheral
                 var desc = x.Item3.Uuid.ToString()
                     .ToGuid() == "2902".ToGuid();
                 var chara = x.Item3.Characteristic.Uuid == characteristic.Uuid;
-
+                if (desc && chara)
+                {
+                    var dValue = characteristic.GetValue();
+                    
+                }
+                if (desc && chara)
+                {
+                    GattServer.SendResponse(x.Item1, x.Item2, GattStatus.Success, 0, characteristic.GetValue());
+                }
                 return desc && chara;
             })
                 .Select(x => new Device(x.Item1)).AsObservable();
