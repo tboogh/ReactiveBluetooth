@@ -154,7 +154,13 @@ namespace Demo.ViewModels.Peripheral
                 throw new Exception("Failed to indicate characteristic");
             }
 
-            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions() {LocalName = "TP", ServiceUuids = new List<Guid>() {service.Uuid}}, new List<IService> {service})
+            _advertiseDisposable = _peripheralManager.Advertise(new AdvertisingOptions()
+            {
+                LocalName = "TP",
+                ServiceUuids = new List<Guid>() {service.Uuid},
+                AdvertiseTx = AdvertiseTx.PowerHigh,
+                AdvertiseMode = AdvertiseMode.LowLatency
+            }, new List<IService> {service})
                 .Subscribe(b => { Advertising = b; });
 
             _notifyLoopCancellationTokenSource?.Cancel();

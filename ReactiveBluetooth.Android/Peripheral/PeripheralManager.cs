@@ -103,7 +103,7 @@ namespace ReactiveBluetooth.Android.Peripheral
                 throw new AdvertisingNotSupportedException();
             }
 
-            var settings = CreateAdvertiseSettings();
+            var settings = CreateAdvertiseSettings(advertisingOptions);
             var advertiseData = CreateAdvertiseData(advertisingOptions);
 
             var startObservable = Observable.Create<bool>(observer =>
@@ -159,12 +159,12 @@ namespace ReactiveBluetooth.Android.Peripheral
             return dataBuilder.Build();
         }
 
-        public AdvertiseSettings CreateAdvertiseSettings()
+        public AdvertiseSettings CreateAdvertiseSettings(AdvertisingOptions advertisingOptions)
         {
             AdvertiseSettings.Builder settingsBuilder = new AdvertiseSettings.Builder();
-            settingsBuilder.SetAdvertiseMode(AdvertiseMode.Balanced);
+            settingsBuilder.SetAdvertiseMode(advertisingOptions.AdvertiseMode.ToAdvertiseMode());
             settingsBuilder.SetConnectable(true);
-            settingsBuilder.SetTxPowerLevel(AdvertiseTx.PowerMedium);
+            settingsBuilder.SetTxPowerLevel(advertisingOptions.AdvertiseTx.ToAdvertiseTx());
             var settings = settingsBuilder.Build();
             return settings;
         }

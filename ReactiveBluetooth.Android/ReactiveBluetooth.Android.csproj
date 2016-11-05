@@ -51,8 +51,10 @@
     <Compile Include="Central\CentralManager.cs" />
     <Compile Include="Central\Characteristic.cs" />
     <Compile Include="Central\Device.cs" />
+    <Compile Include="Extensions\AdvertiseTxExtensions.cs" />
     <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
     <Compile Include="Extensions\CharacteristicPropertiesExtensions.cs" />
+    <Compile Include="Extensions\AdvertiseModeExtensions.cs" />
     <Compile Include="Extensions\DescriptorPermissionExtensions.cs" />
     <Compile Include="Extensions\GattConnectionPriorityExtensions.cs" />
     <Compile Include="Extensions\GattPermissionExtensions.cs" />
