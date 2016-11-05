@@ -68,40 +68,32 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         public async Task ConnectToDevice_ConnectToTestDevice_ResultIsTrue()
         {
             var scanObservable = _centralManager.ScanForDevices();
-            var battByte = await scanObservable.FirstAsync(x => x.Name == TestDeviceName).Timeout(Timeout).ToTask();
+            var testDevice = await scanObservable.FirstAsync(x => x.Name == TestDeviceName).Timeout(Timeout).ToTask();
 
-            if (battByte == null)
+            if (testDevice == null)
             {
                 throw new Exception("Make sure test device is available");
             }
 
-            var connectionResult = await _centralManager.ConnectToDevice(battByte).FirstAsync(x => x == ConnectionState.Connected).Timeout(TimeSpan.FromSeconds(2));
+            var connectionResult = await _centralManager.ConnectToDevice(testDevice).FirstAsync(x => x == ConnectionState.Connected).Timeout(TimeSpan.FromSeconds(2));
 
             Assert.AreEqual(ConnectionState.Connected, connectionResult);
-
-            //await _centralManager.DisconnectDevice(battByte);
         }
 
         [Test]
         public async Task ConnectToDevice_ConnectToTestDevice_StateIsConnected()
         {
             var testSetup = await ConnectToTestDevice();
-            var service = testSetup.Item1;
             var device = testSetup.Item2;
 
-            Assert.AreEqual(ConnectionState.Connected, device.State);
-            //await service.DisconnectDevice(device);
-        }
+            Assert.AreEqual(ConnectionState.Connected, device.State);        }
 
         [Test]
         public async Task DisconnectDevice_DisconnectFromTestDevice_StateIsDisconnected()
         {
             var testSetup = await ConnectToTestDevice();
-            var service = testSetup.Item1;
             var device = testSetup.Item2;
             
-            //await service.DisconnectDevice(device);
-
             Assert.AreEqual(ConnectionState.Disconnected, device.State);
         }
 
@@ -109,13 +101,10 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         public async Task DiscoverServices_FindServicesOnTestDevice_ListNotNull()
         {
             var testSetup = await ConnectToTestDevice();
-            var service = testSetup.Item1;
             var device = testSetup.Item2;
 
 
             var services = await device.DiscoverServices(CancellationToken.None);
-            //await service.DisconnectDevice(device);
-
             Assert.NotNull(services);
             Assert.IsNotEmpty(services);
         }
@@ -124,13 +113,10 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         public async Task DiscoverServices_FindServicesOnTestDevice_ServiceIdSet()
         {
             var testSetup = await ConnectToTestDevice();
-            var service = testSetup.Item1;
             var device = testSetup.Item2;
 
 
             var services = await device.DiscoverServices(CancellationToken.None);
-            //await service.DisconnectDevice(device);
-
             if (services.Count == 0)
             {
                 throw new Exception("Check test device services");
@@ -154,9 +140,6 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var characteristics = await testService.DiscoverCharacteristics(CancellationToken.None);
 
             var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
-
-            //await testSetup.Item1.DisconnectDevice(device);
-
             Assert.NotNull(testCharacterstic);
         }
 
@@ -173,9 +156,6 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var characteristics = await testService.DiscoverCharacteristics(CancellationToken.None);
 
             var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
-
-            //await testSetup.Item1.DisconnectDevice(device);
-
             var value = await device.ReadValue(testCharacterstic, CancellationToken.None);
             Assert.AreEqual(new byte[] { 0xB0, 0x06 }, value);
         }

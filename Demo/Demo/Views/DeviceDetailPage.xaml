@@ -5,6 +5,7 @@
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
              xmlns:valueConverters1="clr-namespace:Demo.Common.ValueConverters;assembly=Demo"
              xmlns:behaviors1="clr-namespace:Demo.Common.Behaviors;assembly=Demo"
+             xmlns:types="clr-namespace:ReactiveBluetooth.Core.Types;assembly=ReactiveBluetooth.Core"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="Demo.Views.DeviceDetailPage">
     <ContentPage.Resources>
@@ -30,6 +31,11 @@
                     <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
                     <Label Text="{Binding Rssi}" />
                     <Label Text="{Binding ConnectionState}" />
+                    <StackLayout Orientation="Horizontal">
+                        <Button Text="Low" Command="{Binding SetConnectionParameterCommand}" CommandParameter="{x:Static types:ConnectionPriority.Low}"/>
+                        <Button Text="Balanced" Command="{Binding SetConnectionParameterCommand}" CommandParameter="{x:Static types:ConnectionPriority.Balanced}"/>
+                        <Button Text="High" Command="{Binding SetConnectionParameterCommand}" CommandParameter="{x:Static types:ConnectionPriority.HighPower}"/>
+                    </StackLayout>
                 </StackLayout>
             </DataTemplate>
         </ListView.HeaderTemplate>

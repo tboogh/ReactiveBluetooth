@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,9 +62,12 @@ namespace Demo.ViewModels.Central
             _centralManager = centralManager;
             UpdateRssiCommand = new DelegateCommand(UpdateRssi);
             ItemSelectedCommand = DelegateCommand<CharacteristicViewModel>.FromAsyncHandler(CharacteristicSelected);
+            SetConnectionParameterCommand = new DelegateCommand<ConnectionPriority?>(SetConnectionPriority);
             Services = new ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>>();
             _cancellationTokenSource = new CancellationTokenSource();
         }
+
+        
 
         public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService,
             IPageDialogService pageDialogService) : this(centralManager)
@@ -73,6 +77,8 @@ namespace Demo.ViewModels.Central
         }
 
         public DelegateCommand<CharacteristicViewModel> ItemSelectedCommand { get; }
+
+        public DelegateCommand<ConnectionPriority?> SetConnectionParameterCommand { get; }
 
         public Guid Uuid
         {
@@ -206,6 +212,17 @@ namespace Demo.ViewModels.Central
         {
             _cancellationTokenSource?.Cancel();
             _connectionStateDisposable?.Dispose();
+        }
+
+        private void SetConnectionPriority(ConnectionPriority? connectionPriority)
+        {
+            if (connectionPriority == null)
+                return;
+
+            if (!_device.RequestConnectionPriority(connectionPriority.Value))
+            {
+                Debug.WriteLine("Failed");
+            }
         }
     }
 }
