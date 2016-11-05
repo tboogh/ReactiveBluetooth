@@ -62,7 +62,10 @@ namespace Demo.ViewModels.Central
             _centralManager = centralManager;
             UpdateRssiCommand = new DelegateCommand(UpdateRssi);
             ItemSelectedCommand = DelegateCommand<CharacteristicViewModel>.FromAsyncHandler(CharacteristicSelected);
-            SetConnectionParameterCommand = new DelegateCommand<ConnectionPriority?>(SetConnectionPriority);
+            SetConnectionParameterCommand = new DelegateCommand<ConnectionPriority?>(priority =>
+            {
+                var task = SetConnectionPriority(priority);
+            });
             Services = new ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>>();
             _cancellationTokenSource = new CancellationTokenSource();
         }
@@ -214,14 +217,14 @@ namespace Demo.ViewModels.Central
             _connectionStateDisposable?.Dispose();
         }
 
-        private void SetConnectionPriority(ConnectionPriority? connectionPriority)
+        private async Task SetConnectionPriority(ConnectionPriority? connectionPriority)
         {
             if (connectionPriority == null)
                 return;
 
             if (!_device.RequestConnectionPriority(connectionPriority.Value))
             {
-                Debug.WriteLine("Failed");
+                await _pageDialogService.DisplayAlertAsync("Error", $"Failed to set connection priority to {Enum.GetName(typeof(ConnectionPriority), connectionPriority.Value)}", "Ok");
             }
         }
     }
