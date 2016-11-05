@@ -54,6 +54,7 @@
     <Compile Include="Extensions\CharacteristicPermissionExtensions.cs" />
     <Compile Include="Extensions\CharacteristicPropertiesExtensions.cs" />
     <Compile Include="Extensions\DescriptorPermissionExtensions.cs" />
+    <Compile Include="Extensions\GattConnectionPriorityExtensions.cs" />
     <Compile Include="Extensions\GattPermissionExtensions.cs" />
     <Compile Include="Extensions\GattPropertyExtensions.cs" />
     <Compile Include="Extensions\StateExtentions.cs" />

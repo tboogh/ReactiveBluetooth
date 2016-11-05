@@ -224,5 +224,10 @@ namespace ReactiveBluetooth.Android.Central
             
             return notificationObservable.Merge(GattCallback.CharacteristicChangedSubject.Select(x => x.Item2.GetValue()));
         }
+
+        public bool RequestConnectionPriority(ConnectionPriority priority)
+        {
+            return Gatt.RequestConnectionPriority(priority.ToConnectionPriority());
+        }
     }
 }
