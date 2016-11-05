@@ -39,7 +39,10 @@ namespace Demo.ViewModels.Central
             {
                 var write = Write();
             }).ObservesCanExecute(o => Connected);
-            ToggleNotificationsCommands = new DelegateCommand(ToggleNotifications);
+            ToggleNotificationsCommands = new DelegateCommand(() =>
+            {
+                var notify = ToggleNotifications();
+            });
         }
 
         public CharacteristicViewModel()
@@ -143,20 +146,32 @@ namespace Demo.ViewModels.Central
         {
         }
 
-        public void ToggleNotifications()
+        public async Task ToggleNotifications()
         {
         	if (_notifyDisposable != null){
         		_notifyDisposable?.Dispose();
 				_notifyDisposable = null;
 			} else {
-				_notifyDisposable = Device.Notifications(Characteristic)
-                	.Subscribe(bytes => {
-						if (bytes != null) {
-							Value = BitConverter.ToString(bytes);
-						} else {
-							Value = "(null)";
-						}
-					 });
+			    try
+			    {
+			        _notifyDisposable = Device.Notifications(Characteristic)
+			            .Subscribe(bytes =>
+			            {
+			                if (bytes != null)
+			                {
+			                    Value = BitConverter.ToString(bytes);
+			                }
+			                else
+			                {
+			                    Value = "(null)";
+			                }
+			            });
+			    }
+			    catch (Exception)
+			    {
+                    await _pageDialogService.DisplayAlertAsync("Error", "Failed to write characteristic", "OK");
+                }
+				
 			}
         }
 
@@ -192,6 +207,7 @@ namespace Demo.ViewModels.Central
             }
             catch (TaskCanceledException)
             {
+                await _pageDialogService.DisplayAlertAsync("Error", "Failed to write characteristic", "OK");
             }
         }
 
@@ -212,6 +228,7 @@ namespace Demo.ViewModels.Central
             }
             catch (TaskCanceledException)
             {
+                await _pageDialogService.DisplayAlertAsync("Error", "Failed to write characteristic", "OK");
             }
         }
 

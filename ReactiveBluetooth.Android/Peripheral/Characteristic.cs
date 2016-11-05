@@ -47,25 +47,49 @@ namespace ReactiveBluetooth.Android.Peripheral
                     GattServer.SendResponse(tuple.Item1, tuple.Item2, GattStatus.Success, 0, null);
                 });
 
-            Subscribed = serverCallback.DescriptorWriteRequestSubject.Where(x =>
+            var subscription = serverCallback.DescriptorWriteRequestSubject.Where(x =>
             {
                 var desc = x.Item3.Uuid.ToString()
                     .ToGuid() == "2902".ToGuid();
                 var chara = x.Item3.Characteristic.Uuid == characteristic.Uuid;
-                if (desc && chara)
-                {
-                    var dValue = x.Item3.GetValue();
-                    
-                }
-                if (desc && chara)
-                {
-                    GattServer.SendResponse(x.Item1, x.Item2, GattStatus.Success, 0, null);
-                }
-                return desc && chara;
-            })
-                .Select(x => new Device(x.Item1)).AsObservable();
 
-            Unsubscribed = Observable.Return<IDevice>(null);
+                return desc && chara;
+            });
+
+            Subscribed = subscription.Where(x =>
+            {
+                int type = 0;
+                if (x.Item7.Length > 1)
+                {
+                    type = x.Item7[0];
+                }
+
+                bool validType = (type == 1 && Properties.HasFlag(CharacteristicProperty.Indicate)) || (type == 2 && Properties.HasFlag(CharacteristicProperty.Indicate));
+
+                if (validType)
+                {
+                    GattServer.SendResponse(x.Item1, x.Item2, GattStatus.Success, 0, x.Item7);
+                }
+
+                return validType;
+            }).Select(x => new Device(x.Item1)).AsObservable();
+
+            Unsubscribed = subscription.Where(x =>
+            {
+                int type = 0;
+                if (x.Item7.Length > 1)
+                {
+                    type = x.Item7[0];
+                }
+
+                bool validType = (type == 0);
+
+                if (validType)
+                {
+                    GattServer.SendResponse(x.Item1, x.Item2, GattStatus.Success, 0, x.Item7);
+                }
+                return validType;
+            }).Select(x => new Device(x.Item1)).AsObservable();
         }
 
         public BluetoothGattCharacteristic NativeCharacteristic { get; }

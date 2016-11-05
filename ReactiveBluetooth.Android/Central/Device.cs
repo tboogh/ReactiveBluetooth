@@ -198,9 +198,15 @@ namespace ReactiveBluetooth.Android.Central
                 if (characteristicConfigDescriptor == null)
                     return;
 
-                CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
-                
+                try
+                {
+                    CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                    await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    throw new NotificationException("Failed to write descriptor");
+                }
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
                 {
                     throw new NotificationException("SetCharacteristicNotification enable failed");
@@ -209,10 +215,14 @@ namespace ReactiveBluetooth.Android.Central
             {
                 var uuid = "2902".ToGuid();
                 var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
-
-                CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                await WriteValue(characteristicConfigDescriptor, BluetoothGattDescriptor.DisableNotificationValue.ToArray(), timeoutSource.Token);
-
+                try
+                {
+                    CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                    await WriteValue(characteristicConfigDescriptor, BluetoothGattDescriptor.DisableNotificationValue.ToArray(), timeoutSource.Token);
+                } catch (TaskCanceledException)
+                {
+                    throw new NotificationException("Failed to write descriptor");
+                }
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
                 {
                     throw new NotificationException("SetCharacteristicNotification disable failed");
