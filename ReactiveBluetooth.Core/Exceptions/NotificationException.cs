@@ -11,5 +11,10 @@ namespace ReactiveBluetooth.Core.Exceptions
         public NotificationException(string message) : base(message)
         {
         }
+
+        public NotificationException(string message, Exception exception) : base(message, exception)
+        {
+
+        }
     }
 }

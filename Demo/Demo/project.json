@@ -1,10 +1,10 @@
-{
+﻿{
   "supports": {},
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "Prism.Unity.Forms": "6.2.0",
     "ReactiveProperty": "3.0.1",
-    "System.Reactive": "3.0.0",
+    "System.Reactive": "3.1.0",
     "Xamarin.Forms": "2.3.1.114"
   },
   "frameworks": {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -165,11 +166,14 @@ namespace Demo.ViewModels.Central
 			                {
 			                    Value = "(null)";
 			                }
-			            });
+			            }, async exception =>
+			            {
+                            await _pageDialogService.DisplayAlertAsync("Error", "Failed to enable notifications", "OK");
+                        });
 			    }
-			    catch (Exception)
+			    catch (Exception e)
 			    {
-                    await _pageDialogService.DisplayAlertAsync("Error", "Failed to write characteristic", "OK");
+                    await _pageDialogService.DisplayAlertAsync("Error", "Failed to enable notifications", "OK");
                 }
 				
 			}

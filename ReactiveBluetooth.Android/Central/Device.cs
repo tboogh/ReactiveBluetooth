@@ -149,16 +149,18 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattDescriptor gattDescriptor = ((Descriptor) descriptor).NativeDescriptor;
 
-            var writeObservable = Observable.FromEvent<bool>(action =>
+            var writeObservable = Observable.Create<bool>(observer =>
             {
                 var result = gattDescriptor.SetValue(value);
                 if (!result)
-                    action(false);
+                    observer.OnError(new Exception("Failed to set value"));
 
                 var writeResult = Gatt.WriteDescriptor(gattDescriptor);
                 if (!writeResult)
-                    action(false);
-            }, _ => { });
+                    observer.OnError(new Exception("Failed to write descriptor"));
+
+                return Disposable.Empty;
+            });
 
             return writeObservable.Merge(GattCallback.DescriptorWriteSubject.FirstAsync(x => x.Item2 == gattDescriptor)
                 .Select(x =>
@@ -177,7 +179,7 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
 
-            IObservable<byte[]> notificationObservable = Observable.FromEvent<byte[]>(async action =>
+            IObservable<byte[]> notificationObservable = Observable.Create<byte[]>(async action =>
             {
                 IList<byte> enableNotificationValue = null;
                 if (characteristic.Properties.HasFlag(CharacteristicProperty.Notify))
@@ -196,40 +198,41 @@ namespace ReactiveBluetooth.Android.Central
 
                 var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
                 if (characteristicConfigDescriptor == null)
-                    return;
+                    throw new NotificationException("Missing client configuration descriptor");
 
                 try
                 {
                     CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
                     await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
                 }
-                catch (TaskCanceledException)
+                catch (Exception exception)
                 {
-                    throw new NotificationException("Failed to write descriptor");
+                    throw new NotificationException("Failed to write descriptor", exception);
                 }
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
                 {
                     throw new NotificationException("SetCharacteristicNotification enable failed");
                 }
-            }, async action =>
-            {
-                var uuid = "2902".ToGuid();
-                var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
-                try
+
+                return Disposable.Create(async () =>
                 {
-                    CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                    await WriteValue(characteristicConfigDescriptor, BluetoothGattDescriptor.DisableNotificationValue.ToArray(), timeoutSource.Token);
-                } catch (TaskCanceledException)
-                {
-                    throw new NotificationException("Failed to write descriptor");
-                }
-                if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
-                {
-                    throw new NotificationException("SetCharacteristicNotification disable failed");
-                }
+                    try
+                    {
+                        CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                        await WriteValue(characteristicConfigDescriptor, BluetoothGattDescriptor.DisableNotificationValue.ToArray(), timeoutSource.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        throw new NotificationException("Failed to write descriptor");
+                    }
+                    if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
+                    {
+                        throw new NotificationException("SetCharacteristicNotification disable failed");
+                    }
+                });
             });
 
-            
+
             return notificationObservable.Merge(GattCallback.CharacteristicChangedSubject.Select(x => x.Item2.GetValue()));
         }
 
