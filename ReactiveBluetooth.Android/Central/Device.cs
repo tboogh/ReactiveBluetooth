@@ -69,7 +69,11 @@ namespace ReactiveBluetooth.Android.Central
 
         public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
         {
-            return Observable.FromEvent<IList<IService>>(action => { Gatt.DiscoverServices(); }, action => { })
+            return Observable.Create<IList<IService>>(observer =>
+            {
+                Gatt.DiscoverServices();
+                return Disposable.Empty;
+            })
                 .Merge(GattCallback.ServicesDiscovered.Select(x =>
                 {
                     return Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
@@ -91,7 +95,11 @@ namespace ReactiveBluetooth.Android.Central
             var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                 .Select(x => x.Item2.GetValue());
             
-            return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { })
+            return Observable.Create<byte[]>(observer =>
+            {
+                Gatt.ReadCharacteristic(gattCharacteristic);
+                return Disposable.Empty;
+            })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -103,7 +111,11 @@ namespace ReactiveBluetooth.Android.Central
             var observable = GattCallback.DescriptorReadSubject.FirstAsync(x => x.Item2 == nativeDescriptor)
                 .Select(x => x.Item2.GetValue());
 
-            return Observable.FromEvent<byte[]>(action => Gatt.ReadDescriptor(nativeDescriptor), _ => { })
+            return Observable.Create<byte[]>(observer =>
+            {
+                Gatt.ReadDescriptor(nativeDescriptor);
+                return Disposable.Empty;
+            })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -113,18 +125,20 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
 
-            var writeObservable = Observable.FromEvent<bool>(action =>
+            var writeObservable = Observable.Create<bool>(observer =>
             {
                 gattCharacteristic.WriteType = writeType.ToGattWriteType();
 
                 var setValueResult = gattCharacteristic.SetValue(value);
                 if (!setValueResult)
-                    action(false);
+                    observer.OnError(new Exception("Failed to set value"));
 
                 var result = Gatt.WriteCharacteristic(gattCharacteristic);
                 if (!result)
-                    action(false);
-            }, _ => { });
+                    observer.OnError(new Exception("Failed to write characteristic"));
+
+                return Disposable.Empty;
+            });
 
             if (writeType == WriteType.WithResponse)
             {

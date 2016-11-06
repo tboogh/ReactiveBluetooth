@@ -54,7 +54,7 @@ namespace ReactiveBluetooth.Android.Central
                 // Store this and return the same someone else subscribes
                 ScanCallback scanCallback = new ScanCallback();
 
-                _discoverObservable = Observable.FromEvent<IDevice>(action =>
+                _discoverObservable = Observable.Create<IDevice>(observer =>
                 {
                     var scanFilters = serviceUuids?.Select(x =>
                     {
@@ -72,12 +72,11 @@ namespace ReactiveBluetooth.Android.Central
                     {
                         _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
                     }
-                    
-                }, action =>
-                {
-                    _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback);
-                    _discoverObservable = null;
-
+                    return Disposable.Create(() =>
+                    {
+                        _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback);
+                        _discoverObservable = null;
+                    });
                 })
                     .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
                     .Merge(scanCallback.FailureSubject.Select(failure => default(Device)));
@@ -92,13 +91,15 @@ namespace ReactiveBluetooth.Android.Central
             var nativeDevice = androidDevice.NativeDevice;
             var context = Application.Context;
 
-            return Observable.FromEvent<ConnectionState>(action =>
+            return Observable.Create<ConnectionState>(observer =>
             {
                 var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
                 androidDevice.Gatt = gatt;
-            }, action =>
-            {
-                androidDevice.Gatt?.Close(); 
+
+                return Disposable.Create(() =>
+                {
+                    androidDevice.Gatt?.Close(); 
+                });
             })
                 .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x));
         }
