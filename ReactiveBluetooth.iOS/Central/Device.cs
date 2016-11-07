@@ -176,14 +176,13 @@ namespace ReactiveBluetooth.iOS.Central
         {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
             Subject<byte[]> s = new Subject<byte[]>();
-            IObservable<byte[]> enableNotificationObservable = Observable.FromEvent<byte[]>(action => { 
-				Peripheral.SetNotifyValue(true, nativeCharacteristic); 
-				
-				var x = 0;
-			}, action => { 
-				Peripheral.SetNotifyValue(false, nativeCharacteristic);
-				var x = 0;
-			 });
+            IObservable<byte[]> enableNotificationObservable = Observable.Create<byte[]>(observer =>
+            {
+                Peripheral.SetNotifyValue(true, nativeCharacteristic);
+                return Disposable.Create(() => { Peripheral.SetNotifyValue(false, nativeCharacteristic); });
+            })
+                .Publish()
+                .RefCount();
 
             var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Select(x => x.Item2.Value.ToArray());
             var stateUpdatedObservable = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Select(x =>
@@ -194,8 +193,7 @@ namespace ReactiveBluetooth.iOS.Central
                 }
                 return x.Item2.Value?.ToArray();
             });
-			return enableNotificationObservable
-                .Merge(valueUpdatedObservable)
+            return enableNotificationObservable.Merge(valueUpdatedObservable)
                 .Merge(stateUpdatedObservable);
         }
 

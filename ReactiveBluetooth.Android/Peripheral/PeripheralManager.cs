@@ -7,7 +7,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
-
 using Android.App;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
@@ -41,9 +40,8 @@ namespace ReactiveBluetooth.Android.Peripheral
         private BluetoothGattServer _gattServer;
         private IObservable<bool> _startAdvertisingObservable;
 
-        public PeripheralManager() :this(null, null)
+        public PeripheralManager() : this(null, null)
         {
-            
         }
 
         public PeripheralManager(IServerCallback serverCallback = null, IBluetoothAbstractFactory bluetoothAbstractFactory = null)
@@ -57,10 +55,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         }
 
         public IBluetoothAbstractFactory Factory { get; }
-
-
         public IObservable<ManagerState> State() => _broadcastListener.StateUpdatedSubject;
-
 
         public void Dispose()
         {
@@ -76,8 +71,8 @@ namespace ReactiveBluetooth.Android.Peripheral
                 return _startAdvertisingObservable;
             }
 
-            var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
-            _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback)_serverCallback);
+            var bluetoothManager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
+            _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback) _serverCallback);
 
             if (_bluetoothAdapter.State.ToManagerState() == ManagerState.PoweredOff)
             {
@@ -108,7 +103,6 @@ namespace ReactiveBluetooth.Android.Peripheral
 
             var startObservable = Observable.Create<bool>(observer =>
             {
-
                 var callback = new StartAdvertiseCallback();
                 var errorDisposable = callback.StartFailureSubject.Subscribe(failure =>
                 {
@@ -118,10 +112,7 @@ namespace ReactiveBluetooth.Android.Peripheral
                     }
                 });
 
-                var successDisposable = callback.StartSuccessSubject.Subscribe(advertiseSettings =>
-                {
-                    observer.OnNext(true);
-                });
+                var successDisposable = callback.StartSuccessSubject.Subscribe(advertiseSettings => { observer.OnNext(true); });
 
                 foreach (var service in services)
                 {
@@ -137,13 +128,14 @@ namespace ReactiveBluetooth.Android.Peripheral
                     _bluetoothLeAdvertiser?.StopAdvertising(callback);
                     _startAdvertisingObservable = null;
                 });
-            });
+            })
+                .Publish()
+                .RefCount();
             return startObservable;
         }
 
         public AdvertiseData CreateAdvertiseData(AdvertisingOptions advertisingOptions)
         {
-            
             var dataBuilder = new AdvertiseData.Builder();
             if (advertisingOptions.ServiceUuids != null)
             {
@@ -155,7 +147,6 @@ namespace ReactiveBluetooth.Android.Peripheral
             }
             dataBuilder.SetIncludeDeviceName(advertisingOptions.LocalName != null);
 
-         
             return dataBuilder.Build();
         }
 
@@ -184,7 +175,7 @@ namespace ReactiveBluetooth.Android.Peripheral
 
         public void RemoveService(IService service)
         {
-            var nativeService = ((Service)service).GattService;
+            var nativeService = ((Service) service).GattService;
             _gattServer?.RemoveService(nativeService);
         }
 
@@ -203,7 +194,7 @@ namespace ReactiveBluetooth.Android.Peripheral
         {
             Device androidDevice = (Device) device;
             Characteristic androidCharacteristic = (Characteristic) characteristic;
-            
+
             bool indicate = androidCharacteristic.Properties.HasFlag(CharacteristicProperty.Indicate);
             if (!indicate)
             {

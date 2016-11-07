@@ -29,7 +29,7 @@ namespace ReactiveBluetooth.Android.Central
         private readonly BluetoothAdapter _bluetoothAdapter;
         private IObservable<IDevice> _discoverObservable;
         private BroadcastListener _broadcastListener;
-        
+
         public CentralManager()
         {
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
@@ -61,7 +61,8 @@ namespace ReactiveBluetooth.Android.Central
                         var scanFilterBuilder = new ScanFilter.Builder();
                         scanFilterBuilder.SetServiceUuid(new ParcelUuid(UUID.FromString(x.ToString())));
                         return scanFilterBuilder.Build();
-                    }).ToArray();
+                    })
+                        .ToArray();
                     if (scanFilters != null)
                     {
                         var scanSettings = new ScanSettings.Builder().Build();
@@ -78,6 +79,8 @@ namespace ReactiveBluetooth.Android.Central
                         _discoverObservable = null;
                     });
                 })
+                    .Publish()
+                    .RefCount()
                     .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
                     .Merge(scanCallback.FailureSubject.Select(failure => default(Device)));
             }
@@ -96,11 +99,10 @@ namespace ReactiveBluetooth.Android.Central
                 var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
                 androidDevice.Gatt = gatt;
 
-                return Disposable.Create(() =>
-                {
-                    androidDevice.Gatt?.Close(); 
-                });
+                return Disposable.Create(() => { androidDevice.Gatt?.Close(); });
             })
+                .Publish()
+                .RefCount()
                 .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x));
         }
     }

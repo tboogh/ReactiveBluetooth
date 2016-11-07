@@ -32,26 +32,16 @@ namespace ReactiveBluetooth.iOS.Peripheral
 
         public IObservable<ManagerState> State()
         {
-            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
+            return _peripheralDelegate.StateUpdatedSubject.Select(x => (ManagerState) x);
         }
 
         public IBluetoothAbstractFactory Factory { get; }
 
-        public void Shutdown()
-        {
-            _peripheralManager.StopAdvertising();
-        }
-
         public IObservable<bool> Advertise(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
-
             var advertiseObservable = Observable.Create<bool>(observer =>
             {
-                IDisposable started = _peripheralDelegate.AdvertisingStartedSubject.Subscribe(o =>
-                {
-                    observer.OnNext(o);
-                });
-
+               
                 foreach (var service in services)
                 {
                     var nativeService = (Service) service;
@@ -64,10 +54,11 @@ namespace ReactiveBluetooth.iOS.Peripheral
                 {
                     _peripheralManager.StopAdvertising();
                     _peripheralManager.RemoveAllServices();
-                    started.Dispose();
                 });
-            });
-            return advertiseObservable;
+            })
+                .Publish()
+                .RefCount();
+            return advertiseObservable.Merge(_peripheralDelegate.AdvertisingStartedSubject);
         }
 
         public StartAdvertisingOptions CreateAdvertisementOptions(AdvertisingOptions advertisingOptions)
@@ -89,16 +80,12 @@ namespace ReactiveBluetooth.iOS.Peripheral
         {
             var nativeService = ((Service) service).MutableService;
             _peripheralManager.AddService(nativeService);
-            return _peripheralDelegate.ServiceAddedSubject.Select(x =>
-            {
-                return x.Service.UUID == nativeService.UUID;
-            })
-                .Catch(Observable.Return(false));
+            return _peripheralDelegate.ServiceAddedSubject.Select(x => x.Service.UUID == nativeService.UUID);
         }
 
         public void RemoveService(IService service)
         {
-            var nativeService = ((Service)service).MutableService;
+            var nativeService = ((Service) service).MutableService;
             _peripheralManager.RemoveService(nativeService);
         }
 
@@ -112,15 +99,15 @@ namespace ReactiveBluetooth.iOS.Peripheral
             var attRequest = (AttRequest) request;
             var r = attRequest.CbAttRequest;
             r.Value = NSData.FromArray(value);
-            
+
             _peripheralManager.RespondToRequest(r, CBATTError.Success);
             return true;
         }
 
         public bool Notify(IDevice device, ICharacteristic characteristic, byte[] value)
         {
-            Device iosDevice = (Device)device;
-            Characteristic iosCharacteristic = (Characteristic)characteristic;
+            Device iosDevice = (Device) device;
+            Characteristic iosCharacteristic = (Characteristic) characteristic;
             return _peripheralManager.UpdateValue(NSData.FromArray(value), iosCharacteristic.NativeCharacteristic, new[] {iosDevice.NativeCentral});
         }
     }

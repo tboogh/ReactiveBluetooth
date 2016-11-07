@@ -40,7 +40,9 @@ namespace ReactiveBluetooth.iOS.Central
             {
                 _centralManager.ScanForPeripherals(cbuuids);
                 return Disposable.Create(() => { _centralManager.StopScan(); });
-            });
+            })
+                .Publish()
+                .RefCount();
             return scanObservable.Merge(_centralManagerDelegate.DiscoveredPeriperhalSubject.Select(x =>
             {
                 Device device = new Device(x.Item2, x.Item4.Int32Value, new AdvertisementData(x.Item3));
@@ -53,9 +55,10 @@ namespace ReactiveBluetooth.iOS.Central
             return Observable.Create<ConnectionState>(observer =>
             {
                 _centralManager.ConnectPeripheral(((Device) device).Peripheral);
-                return Disposable.Create(() =>
-                { _centralManager.CancelPeripheralConnection(((Device)device).Peripheral); });
+                return Disposable.Create(() => { _centralManager.CancelPeripheralConnection(((Device) device).Peripheral); });
             })
+                .Publish()
+                .RefCount()
                 .Merge(_centralManagerDelegate.ConnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device) device).Peripheral.Identifier))
                     .Select(x => ConnectionState.Connected))
                 .Merge(_centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device) device).Peripheral.Identifier))
