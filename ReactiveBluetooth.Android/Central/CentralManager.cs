@@ -55,30 +55,30 @@ namespace ReactiveBluetooth.Android.Central
                 ScanCallback scanCallback = new ScanCallback();
 
                 _discoverObservable = Observable.Create<IDevice>(observer =>
-                {
-                    var scanFilters = serviceUuids?.Select(x =>
                     {
-                        var scanFilterBuilder = new ScanFilter.Builder();
-                        scanFilterBuilder.SetServiceUuid(new ParcelUuid(UUID.FromString(x.ToString())));
-                        return scanFilterBuilder.Build();
-                    })
-                        .ToArray();
-                    if (scanFilters != null)
-                    {
-                        var scanSettings = new ScanSettings.Builder().Build();
+                        var scanFilters = serviceUuids?.Select(x =>
+                            {
+                                var scanFilterBuilder = new ScanFilter.Builder();
+                                scanFilterBuilder.SetServiceUuid(new ParcelUuid(UUID.FromString(x.ToString())));
+                                return scanFilterBuilder.Build();
+                            })
+                            .ToArray();
+                        if (scanFilters != null)
+                        {
+                            var scanSettings = new ScanSettings.Builder().Build();
 
-                        _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
-                    }
-                    else
-                    {
-                        _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
-                    }
-                    return Disposable.Create(() =>
-                    {
-                        _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback);
-                        _discoverObservable = null;
-                    });
-                })
+                            _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
+                        }
+                        else
+                        {
+                            _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
+                        }
+                        return Disposable.Create(() =>
+                        {
+                            _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback);
+                            _discoverObservable = null;
+                        });
+                    })
                     .Publish()
                     .RefCount()
                     .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
@@ -95,15 +95,20 @@ namespace ReactiveBluetooth.Android.Central
             var context = Application.Context;
 
             return Observable.Create<ConnectionState>(observer =>
-            {
-                var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
-                androidDevice.Gatt = gatt;
+                {
+                    var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
+                    androidDevice.Gatt = gatt;
 
-                return Disposable.Create(() => { androidDevice.Gatt?.Close(); });
-            })
+                    return Disposable.Create(() =>
+                    {
+                        androidDevice.Gatt?.Disconnect();
+                        androidDevice.Gatt?.Close();
+                        androidDevice.GattCallback.ConnectionStateChange.OnNext(ProfileState.Disconnected);
+                    });
+                })
+                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x))
                 .Publish()
-                .RefCount()
-                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x));
+                .RefCount();
         }
     }
 }
