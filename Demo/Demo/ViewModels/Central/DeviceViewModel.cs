@@ -123,10 +123,16 @@ namespace Demo.ViewModels.Central
             Device?.UpdateRemoteRssi();
         }
 
+        void Disconnect()
+        {
+            _centralManager.Disconnect(Device);
+        }
+
         public async Task Connect()
         {
+            Disconnect();
             _connectionStateDisposable?.Dispose();
-            _connectObservable = _centralManager.ConnectToDevice(Device)
+            _connectObservable = _centralManager.Connect(Device)
                 .SubscribeOn(SynchronizationContext.Current);
             try
             {

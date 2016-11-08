@@ -88,7 +88,7 @@ namespace ReactiveBluetooth.Android.Central
             return _discoverObservable;
         }
 
-        public IObservable<ConnectionState> ConnectToDevice(IDevice device)
+        public IObservable<ConnectionState> Connect(IDevice device)
         {
             var androidDevice = (Device) device;
             var nativeDevice = androidDevice.NativeDevice;
@@ -99,16 +99,18 @@ namespace ReactiveBluetooth.Android.Central
                     var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
                     androidDevice.Gatt = gatt;
 
-                    return Disposable.Create(() =>
-                    {
-                        androidDevice.Gatt?.Disconnect();
-                        androidDevice.Gatt?.Close();
-                        androidDevice.GattCallback.ConnectionStateChange.OnNext(ProfileState.Disconnected);
-                    });
+                    return Disposable.Empty;
                 })
                 .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x))
                 .Publish()
                 .RefCount();
+        }
+
+        public void Disconnect(IDevice device)
+        {
+            var androidDevice = (Device)device;
+            androidDevice.Gatt?.Disconnect();
+            androidDevice.Gatt?.Close();
         }
     }
 }
