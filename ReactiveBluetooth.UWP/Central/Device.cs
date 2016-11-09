@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,9 @@ namespace ReactiveBluetooth.UWP.Central
 
         public Device(BluetoothLEAdvertisement advertisement, ulong bluetoothAddress)
         {
-            byte[] uuidBytes = BitConverter.GetBytes(bluetoothAddress);
+            byte[] addressBytes = BitConverter.GetBytes(bluetoothAddress);
+            byte[] uuidBytes = new byte[16];
+            Array.Copy(addressBytes, 0, uuidBytes, 10, 6);
             Uuid = new Guid(uuidBytes);
             _advertisement = advertisement;
         }
@@ -32,7 +35,8 @@ namespace ReactiveBluetooth.UWP.Central
             throw new NotImplementedException();
         }
 
-        public IObservable<int> Rssi { get; }
+        public IObservable<int> Rssi => Observable.Return(2);
+
         public void UpdateRemoteRssi()
         {
             throw new NotImplementedException();

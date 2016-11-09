@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
 using Demo.Common.Behaviors;
 using Demo.Views;
 using Prism.Commands;
@@ -56,6 +58,7 @@ namespace Demo.ViewModels.Central
             {
                 Devices.Clear();
                 _toggleScanDisposable = _centralManager.ScanForDevices()
+                    .ObserveOn(SynchronizationContext.Current)
                     .Subscribe(device =>
                     {
                         var currentDevice = Devices.FirstOrDefault(x => x.Uuid == device.Uuid);

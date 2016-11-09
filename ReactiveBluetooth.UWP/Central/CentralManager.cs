@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using ReactiveBluetooth.Core;
 using ReactiveBluetooth.Core.Central;
@@ -19,7 +21,10 @@ namespace ReactiveBluetooth.UWP.Central
 
         public CentralManager()
         {
-            _advertismentWatcher = new BluetoothLEAdvertisementWatcher();
+            _advertismentWatcher = new BluetoothLEAdvertisementWatcher()
+            {
+                ScanningMode = BluetoothLEScanningMode.Active
+            };
         }
 
         public IObservable<ManagerState> State()
