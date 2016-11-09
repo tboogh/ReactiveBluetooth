@@ -16,7 +16,6 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
     [TestFixture]
     public abstract class CentralTests
     {
-        private static readonly string TestDeviceName = "TP";
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(5);
 
         private ICentralManager _centralManager;
@@ -61,7 +60,6 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             var testDevice = await scanObservable.FirstAsync().Timeout(Timeout).ToTask();
 
             Assert.NotNull(testDevice);
-            Assert.AreEqual(TestDeviceName, testDevice.Name);
         }
 
         [Test]
