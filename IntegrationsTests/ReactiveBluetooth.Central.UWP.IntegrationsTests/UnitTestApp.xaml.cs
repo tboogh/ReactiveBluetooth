@@ -58,15 +58,18 @@ namespace ReactiveBluetooth.Central.UWP.IntegrationsTests
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
+                // ==> ADD THIS LINE <==
+                Xamarin.Forms.Forms.Init(e);
+
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    //TODO: Load state from previously suspended application
+                    // TODO: Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
             }
-            
+
             Microsoft.VisualStudio.TestPlatform.TestExecutor.UnitTestClient.CreateDefaultUI();
 
             // Ensure the current window is active
