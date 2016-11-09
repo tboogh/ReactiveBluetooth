@@ -12,6 +12,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Practices.Unity;
+using Prism.Unity;
+using ReactiveBluetooth.Core.Central;
+using ReactiveBluetooth.UWP.Central;
 
 namespace Demo.UWP
 {
@@ -21,7 +25,16 @@ namespace Demo.UWP
         {
             this.InitializeComponent();
 
-            LoadApplication(new Demo.App());
+            LoadApplication(new Demo.App(new PlatformInitializer()));
+        }
+    }
+
+    public class PlatformInitializer : IPlatformInitializer
+    {
+        public void RegisterTypes(IUnityContainer container)
+        {
+            //container.RegisterType<IPeripheralManager, PeripheralManager>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ICentralManager, CentralManager>(new ContainerControlledLifetimeManager());
         }
     }
 }
