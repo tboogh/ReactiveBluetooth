@@ -39,6 +39,7 @@
     </Compile>
     <Compile Include="Common\Behaviors\ListViewItemSelectedBehaviour.cs" />
     <Compile Include="Common\Behaviors\PageAppearingBehavior.cs" />
+    <Compile Include="Common\Grouping.cs" />
     <Compile Include="Common\ValueConverters\CharactersticPropertiesToStringConverter.cs" />
     <Compile Include="Common\ValueConverters\GuidToStringValueConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -49,7 +50,9 @@
     <Compile Include="ViewModels\Central\DeviceViewModel.cs" />
     <Compile Include="ViewModels\Central\ServiceViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
+    <Compile Include="ViewModels\Peripheral\CharacteristicViewModel.cs" />
     <Compile Include="ViewModels\Peripheral\PeripheralModeViewModel.cs" />
+    <Compile Include="ViewModels\Peripheral\ServiceViewModel.cs" />
     <Compile Include="Views\AdvertiseDataPage.xaml.cs">
       <DependentUpon>AdvertiseDataPage.xaml</DependentUpon>
     </Compile>

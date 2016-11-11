@@ -25,6 +25,8 @@ namespace ReactiveBluetooth.Android.Central
 {
     public class Device : IDevice
     {
+        private IDisposable _connectionStateDisposable;
+
         public Device(BluetoothDevice device, int rssi, AdvertisementData advertisementData)
         {
             AdvertisementData = advertisementData;
@@ -33,6 +35,9 @@ namespace ReactiveBluetooth.Android.Central
             var currentRssi = Observable.Return(rssi);
             var callbackRssi = GattCallback.ReadRemoteRssiSubject.Select(x => x.Item2);
             Rssi = currentRssi.Merge(callbackRssi);
+
+            _connectionStateDisposable = GattCallback.ConnectionStateChange.Subscribe(state =>
+            { State = (ConnectionState) state; });
         }
 
         public BluetoothDevice NativeDevice { get; }
@@ -55,21 +60,18 @@ namespace ReactiveBluetooth.Android.Central
             }
         }
 
-        public ConnectionState State
-        {
-            get
-            {
-                var manager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
-                return (ConnectionState) manager.GetConnectionState(NativeDevice, ProfileType.Gatt);
-            }
-        }
+        public ConnectionState State { get; private set; }
 
         public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
         public Task<IList<IService>> DiscoverServices(CancellationToken cancellationToken)
         {
-            return Observable.FromEvent<IList<IService>>(action => { Gatt.DiscoverServices(); }, action => { })
+            return Observable.Create<IList<IService>>(observer =>
+            {
+                Gatt.DiscoverServices();
+                return Disposable.Empty;
+            })
                 .Merge(GattCallback.ServicesDiscovered.Select(x =>
                 {
                     return Gatt.Services.Select(bluetoothGattService => new Service(bluetoothGattService))
@@ -91,7 +93,14 @@ namespace ReactiveBluetooth.Android.Central
             var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                 .Select(x => x.Item2.GetValue());
             
-            return Observable.FromEvent<byte[]>(action => Gatt.ReadCharacteristic(gattCharacteristic), _ => { })
+            return Observable.Create<byte[]>(observer =>
+            {
+                bool read = Gatt.ReadCharacteristic(gattCharacteristic);
+                if (!read)
+                    observer.OnError(new Exception("Failed to read characteristic"));
+
+                return Disposable.Empty;
+            })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -103,7 +112,11 @@ namespace ReactiveBluetooth.Android.Central
             var observable = GattCallback.DescriptorReadSubject.FirstAsync(x => x.Item2 == nativeDescriptor)
                 .Select(x => x.Item2.GetValue());
 
-            return Observable.FromEvent<byte[]>(action => Gatt.ReadDescriptor(nativeDescriptor), _ => { })
+            return Observable.Create<byte[]>(observer =>
+            {
+                Gatt.ReadDescriptor(nativeDescriptor);
+                return Disposable.Empty;
+            })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -113,22 +126,22 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
 
-            var writeObservable = Observable.FromEvent<bool>(action =>
+            var writeObservable = Observable.Create<bool>(observer =>
             {
                 gattCharacteristic.WriteType = writeType.ToGattWriteType();
 
                 var setValueResult = gattCharacteristic.SetValue(value);
                 if (!setValueResult)
-                    action(false);
+                    observer.OnError(new Exception("Failed to set value"));
 
                 var result = Gatt.WriteCharacteristic(gattCharacteristic);
                 if (!result)
-                    action(false);
-            }, _ => { });
+                    observer.OnError(new Exception("Failed to write characteristic"));
 
-            if (writeType == WriteType.WithResponse)
-            {
-                return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
+                return Disposable.Empty;
+            });
+
+            return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                     .Select(x =>
                     {
                         if (x.Item3 != GattStatus.Success)
@@ -139,10 +152,6 @@ namespace ReactiveBluetooth.Android.Central
                     }))
                     .Take(1)
                     .ToTask(cancellationToken);
-            }
-            return writeObservable.Merge(Observable.Return(true))
-                .Take(1)
-                .ToTask(cancellationToken);
         }
 
         public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
@@ -233,12 +242,17 @@ namespace ReactiveBluetooth.Android.Central
             });
 
 
-            return notificationObservable.Merge(GattCallback.CharacteristicChangedSubject.Select(x => x.Item2.GetValue()));
+            return notificationObservable.Publish().RefCount().Merge(GattCallback.CharacteristicChangedSubject.Select(x => x.Item2.GetValue()));
         }
 
         public bool RequestConnectionPriority(ConnectionPriority priority)
         {
             return Gatt.RequestConnectionPriority(priority.ToConnectionPriority());
+        }
+
+        public void Dispose()
+        {
+            _connectionStateDisposable?.Dispose();
         }
     }
 }

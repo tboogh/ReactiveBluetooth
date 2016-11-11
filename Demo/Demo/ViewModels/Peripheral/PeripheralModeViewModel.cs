@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Demo.Common;
 using Demo.Common.Behaviors;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -18,11 +20,17 @@ namespace Demo.ViewModels.Peripheral
     public class PeripheralModeViewModel : BindableBase, INavigationAware, IPageAppearingAware, IDisposable
     {
         private readonly IPeripheralManager _peripheralManager;
+
+        private readonly byte[] _readValue = { 0xB0, 0x06, 0x00, 0x01 };
+        private readonly byte[] _writeValue = {0xB0, 0x06, 0x00, 0x02};
+        private readonly byte[] _writeWithoutResponseValue = { 0xB0, 0x06, 0x00, 0x03 };
+        private byte[] _timeValue;
+        private byte[] _reverseTimeValue;
+
         private string _state;
         private bool _advertising;
         private IDisposable _stateDisposable;
         private IDisposable _advertiseDisposable;
-        private byte[] _writeValue = new byte[] {0xB0, 0x0B};
         private IDisposable _writeDisposable;
         private IDisposable _writeWithoutResponseDisposable;
         private IDisposable _readDisposable;
@@ -36,7 +44,6 @@ namespace Demo.ViewModels.Peripheral
         private IDisposable _notifyReadDisposable;
         private readonly IList<IDevice> _notifySubscribedDevices;
         private readonly IList<IDevice> _indicateSubscribedDevices;
-        byte[] _timeValue;
 
         public PeripheralModeViewModel(IPeripheralManager peripheralManager)
         {
@@ -46,7 +53,11 @@ namespace Demo.ViewModels.Peripheral
 
             AdvertiseCommand = new DelegateCommand(StartAdvertise);
             StopAdvertiseCommand = new DelegateCommand(StopAdvertise);
+
+            Services = new ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>>();
         }
+
+        public ObservableCollection<Grouping<ServiceViewModel, CharacteristicViewModel>> Services { get; set; }
 
         public string State
         {
@@ -59,8 +70,7 @@ namespace Demo.ViewModels.Peripheral
             get { return _advertising; }
             set { SetProperty(ref _advertising, value); }
         }
-
-        public string WriteValue => BitConverter.ToString(_writeValue);
+        
         public DelegateCommand AdvertiseCommand { get; }
         public DelegateCommand StopAdvertiseCommand { get; }
 
@@ -70,35 +80,46 @@ namespace Demo.ViewModels.Peripheral
                 return;
 
             var service = _peripheralManager.Factory.CreateService(Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"), ServiceType.Primary);
-            var readCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"), new byte[] {0xB0, 0x06}, CharacteristicPermission.Read, CharacteristicProperty.Read);
+            var readCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"), _readValue, CharacteristicPermission.Read, CharacteristicProperty.Read);
+            var writeCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.Write);
+            var writeWithoutResponseCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060003-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.WriteWithoutResponse);
+            var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify | CharacteristicProperty.Read);
+            var indicateCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060005-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Indicate | CharacteristicProperty.Read);
+
+            ServiceViewModel serviceViewModel = new ServiceViewModel()
+            {
+                Uuid = service.Uuid
+            };
+
+            CharacteristicViewModel readCharacteristicViewModel = new CharacteristicViewModel { Uuid = readCharacterstic.Uuid, Properties = readCharacterstic.Properties, Value = BitConverter.ToString(readCharacterstic.Value) };
+            CharacteristicViewModel writeCharacteristicViewModel = new CharacteristicViewModel { Uuid = writeCharacterstic.Uuid, Properties = writeCharacterstic.Properties, Value = BitConverter.ToString(_writeValue)};
+            CharacteristicViewModel writeWithoutResponseCharacteristicViewModel = new CharacteristicViewModel { Uuid = writeWithoutResponseCharacterstic.Uuid, Properties = writeWithoutResponseCharacterstic.Properties, Value = BitConverter.ToString(_writeWithoutResponseValue)};
+            CharacteristicViewModel notifyCharacteristicViewModel = new CharacteristicViewModel { Uuid = notifyCharacteristic.Uuid, Properties = notifyCharacteristic.Properties };
+            CharacteristicViewModel indicateCharacteristicViewModel = new CharacteristicViewModel { Uuid = indicateCharacteristic.Uuid, Properties = indicateCharacteristic.Properties };
 
             _readDisposable = readCharacterstic.ReadRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine("Read request");
-                _peripheralManager.SendResponse(request, 0, new byte[] {0xB0, 0x0B});
+                _peripheralManager.SendResponse(request, 0, readCharacterstic.Value);
             });
-
-            var writeCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.Write);
 
             _writeDisposable = writeCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
-                SetWriteValue(request.Value);
                 _peripheralManager.SendResponse(request, 0, _writeValue);
+                writeCharacteristicViewModel.Value = BitConverter.ToString(_writeValue);
             });
             _writeReadDisposable = writeCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
-
-            var writeWithoutResponseCharacterstic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060003-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read | CharacteristicPermission.Write, CharacteristicProperty.Read | CharacteristicProperty.WriteWithoutResponse);
 
             _writeWithoutResponseDisposable = writeWithoutResponseCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write without response request. Value: {BitConverter.ToString(request.Value)}");
-                SetWriteValue(request.Value);
+               
+                _peripheralManager.SendResponse(request, 0, _writeWithoutResponseValue);
+                writeWithoutResponseCharacteristicViewModel.Value = BitConverter.ToString(_writeWithoutResponseValue);
             });
 
-            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
-
-            var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify | CharacteristicProperty.Read);
+            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeWithoutResponseValue); });
 
             _notifyReadDisposable = notifyCharacteristic.ReadRequestObservable.Subscribe(request =>
             {
@@ -116,7 +137,6 @@ namespace Demo.ViewModels.Peripheral
                 _notifySubscribedDevices.Remove(d); 
             });
 
-            var indicateCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060005-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Indicate | CharacteristicProperty.Read);
             _indicateSubscribedDisposable = indicateCharacteristic.Subscribed.Subscribe(device =>
             {
                 _indicateSubscribedDevices.Add(device); 
@@ -130,7 +150,7 @@ namespace Demo.ViewModels.Peripheral
 
             indicateCharacteristic.ReadRequestObservable.Subscribe(request =>
             {
-                _peripheralManager.SendResponse(request, 0, _timeValue);
+                _peripheralManager.SendResponse(request, 0, _reverseTimeValue);
             });
 
             if (!service.AddCharacteristic(writeCharacterstic))
@@ -172,8 +192,13 @@ namespace Demo.ViewModels.Peripheral
                 {
                     await Task.Delay(TimeSpan.FromSeconds(1));
                     _timeValue = BitConverter.GetBytes(DateTime.Now.Second);
+                    _reverseTimeValue = BitConverter.GetBytes(60 - DateTime.Now.Second);
                     notifyCharacteristic.Value = _timeValue;
                     indicateCharacteristic.Value = _timeValue;
+
+                    notifyCharacteristicViewModel.Value = BitConverter.ToString(_timeValue);
+                    indicateCharacteristicViewModel.Value = BitConverter.ToString(_reverseTimeValue);
+
                     foreach (var subscribedDevice in _notifySubscribedDevices)
                     {
                         if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, _timeValue))
@@ -184,7 +209,7 @@ namespace Demo.ViewModels.Peripheral
 
                     foreach (var subscribedDevice in _indicateSubscribedDevices)
                     {
-                        if (!_peripheralManager.Notify(subscribedDevice, notifyCharacteristic, _timeValue))
+                        if (!_peripheralManager.Notify(subscribedDevice, indicateCharacteristic, _reverseTimeValue))
                         {
                             // delay until write is ready
                         }
@@ -192,6 +217,23 @@ namespace Demo.ViewModels.Peripheral
                 }
                 while (!_notifyLoopCancellationTokenSource.IsCancellationRequested);
             }, _notifyLoopCancellationTokenSource.Token);
+
+            Grouping<ServiceViewModel, CharacteristicViewModel> grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel,
+                        new List<CharacteristicViewModel>()
+                        {
+                            readCharacteristicViewModel,
+                            writeCharacteristicViewModel,
+                            writeWithoutResponseCharacteristicViewModel,
+                            notifyCharacteristicViewModel,
+                            indicateCharacteristicViewModel
+                        });
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                Services.Clear();
+                Services.Add(grouping);
+            });
+            
         }
 
         public void StopAdvertise()
@@ -235,12 +277,6 @@ namespace Demo.ViewModels.Peripheral
         public void OnDisappearing(Page page)
         {
             StopAdvertise();
-        }
-
-        private void SetWriteValue(byte[] writeValue)
-        {
-            _writeValue = writeValue;
-            OnPropertyChanged(() => WriteValue);
         }
 
         public void Dispose()

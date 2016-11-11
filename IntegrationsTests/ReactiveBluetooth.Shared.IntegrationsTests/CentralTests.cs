@@ -17,7 +17,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
     public abstract class CentralTests
     {
         private static readonly string TestDeviceName = "TP";
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
 
         private ICentralManager _centralManager;
         public abstract ICentralManager GetCentralManager();
@@ -43,39 +43,42 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         [Test]
         public async Task ScanForDevices_DiscoversDevicesFindAny_NotNull()
         {
-           
-            var device = await _centralManager.ScanForDevices().FirstAsync().Timeout(Timeout);
-            
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            var device = await _centralManager.ScanForDevices(new List<Guid>() { Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") }).FirstAsync().Timeout(Timeout);
+            Assert.NotNull(device);
+        }
 
+        [Test]
+        public async Task ScanForDevices_DiscoversDevicesServiceFilterFindAny_NotNull()
+        {
+            var device = await _centralManager.ScanForDevices().FirstAsync().Timeout(Timeout);
             Assert.NotNull(device);
         }
 
         [Test]
         public async Task ScanForDevices_FindTestDevice_NotNull()
         {
+            var scanObservable = _centralManager.ScanForDevices(new List<Guid>() { Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") });
+            var testDevice = await scanObservable.FirstAsync().Timeout(Timeout).ToTask();
 
-            var scanObservable = _centralManager.ScanForDevices();
-            var battByte = await scanObservable.FirstAsync(x =>
-            {
-                return x.Name == TestDeviceName;
-            }).Timeout(Timeout).ToTask();
-
-            Assert.NotNull(battByte);
+            Assert.NotNull(testDevice);
+            Assert.AreEqual(TestDeviceName, testDevice.Name);
         }
 
         [Test]
         public async Task ConnectToDevice_ConnectToTestDevice_ResultIsTrue()
         {
-            var scanObservable = _centralManager.ScanForDevices();
-            var testDevice = await scanObservable.FirstAsync(x => x.Name == TestDeviceName).Timeout(Timeout).ToTask();
+            var scanObservable = _centralManager.ScanForDevices(new List<Guid>() { Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") });
+            var device = await scanObservable.FirstAsync().Timeout(Timeout).ToTask();
 
-            if (testDevice == null)
+            if (device == null)
             {
                 throw new Exception("Make sure test device is available");
             }
 
-            var connectionResult = await _centralManager.ConnectToDevice(testDevice).FirstAsync(x => x == ConnectionState.Connected).Timeout(TimeSpan.FromSeconds(2));
+            var connectionResult = await _centralManager.Connect(device).FirstAsync(x => x == ConnectionState.Connected).Timeout(Timeout);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
 
             Assert.AreEqual(ConnectionState.Connected, connectionResult);
         }
@@ -83,16 +86,22 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         [Test]
         public async Task ConnectToDevice_ConnectToTestDevice_StateIsConnected()
         {
-            var testSetup = await ConnectToTestDevice();
-            var device = testSetup.Item2;
+            var device = await FindTestDevice();
+            ConnectionState state = await _centralManager.Connect(device).FirstAsync(x => x == ConnectionState.Connected).Timeout(Timeout);
 
-            Assert.AreEqual(ConnectionState.Connected, device.State);        }
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+
+            Assert.AreEqual(ConnectionState.Connected, state);
+        }
 
         [Test]
         public async Task DisconnectDevice_DisconnectFromTestDevice_StateIsDisconnected()
         {
-            var testSetup = await ConnectToTestDevice();
-            var device = testSetup.Item2;
+            var device = await ConnectToTestDevice();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
             
             Assert.AreEqual(ConnectionState.Disconnected, device.State);
         }
@@ -100,11 +109,13 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         [Test]
         public async Task DiscoverServices_FindServicesOnTestDevice_ListNotNull()
         {
-            var testSetup = await ConnectToTestDevice();
-            var device = testSetup.Item2;
+            var device = await ConnectToTestDevice();
 
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
 
-            var services = await device.DiscoverServices(CancellationToken.None);
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
             Assert.NotNull(services);
             Assert.IsNotEmpty(services);
         }
@@ -112,11 +123,13 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         [Test]
         public async Task DiscoverServices_FindServicesOnTestDevice_ServiceIdSet()
         {
-            var testSetup = await ConnectToTestDevice();
-            var device = testSetup.Item2;
+            var device = await ConnectToTestDevice();
 
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(() =>
+            { _centralManager.Disconnect(device, CancellationToken.None); });
 
-            var services = await device.DiscoverServices(CancellationToken.None);
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
             if (services.Count == 0)
             {
                 throw new Exception("Check test device services");
@@ -124,56 +137,174 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
             Assert.NotNull(testService?.Uuid);
         }
 
         [Test]
         public async Task DiscoverCharacteristics_FindCharacteristicsOnService_NotNullList()
         {
-            var testSetup = await ConnectToTestDevice();
-            var device = testSetup.Item2;
+            var device = await ConnectToTestDevice();
 
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(() =>
+            { _centralManager.Disconnect(device, CancellationToken.None); });
 
-            var services = await device.DiscoverServices(CancellationToken.None);
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
             var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
-            var characteristics = await testService.DiscoverCharacteristics(CancellationToken.None);
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
 
             var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
             Assert.NotNull(testCharacterstic);
         }
 
         [Test]
-        public async Task ReadValue_CharactersiticValue_CorrectValue()
+        public async Task ReadValue_CorrectValue()
         {
-            var testSetup = await ConnectToTestDevice();
-            var device = testSetup.Item2;
+            var device = await ConnectToTestDevice();
 
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(() =>
+            { _centralManager.Disconnect(device, CancellationToken.None); });
 
             var services = await device.DiscoverServices(CancellationToken.None);
             var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
 
-            var characteristics = await testService.DiscoverCharacteristics(CancellationToken.None);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
 
             var testCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060001-0234-49D9-8439-39100D7EBD62"));
-            var value = await device.ReadValue(testCharacterstic, CancellationToken.None);
-            Assert.AreEqual(new byte[] { 0xB0, 0x06 }, value);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var value = await device.ReadValue(testCharacterstic, cancellationTokenSource.Token);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+            Assert.AreEqual(new byte[] { 0xB0, 0x0B }, value);
         }
 
-        private async Task<Tuple<ICentralManager, IDevice>> ConnectToTestDevice()
+        [Test]
+        public async Task WriteValue_WithResponse()
         {
-            var scanObservable = _centralManager.ScanForDevices();
-            var testDevice = await scanObservable.FirstAsync(x => x.Name == TestDeviceName)
-                .Timeout(Timeout)
-                .ToTask();
+            var device = await ConnectToTestDevice();
 
-            if (testDevice == null)
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(() =>
+            { _centralManager.Disconnect(device, CancellationToken.None); });
+
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
+
+            var writeCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var success = await device.WriteValue(writeCharacterstic, new byte[] { 0x12, 0x34, 0x56, 0x78 }, WriteType.WithResponse, cancellationTokenSource.Token);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+            Assert.IsTrue(success);
+        }
+
+        [Test]
+        public async Task WriteValue_WithoutResponse()
+        {
+            var device = await ConnectToTestDevice();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(() =>
+            { _centralManager.Disconnect(device, CancellationToken.None); });
+
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
+
+            var writeCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060003-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var success = await device.WriteValue(writeCharacterstic, new byte[] { 0x12, 0x34, 0x56, 0x78 }, WriteType.WithoutRespoonse, cancellationTokenSource.Token);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+            Assert.IsTrue(success);
+        }
+
+        [Test]
+        public async Task WriteValue_WithResponse_CorrectValue()
+        {
+            var device = await ConnectToTestDevice();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(() =>
+            { _centralManager.Disconnect(device, CancellationToken.None); });
+
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
+
+            var writeCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060002-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var sucess = await device.WriteValue(writeCharacterstic, new byte[] { 0x12, 0x34, 0x56, 0x78 }, WriteType.WithResponse, cancellationTokenSource.Token);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var value = await device.ReadValue(writeCharacterstic, cancellationTokenSource.Token);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+            Assert.AreEqual(new byte[] { 0x12, 0x34, 0x56, 0x78 }, value);
+        }
+
+        [Test]
+        public async Task WriteValue_WithoutResponse_CorrectValue()
+        {
+            var device = await ConnectToTestDevice();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(async () =>
             {
-                throw new Exception("Make sure test device is available");
-            }
+                await _centralManager.Disconnect(device, CancellationToken.None); 
+            });
 
-            var connectionResult = await _centralManager.ConnectToDevice(testDevice).FirstAsync(x => x == ConnectionState.Connected).Timeout(TimeSpan.FromSeconds(2));
-            return new Tuple<ICentralManager, IDevice>(_centralManager, testDevice);
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
+
+            var writeCharacterstic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060003-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var sucess = await device.WriteValue(writeCharacterstic, new byte[] { 0x12, 0x34, 0x56, 0x78 }, WriteType.WithoutRespoonse, cancellationTokenSource.Token);
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var value = await device.ReadValue(writeCharacterstic, cancellationTokenSource.Token);
+            cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(30));
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+            Assert.AreEqual(new byte[] { 0x12, 0x34, 0x56, 0x78 }, value);
+        }
+
+        private async Task<IDevice> ConnectToTestDevice()
+        {
+            IDevice device = await FindTestDevice();
+            var connectionObservable = await _centralManager.Connect(device).FirstAsync(x => x == ConnectionState.Connected).Timeout(Timeout);
+            return device;
+        }
+
+        private async Task<IDevice> FindTestDevice()
+        {
+            return await _centralManager.ScanForDevices(new List<Guid>() { Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62") }).FirstAsync().Timeout(Timeout);
         }
     }
 }

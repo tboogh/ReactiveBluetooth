@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreBluetooth;
 using CoreFoundation;
@@ -28,7 +29,7 @@ namespace ReactiveBluetooth.iOS.Central
 
         public IObservable<ManagerState> State()
         {
-            return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState)x);
+            return _centralManagerDelegate.StateUpdatedSubject.Select(x => (ManagerState) x);
         }
 
         public IObservable<IDevice> ScanForDevices(IList<Guid> serviceUuid = null)
@@ -36,33 +37,43 @@ namespace ReactiveBluetooth.iOS.Central
             CBUUID[] cbuuids = serviceUuid?.Select(x => CBUUID.FromString(x.ToString()))
                 .ToArray();
 
-            var scanObservable = Observable.FromEvent<IDevice>(action => { _centralManager.ScanForPeripherals(cbuuids); }, action => { _centralManager.StopScan(); });
+            var scanObservable = Observable.Create<IDevice>(observer =>
+            {
+                _centralManager.ScanForPeripherals(cbuuids);
+                return Disposable.Create(() => { _centralManager.StopScan(); });
+            })
+                .Publish()
+                .RefCount();
             return scanObservable.Merge(_centralManagerDelegate.DiscoveredPeriperhalSubject.Select(x =>
             {
                 Device device = new Device(x.Item2, x.Item4.Int32Value, new AdvertisementData(x.Item3));
                 return device;
             }));
-
         }
 
-        public IObservable<ConnectionState> ConnectToDevice(IDevice device)
+        public IObservable<ConnectionState> Connect(IDevice device)
         {
-            return Observable.FromEvent<ConnectionState>(action =>
+            return Observable.Create<ConnectionState>(observer =>
             {
-                _centralManager.ConnectPeripheral(((Device)device).Peripheral);
-            }, action =>
-            {
-                _centralManager.CancelPeripheralConnection(((Device)device).Peripheral); 
-            }).Merge(_centralManagerDelegate.ConnectedPeripheralSubject
-                    .Where(x => Equals(x.Item2.Identifier, ((Device)device).Peripheral.Identifier))
+                _centralManager.ConnectPeripheral(((Device) device).Peripheral);
+                return Disposable.Empty;
+            })
+                .Publish()
+                .RefCount()
+                .Merge(_centralManagerDelegate.ConnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device) device).Peripheral.Identifier))
                     .Select(x => ConnectionState.Connected))
-                    .Merge(_centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device)device).Peripheral.Identifier))
+                .Merge(_centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device) device).Peripheral.Identifier))
                     .Select(x => ConnectionState.Disconnected));
+        }
+
+        public Task Disconnect(IDevice device, CancellationToken cancellationToken)
+        {
+            _centralManager.CancelPeripheralConnection(((Device)device).Peripheral);
+            return Task.FromResult(true);
         }
 
         public void Dispose()
         {
-            
         }
     }
 }

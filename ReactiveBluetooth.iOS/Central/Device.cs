@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,8 +28,8 @@ namespace ReactiveBluetooth.iOS.Central
             Peripheral = peripheral;
             _cbPeripheralDelegate = new PeripheralDelegate.PeripheralDelegate();
             peripheral.Delegate = _cbPeripheralDelegate;
-            var currentRssi = Observable.Return(rssi);
-            var delegateRssi = _cbPeripheralDelegate.RssiUpdatedSubject.Select(x => x.Item1.RSSI.Int32Value);
+            IObservable<int> currentRssi = Observable.Return(rssi);
+            IObservable<int> delegateRssi = _cbPeripheralDelegate.RssiUpdatedSubject.Select(x => x.Item1.RSSI.Int32Value);
             Rssi = currentRssi.Merge(delegateRssi);
         }
 
@@ -47,7 +48,11 @@ namespace ReactiveBluetooth.iOS.Central
                     .Cast<IService>()
                     .ToList());
             }
-            return Observable.FromEvent<IList<IService>>(action => { Peripheral.DiscoverServices(); }, _ => { })
+            return Observable.Create<IList<IService>>(observer =>
+            {
+                Peripheral.DiscoverServices();
+                return Disposable.Empty;
+            })
                 .Merge(_cbPeripheralDelegate.DiscoveredServicesSubject.Select(x =>
                 {
                     return x.Item1.Services.Select(y => new Service(y, Peripheral, _cbPeripheralDelegate))
@@ -74,7 +79,11 @@ namespace ReactiveBluetooth.iOS.Central
             })
                 .Select(x => x.Item2.Value?.ToArray());
 
-            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(cbCharacteristic); }, action => { })
+            return Observable.Create<byte[]>(observer =>
+            {
+                Peripheral.ReadValue(cbCharacteristic);
+                return Disposable.Empty;
+            })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -95,7 +104,11 @@ namespace ReactiveBluetooth.iOS.Central
                     return data?.ToArray();
                 });
 
-            return Observable.FromEvent<byte[]>(action => { Peripheral.ReadValue(nativeDescriptor); }, action => { })
+            return Observable.Create<byte[]>(observer =>
+            {
+                Peripheral.ReadValue(nativeDescriptor);
+                return Disposable.Empty;
+            })
                 .Merge(observable)
                 .FirstAsync()
                 .ToTask(cancellationToken);
@@ -104,7 +117,11 @@ namespace ReactiveBluetooth.iOS.Central
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            var writeObservable = Observable.FromEvent<bool>(action => { Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType()); }, _ => { });
+            var writeObservable = Observable.Create<bool>(observer =>
+            {
+                Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType());
+                return Disposable.Empty;
+            });
 
             if (writeType == WriteType.WithResponse)
             {
@@ -132,7 +149,11 @@ namespace ReactiveBluetooth.iOS.Central
         public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
         {
             CBDescriptor nativeDescriptor = ((Descriptor) descriptor).NativeDescriptor;
-            var writeObservable = Observable.FromEvent<bool>(action => { Peripheral.WriteValue(NSData.FromArray(value), nativeDescriptor); }, _ => { });
+            var writeObservable = Observable.Create<bool>(observer =>
+            {
+                Peripheral.WriteValue(NSData.FromArray(value), nativeDescriptor);
+                return Disposable.Empty;
+            });
 
             return writeObservable.Merge(_cbPeripheralDelegate.WroteDescriptorValueSubject.FirstAsync(x =>
             {
@@ -154,15 +175,14 @@ namespace ReactiveBluetooth.iOS.Central
         public IObservable<byte[]> Notifications(ICharacteristic characteristic)
         {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-
-            IObservable<byte[]> enableNotificationObservable = Observable.FromEvent<byte[]>(action => { 
-				Peripheral.SetNotifyValue(true, nativeCharacteristic); 
-				
-				var x = 0;
-			}, action => { 
-				Peripheral.SetNotifyValue(false, nativeCharacteristic);
-				var x = 0;
-			 });
+            Subject<byte[]> s = new Subject<byte[]>();
+            IObservable<byte[]> enableNotificationObservable = Observable.Create<byte[]>(observer =>
+            {
+                Peripheral.SetNotifyValue(true, nativeCharacteristic);
+                return Disposable.Create(() => { Peripheral.SetNotifyValue(false, nativeCharacteristic); });
+            })
+                .Publish()
+                .RefCount();
 
             var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Select(x => x.Item2.Value.ToArray());
             var stateUpdatedObservable = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Select(x =>
@@ -173,14 +193,18 @@ namespace ReactiveBluetooth.iOS.Central
                 }
                 return x.Item2.Value?.ToArray();
             });
-			return enableNotificationObservable
-                .Merge(valueUpdatedObservable)
+            return enableNotificationObservable.Merge(valueUpdatedObservable)
                 .Merge(stateUpdatedObservable);
         }
 
         public bool RequestConnectionPriority(ConnectionPriority priority)
         {
             return true;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

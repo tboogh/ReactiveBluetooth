@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
+using System.Threading;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Types;
@@ -27,11 +28,18 @@ namespace ReactiveBluetooth.Core.Central
         IObservable<IDevice> ScanForDevices(IList<Guid> serviceGuids = null);
 
         /// <summary>
-        /// Tries to connect to a <see cref="IDevice"/>
+        /// Attempts to connect to the device
         /// Throws <see cref="FailedToConnectException"/> if connection fails
         /// </summary>
         /// <param name="device">The device to connect to</param>
         /// <returns></returns>
-        IObservable<ConnectionState> ConnectToDevice(IDevice device);
+        IObservable<ConnectionState> Connect(IDevice device);
+
+        /// <summary>
+        /// Disconnects from the device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="cancellationTokenSource"></param>
+        Task Disconnect(IDevice device, CancellationToken cancellationToken);
     }
 }

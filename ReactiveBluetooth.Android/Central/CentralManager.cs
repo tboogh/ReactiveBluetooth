@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Bluetooth;
@@ -29,7 +30,7 @@ namespace ReactiveBluetooth.Android.Central
         private readonly BluetoothAdapter _bluetoothAdapter;
         private IObservable<IDevice> _discoverObservable;
         private BroadcastListener _broadcastListener;
-        
+
         public CentralManager()
         {
             _bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
@@ -54,31 +55,33 @@ namespace ReactiveBluetooth.Android.Central
                 // Store this and return the same someone else subscribes
                 ScanCallback scanCallback = new ScanCallback();
 
-                _discoverObservable = Observable.FromEvent<IDevice>(action =>
-                {
-                    var scanFilters = serviceUuids?.Select(x =>
+                _discoverObservable = Observable.Create<IDevice>(observer =>
                     {
-                        var scanFilterBuilder = new ScanFilter.Builder();
-                        scanFilterBuilder.SetServiceUuid(new ParcelUuid(UUID.FromString(x.ToString())));
-                        return scanFilterBuilder.Build();
-                    }).ToArray();
-                    if (scanFilters != null)
-                    {
-                        var scanSettings = new ScanSettings.Builder().Build();
+                        var scanFilters = serviceUuids?.Select(x =>
+                            {
+                                var scanFilterBuilder = new ScanFilter.Builder();
+                                scanFilterBuilder.SetServiceUuid(new ParcelUuid(UUID.FromString(x.ToString())));
+                                return scanFilterBuilder.Build();
+                            })
+                            .ToArray();
+                        if (scanFilters != null)
+                        {
+                            var scanSettings = new ScanSettings.Builder().Build();
 
-                        _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
-                    }
-                    else
-                    {
-                        _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
-                    }
-                    
-                }, action =>
-                {
-                    _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback);
-                    _discoverObservable = null;
-
-                })
+                            _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
+                        }
+                        else
+                        {
+                            _bluetoothAdapter.BluetoothLeScanner.StartScan(scanCallback);
+                        }
+                        return Disposable.Create(() =>
+                        {
+                            _bluetoothAdapter.BluetoothLeScanner.StopScan(scanCallback);
+                            _discoverObservable = null;
+                        });
+                    })
+                    .Publish()
+                    .RefCount()
                     .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
                     .Merge(scanCallback.FailureSubject.Select(failure => default(Device)));
             }
@@ -86,21 +89,36 @@ namespace ReactiveBluetooth.Android.Central
             return _discoverObservable;
         }
 
-        public IObservable<ConnectionState> ConnectToDevice(IDevice device)
+        public IObservable<ConnectionState> Connect(IDevice device)
         {
             var androidDevice = (Device) device;
             var nativeDevice = androidDevice.NativeDevice;
             var context = Application.Context;
 
-            return Observable.FromEvent<ConnectionState>(action =>
-            {
-                var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
-                androidDevice.Gatt = gatt;
-            }, action =>
-            {
-                androidDevice.Gatt?.Close(); 
-            })
-                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x));
+            return Observable.Create<ConnectionState>(observer =>
+                {
+                    var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
+                    androidDevice.Gatt = gatt;
+
+                    return Disposable.Empty;
+                })
+                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x))
+                .TakeLast(1)
+                .Publish()
+                .RefCount();
+        }
+
+        public async Task Disconnect(IDevice device, CancellationToken cancellationToken)
+        {
+            var androidDevice = (Device)device;
+            if (androidDevice.Gatt == null)
+                return;
+
+            androidDevice.Gatt?.Disconnect();
+            
+            await androidDevice.GattCallback.ConnectionStateChange.FirstAsync(x => x == ProfileState.Disconnected).ToTask(cancellationToken);
+            androidDevice.Gatt?.Close();
+            androidDevice.Gatt = null;
         }
     }
 }
