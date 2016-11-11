@@ -28,8 +28,8 @@ namespace ReactiveBluetooth.iOS.Central
             Peripheral = peripheral;
             _cbPeripheralDelegate = new PeripheralDelegate.PeripheralDelegate();
             peripheral.Delegate = _cbPeripheralDelegate;
-            var currentRssi = Observable.Return(rssi);
-            var delegateRssi = _cbPeripheralDelegate.RssiUpdatedSubject.Select(x => x.Item1.RSSI.Int32Value);
+            IObservable<int> currentRssi = Observable.Return(rssi);
+            IObservable<int> delegateRssi = _cbPeripheralDelegate.RssiUpdatedSubject.Select(x => x.Item1.RSSI.Int32Value);
             Rssi = currentRssi.Merge(delegateRssi);
         }
 
@@ -200,6 +200,11 @@ namespace ReactiveBluetooth.iOS.Central
         public bool RequestConnectionPriority(ConnectionPriority priority)
         {
             return true;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

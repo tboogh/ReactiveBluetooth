@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreBluetooth;
 using CoreFoundation;
@@ -65,9 +66,10 @@ namespace ReactiveBluetooth.iOS.Central
                     .Select(x => ConnectionState.Disconnected));
         }
 
-        public void Disconnect(IDevice device)
+        public Task Disconnect(IDevice device, CancellationToken cancellationToken)
         {
             _centralManager.CancelPeripheralConnection(((Device)device).Peripheral);
+            return Task.FromResult(true);
         }
 
         public void Dispose()

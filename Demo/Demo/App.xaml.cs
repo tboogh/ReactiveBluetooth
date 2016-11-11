@@ -29,7 +29,7 @@ namespace Demo
             Container.RegisterTypeForNavigation<PeripheralPage, PeripheralModeViewModel>();
             Container.RegisterTypeForNavigation<CentralPage, CentralModeViewModel>();
             Container.RegisterTypeForNavigation<DeviceDetailPage, DeviceViewModel>();
-            Container.RegisterTypeForNavigation<CharacteristicDetailPage, CharacteristicViewModel>();
+            Container.RegisterTypeForNavigation<CharacteristicDetailPage, ViewModels.Central.CharacteristicViewModel>();
             Container.RegisterTypeForNavigation<AdvertiseDataPage, AdvertiseDataViewModel>();
         }
     }

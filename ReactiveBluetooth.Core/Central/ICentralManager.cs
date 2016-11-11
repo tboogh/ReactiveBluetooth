@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
+using System.Threading;
 using System.Threading.Tasks;
 using ReactiveBluetooth.Core.Exceptions;
 using ReactiveBluetooth.Core.Types;
@@ -38,6 +39,7 @@ namespace ReactiveBluetooth.Core.Central
         /// Disconnects from the device
         /// </summary>
         /// <param name="device"></param>
-        void Disconnect(IDevice device);
+        /// <param name="cancellationTokenSource"></param>
+        Task Disconnect(IDevice device, CancellationToken cancellationToken);
     }
 }

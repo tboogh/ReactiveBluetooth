@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Bluetooth;
@@ -102,15 +103,22 @@ namespace ReactiveBluetooth.Android.Central
                     return Disposable.Empty;
                 })
                 .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x))
+                .TakeLast(1)
                 .Publish()
                 .RefCount();
         }
 
-        public void Disconnect(IDevice device)
+        public async Task Disconnect(IDevice device, CancellationToken cancellationToken)
         {
             var androidDevice = (Device)device;
+            if (androidDevice.Gatt == null)
+                return;
+
             androidDevice.Gatt?.Disconnect();
+            
+            await androidDevice.GattCallback.ConnectionStateChange.FirstAsync(x => x == ProfileState.Disconnected).ToTask(cancellationToken);
             androidDevice.Gatt?.Close();
+            androidDevice.Gatt = null;
         }
     }
 }

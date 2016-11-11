@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Demo.Common;
 using Demo.Common.Behaviors;
 using Demo.Views;
 using Prism.Commands;
@@ -21,18 +22,6 @@ namespace Demo.ViewModels.Central
 {
     public class DeviceViewModel : BindableBase, INavigationAware, IPageAppearingAware, INavigationBackAware
     {
-        public class Grouping<K, T> : ObservableCollection<T>
-        {
-            public K Key { get; private set; }
-
-            public Grouping(K key, IEnumerable<T> items)
-            {
-                Key = key;
-                foreach (var item in items)
-                    this.Items.Add(item);
-            }
-        }
-
         private readonly ICentralManager _centralManager;
         private readonly INavigationService _navigationService;
         private readonly IPageDialogService _pageDialogService;
@@ -125,7 +114,7 @@ namespace Demo.ViewModels.Central
 
         void Disconnect()
         {
-            _centralManager.Disconnect(Device);
+            _centralManager.Disconnect(Device, CancellationToken.None);
         }
 
         public async Task Connect()
@@ -219,6 +208,7 @@ namespace Demo.ViewModels.Central
 
         public void PagePopped()
         {
+            var disconnectTask = _centralManager.Disconnect(Device, CancellationToken.None);
             _cancellationTokenSource?.Cancel();
             _connectionStateDisposable?.Dispose();
         }

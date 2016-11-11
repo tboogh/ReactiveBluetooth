@@ -7,7 +7,7 @@ using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Core.Central
 {
-    public interface IDevice
+    public interface IDevice: IDisposable
     {
         string Name { get;  }
 
