@@ -68,8 +68,22 @@ namespace ReactiveBluetooth.iOS.Central
 
         public Task Disconnect(IDevice device, CancellationToken cancellationToken)
         {
-            _centralManager.CancelPeripheralConnection(((Device)device).Peripheral);
-            return Task.FromResult(true);
+            Device nativeDevice = (Device) device;
+
+            return Observable.Create<bool>(observer =>
+            {
+                IDisposable disposable = _centralManagerDelegate.DisconnectedPeripheralSubject.Where(x => Equals(x.Item2.Identifier, ((Device) device).Peripheral.Identifier))
+                    .Subscribe(tuple =>
+                    {
+                        observer.OnNext(true);
+                        observer.OnCompleted();
+                    });
+                _centralManager.CancelPeripheralConnection(nativeDevice.Peripheral);
+                return Disposable.Create(() =>
+                {
+                    disposable?.Dispose();
+                });
+            }).ToTask(cancellationToken);
         }
 
         public void Dispose()

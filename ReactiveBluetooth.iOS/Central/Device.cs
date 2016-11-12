@@ -117,32 +117,28 @@ namespace ReactiveBluetooth.iOS.Central
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            var writeObservable = Observable.Create<bool>(observer =>
+            return Observable.Create<bool>(observer =>
             {
-                Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType());
-                return Disposable.Empty;
-            });
-
-            if (writeType == WriteType.WithResponse)
-            {
-                return writeObservable.Merge<bool>(_cbPeripheralDelegate.WroteCharacteristicValueSubject.FirstAsync(x =>
+                var wroteDisposabel = _cbPeripheralDelegate.WroteCharacteristicValueSubject.FirstAsync(x =>
                 {
-                    bool perphEqual = x.Item1.Identifier.ToString() == Peripheral.Identifier.ToString();
-                    bool chgarEqual = x.Item2.UUID.Uuid == nativeCharacteristic.UUID.Uuid;
+                    bool perphEqual = x.Item1.Identifier.ToString()
+                        .Equals(Peripheral.Identifier.ToString());
+                    bool chgarEqual = x.Item2.UUID.Uuid.Equals(nativeCharacteristic.UUID.Uuid);
                     return perphEqual && chgarEqual;
                 })
-                    .Select(x =>
+                    .Subscribe(x =>
                     {
                         if (x.Item3 != null)
                         {
-                            throw new Exception(x.Item3.LocalizedDescription);
+                            observer.OnError(new Exception(x.Item3.LocalizedDescription));
                         }
-                        return true;
-                    }))
-                    .ToTask(cancellationToken);
-            }
+                        observer.OnNext(true);
+                        observer.OnCompleted();
+                    });
 
-            return writeObservable.Merge<bool>(Observable.Return(true))
+                Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType());
+                return Disposable.Create(() => { wroteDisposabel?.Dispose(); });
+            })
                 .ToTask(cancellationToken);
         }
 
@@ -204,7 +200,6 @@ namespace ReactiveBluetooth.iOS.Central
 
         public void Dispose()
         {
-            
         }
     }
 }
