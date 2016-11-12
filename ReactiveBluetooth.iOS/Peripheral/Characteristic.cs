@@ -22,7 +22,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
             NSData nsData = null;
             if (value != null)
             {
-                NSData.FromArray(value);
+                nsData = NSData.FromArray(value);
             }
 
             CBMutableCharacteristic mutableCharacteristic = new CBMutableCharacteristic(CBUUID.FromString(uuid.ToString()), nativeProperties, nsData, nativePermissions);

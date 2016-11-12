@@ -103,7 +103,6 @@ namespace ReactiveBluetooth.Android.Central
                     return Disposable.Empty;
                 })
                 .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x))
-                .TakeLast(1)
                 .Publish()
                 .RefCount();
         }

@@ -22,8 +22,8 @@ namespace Demo.ViewModels.Peripheral
         private readonly IPeripheralManager _peripheralManager;
 
         private readonly byte[] _readValue = { 0xB0, 0x06, 0x00, 0x01 };
-        private readonly byte[] _writeValue = {0xB0, 0x06, 0x00, 0x02};
-        private readonly byte[] _writeWithoutResponseValue = { 0xB0, 0x06, 0x00, 0x03 };
+        private byte[] _writeValue = {0xB0, 0x06, 0x00, 0x02};
+        private byte[] _writeWithoutResponseValue = { 0xB0, 0x06, 0x00, 0x03 };
         private byte[] _timeValue;
         private byte[] _reverseTimeValue;
 
@@ -106,20 +106,24 @@ namespace Demo.ViewModels.Peripheral
             _writeDisposable = writeCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write request. Value: {BitConverter.ToString(request.Value)}");
-                _peripheralManager.SendResponse(request, 0, _writeValue);
+                _writeValue = request.Value;
                 writeCharacteristicViewModel.Value = BitConverter.ToString(_writeValue);
+                _peripheralManager.SendResponse(request, 0, _writeValue);
             });
             _writeReadDisposable = writeCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeValue); });
 
             _writeWithoutResponseDisposable = writeWithoutResponseCharacterstic.WriteRequestObservable.Subscribe(request =>
             {
                 Debug.WriteLine($"Write without response request. Value: {BitConverter.ToString(request.Value)}");
-               
-                _peripheralManager.SendResponse(request, 0, _writeWithoutResponseValue);
+                _writeWithoutResponseValue = request.Value;
                 writeWithoutResponseCharacteristicViewModel.Value = BitConverter.ToString(_writeWithoutResponseValue);
+                _peripheralManager.SendResponse(request, 0, _writeWithoutResponseValue);
             });
 
-            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request => { _peripheralManager.SendResponse(request, 0, _writeWithoutResponseValue); });
+            _writeWithoutResponseReadDisposable = writeWithoutResponseCharacterstic.ReadRequestObservable.Subscribe(request =>
+            {
+                _peripheralManager.SendResponse(request, 0, _writeWithoutResponseValue);
+            });
 
             _notifyReadDisposable = notifyCharacteristic.ReadRequestObservable.Subscribe(request =>
             {

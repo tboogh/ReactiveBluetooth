@@ -185,7 +185,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             cancellationTokenSource.CancelAfter(Timeout);
             await _centralManager.Disconnect(device, cancellationTokenSource.Token);
-            Assert.AreEqual(new byte[] { 0xB0, 0x0B }, value);
+            Assert.AreEqual(new byte[] { 0xB0, 0x06, 0x00, 0x01 }, value);
         }
 
         [Test]
