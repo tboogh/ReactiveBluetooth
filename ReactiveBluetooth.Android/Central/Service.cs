@@ -41,5 +41,15 @@ namespace ReactiveBluetooth.Android.Central
                         .ToList());
             return obs.ToTask(cancellationToken);
         }
+
+        public Task<IList<IService>> DiscoverIncludedServices(CancellationToken cancellationToken, IList<Guid> serviceUuids = null)
+        {
+            var obs =
+                Observable.Return<IList<IService>>(
+                    _service.IncludedServices.Select(service => new Service(service))
+                        .Cast<IService>()
+                        .ToList());
+            return obs.ToTask(cancellationToken);
+        }
     }
 }

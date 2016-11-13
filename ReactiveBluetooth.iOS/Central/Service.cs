@@ -20,8 +20,7 @@ namespace ReactiveBluetooth.iOS.Central
         private readonly CBPeripheral _nativeDevice;
         private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
-        public Service(CBService service, CBPeripheral nativeDevice,
-            PeripheralDelegate.PeripheralDelegate cbPeripheralDelegate)
+        public Service(CBService service, CBPeripheral nativeDevice, PeripheralDelegate.PeripheralDelegate cbPeripheralDelegate)
         {
             _service = service;
             _nativeDevice = nativeDevice;
@@ -37,15 +36,32 @@ namespace ReactiveBluetooth.iOS.Central
 
         public Task<IList<ICharacteristic>> DiscoverCharacteristics(CancellationToken cancellationToken)
         {
-            var observable =
-                Observable.FromEvent<IList<ICharacteristic>>(
-                    action => { _nativeDevice.DiscoverCharacteristics(_service); }, _ => { });
+            var observable = Observable.FromEvent<IList<ICharacteristic>>(action => { _nativeDevice.DiscoverCharacteristics(_service); }, _ => { });
 
-            IObservable<IList<ICharacteristic>> delegateObservable =
-                _cbPeripheralDelegate.DiscoveredCharacteristicsSubject.Select(
-                    x => x.Item2.Characteristics.Select(y => new Characteristic(y))
-                        .Cast<ICharacteristic>()
-                        .ToList());
+            IObservable<IList<ICharacteristic>> delegateObservable = _cbPeripheralDelegate.DiscoveredCharacteristicsSubject
+                .Where(x => Equals(x.Item2, _service) && Equals(x.Item1, _nativeDevice))
+                .Select(x => x.Item2.Characteristics.Select(y => new Characteristic(y))
+                    .Cast<ICharacteristic>()
+                    .ToList());
+
+            return observable.Merge(delegateObservable)
+                .Take(1)
+                .ToTask(cancellationToken);
+        }
+
+        public Task<IList<IService>> DiscoverIncludedServices(CancellationToken cancellationToken, IList<Guid> serviceUuids = null)
+        {
+            var observable = Observable.FromEvent<IList<IService>>(action =>
+            {
+                _nativeDevice.DiscoverIncludedServices(serviceUuids?.Select(x => CBUUID.FromString(x.ToString()))
+                    .ToArray(), _service);
+            }, _ => { });
+
+            IObservable<IList<IService>> delegateObservable = _cbPeripheralDelegate.DiscoveredIncludedServicesSubject
+                .Where(x => Equals(x.Item2, _service) && Equals(x.Item1, _nativeDevice))
+                .Select(x => x.Item2.IncludedServices.Select(y => new Service(y, _nativeDevice, _cbPeripheralDelegate))
+                    .Cast<IService>()
+                    .ToList());
 
             return observable.Merge(delegateObservable)
                 .Take(1)
