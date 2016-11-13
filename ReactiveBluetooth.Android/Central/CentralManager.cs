@@ -110,11 +110,18 @@ namespace ReactiveBluetooth.Android.Central
         public async Task Disconnect(IDevice device, CancellationToken cancellationToken)
         {
             var androidDevice = (Device)device;
+
+            cancellationToken.Register(() =>
+            {
+                androidDevice.Gatt?.Close();
+                androidDevice.Gatt = null;
+            });
+
             if (androidDevice.Gatt == null)
                 return;
 
             androidDevice.Gatt?.Disconnect();
-            
+
             await androidDevice.GattCallback.ConnectionStateChange.FirstAsync(x => x == ProfileState.Disconnected).ToTask(cancellationToken);
             androidDevice.Gatt?.Close();
             androidDevice.Gatt = null;

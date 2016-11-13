@@ -100,7 +100,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
             await _centralManager.Disconnect(device, cancellationTokenSource.Token);
-            
+
             Assert.AreEqual(ConnectionState.Disconnected, device.State);
         }
 
@@ -272,7 +272,7 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
             cancellationTokenSource.Token.Register(async () =>
             {
-                await _centralManager.Disconnect(device, CancellationToken.None); 
+                await _centralManager.Disconnect(device, CancellationToken.None);
             });
 
             var services = await device.DiscoverServices(cancellationTokenSource.Token);
@@ -291,6 +291,92 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(30));
             await _centralManager.Disconnect(device, cancellationTokenSource.Token);
             Assert.AreEqual(new byte[] { 0x12, 0x34, 0x56, 0x78 }, value);
+        }
+
+        [Test]
+        public async Task Notifications_Notify_ValuesUpdated()
+        {
+            var device = await ConnectToTestDevice();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(async () =>
+            {
+                await _centralManager.Disconnect(device, CancellationToken.None);
+            });
+
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
+
+            var notifyCharacteristic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"));
+
+            bool valuesUpdated = false;
+            byte[] values = null;
+            var notifyDisposable = device.Notifications(notifyCharacteristic)
+                .Subscribe(bytes =>
+                {
+                    if (values == null)
+                    {
+                        values = bytes;
+                    } else
+                    {
+                        valuesUpdated = !values.SequenceEqual(bytes);
+                        values = bytes;
+                    }
+                });
+
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            notifyDisposable.Dispose();
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+
+            Assert.True(valuesUpdated, "Received no updated");
+        }
+
+        [Test]
+        public async Task Notifications_Indicate_ValuesUpdated()
+        {
+            var device = await ConnectToTestDevice();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(Timeout);
+            cancellationTokenSource.Token.Register(async () =>
+            {
+                await _centralManager.Disconnect(device, CancellationToken.None);
+            });
+
+            var services = await device.DiscoverServices(cancellationTokenSource.Token);
+            var testService = services.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060000-0234-49D9-8439-39100D7EBD62"));
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            var characteristics = await testService.DiscoverCharacteristics(cancellationTokenSource.Token);
+
+            var notifyCharacteristic = characteristics.FirstOrDefault(x => x.Uuid == Guid.Parse("B0060005-0234-49D9-8439-39100D7EBD62"));
+
+            bool valuesUpdated = false;
+            byte[] values = null;
+            var notifyDisposable = device.Notifications(notifyCharacteristic)
+                .Subscribe(bytes =>
+                {
+                    if (values == null)
+                    {
+                        values = bytes;
+                    } else
+                    {
+                        valuesUpdated = !values.SequenceEqual(bytes);
+                        values = bytes;
+                    }
+                });
+
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            notifyDisposable.Dispose();
+
+            cancellationTokenSource.CancelAfter(Timeout);
+            await _centralManager.Disconnect(device, cancellationTokenSource.Token);
+
+            Assert.True(valuesUpdated, "Received no updated");
         }
 
         private async Task<IDevice> ConnectToTestDevice()

@@ -160,6 +160,12 @@ namespace ReactiveBluetooth.Android.Central
 
             var writeObservable = Observable.Create<bool>(observer =>
             {
+                if (Gatt == null)
+                {
+                    observer.OnError(new Exception("Not connected"));
+                    return Disposable.Empty;
+                }
+
                 var result = gattDescriptor.SetValue(value);
                 if (!result)
                     observer.OnError(new Exception("Failed to set value"));
