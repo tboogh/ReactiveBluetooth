@@ -21,7 +21,6 @@ namespace ReactiveBluetooth.iOS.Peripheral
         {
             CBMutableService mutableService = new CBMutableService(CBUUID.FromString(id.ToString()), type == ServiceType.Primary);
             MutableService = mutableService;
-            Characteristics = new List<ICharacteristic>();
         }
 
         public CBMutableService MutableService { get; }
@@ -30,15 +29,32 @@ namespace ReactiveBluetooth.iOS.Peripheral
 
         public bool AddCharacteristic(ICharacteristic characteristic)
         {
-            Characteristics.Add(characteristic);
-            List<CBCharacteristic> characteristics = MutableService.Characteristics?.ToList() ?? new List<CBCharacteristic>();
-            var nativeCharacteristic = (Characteristic) characteristic;
-            characteristics.Add(nativeCharacteristic.NativeCharacteristic);
+            List<ICharacteristic> characteristics = Characteristics?.ToList() ?? new List<ICharacteristic>();
+            characteristics.Add(characteristic);
+            Characteristics = characteristics.ToArray();
 
-            MutableService.Characteristics = characteristics.ToArray();
+            List<CBCharacteristic> nativeCharacteristics = MutableService.Characteristics?.ToList() ?? new List<CBCharacteristic>();
+            var nativeCharacteristic = (Characteristic) characteristic;
+            nativeCharacteristics.Add(nativeCharacteristic.NativeCharacteristic);
+
+            MutableService.Characteristics = nativeCharacteristics.ToArray();
             return true;
         }
 
-        public List<ICharacteristic> Characteristics { get; }
+        public bool AddIncludeService(IService service)
+        {
+            List<IService> services = IncludeServices?.ToList() ?? new List<IService>();
+            services.Add(service);
+            IncludeServices = services.ToArray();
+
+            List<CBService> nativeServices = MutableService.IncludedServices?.ToList() ?? new List<CBService>();
+            nativeServices.Add(((Service)service).MutableService);
+            MutableService.IncludedServices = nativeServices.ToArray();
+
+            return true;
+        }
+
+        public ICharacteristic[] Characteristics { get; private set; }
+        public IService[] IncludeServices { get; private set; }
     }
 }

@@ -86,6 +86,12 @@ namespace Demo.ViewModels.Peripheral
             var notifyCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060004-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Notify | CharacteristicProperty.Read);
             var indicateCharacteristic = _peripheralManager.Factory.CreateCharacteristic(Guid.Parse("B0060005-0234-49D9-8439-39100D7EBD62"), null, CharacteristicPermission.Read, CharacteristicProperty.Indicate | CharacteristicProperty.Read);
 
+            var includeService = _peripheralManager.Factory.CreateService(Guid.Parse("B0120000-0234-49D9-8439-39100D7EBD62"), ServiceType.Secondary);
+            if (!service.AddIncludeService(includeService))
+            {
+                throw new Exception("Failed to add include service");
+            }
+
             ServiceViewModel serviceViewModel = new ServiceViewModel()
             {
                 Uuid = service.Uuid
