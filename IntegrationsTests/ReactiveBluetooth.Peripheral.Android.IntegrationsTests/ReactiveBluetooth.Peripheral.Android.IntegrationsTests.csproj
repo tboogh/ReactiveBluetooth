@@ -25,6 +25,7 @@
     </NuGetPackageImportStamp>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
     <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <AndroidTlsProvider></AndroidTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -78,11 +79,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ReactiveBluetooth.Android\ReactiveBluetooth.Android.csproj">
-      <Project>{193f5362-ff71-4b5e-be48-b577a0197f57}</Project>
+      <Project>{787E422E-FE7E-4321-8883-D1BA9ABEA5B8}</Project>
       <Name>ReactiveBluetooth.Android</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{67f9d3a8-f71e-4428-913f-c37ae82cdb24}</Project>
+      <Project>{B116403F-F667-4792-B7FC-A06B9B35E89C}</Project>
       <Name>ReactiveBluetooth.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\ReactiveBluetooth.Shared.IntegrationsTests\ReactiveBluetooth.Shared.IntegrationsTests.csproj">

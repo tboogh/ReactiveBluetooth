@@ -128,6 +128,11 @@ namespace Demo.ViewModels.Central
         {
         }
 
+		public void OnNavigatingTo(NavigationParameters parameters)
+		{
+
+		}
+
         public void OnAppearing(Page page)
         {
             
@@ -137,5 +142,7 @@ namespace Demo.ViewModels.Central
         {
             _toggleScanDisposable?.Dispose();
         }
-    }
+
+
+	}
 }

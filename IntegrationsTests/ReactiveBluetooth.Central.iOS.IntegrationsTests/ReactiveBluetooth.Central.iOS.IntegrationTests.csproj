@@ -124,11 +124,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{67f9d3a8-f71e-4428-913f-c37ae82cdb24}</Project>
+      <Project>{B116403F-F667-4792-B7FC-A06B9B35E89C}</Project>
       <Name>ReactiveBluetooth.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ReactiveBluetooth.iOS\ReactiveBluetooth.iOS.csproj">
-      <Project>{7505d92f-2f85-4792-b31c-a96d7cb1db6c}</Project>
+      <Project>{09A0EDDD-CBA6-4373-B73A-CB54195FBED1}</Project>
       <Name>ReactiveBluetooth.iOS</Name>
       <IsAppExtension>false</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>

@@ -101,6 +101,11 @@ namespace Demo.ViewModels.Central
         public DelegateCommand WriteValueCommand { get; }
         public DelegateCommand ToggleNotificationsCommands { get; }
 
+		public void OnNavigatingTo(NavigationParameters parameters)
+		{
+
+		}
+
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
         }
@@ -242,6 +247,5 @@ namespace Demo.ViewModels.Central
 		public void Dispose() {
 			_notifyDisposable?.Dispose();
 		}
-		
 	}
 }

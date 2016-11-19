@@ -47,13 +47,11 @@ namespace ReactiveBluetooth.Android.Peripheral.GattServer
 
         public override void OnDescriptorReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattDescriptor descriptor)
         {
-            var uuid = descriptor.Uuid.ToString();
             DescriptorReadRequestSubject?.OnNext(new Tuple<BluetoothDevice, int, int, BluetoothGattDescriptor>(device, requestId, offset, descriptor));
         }
 
         public override void OnDescriptorWriteRequest(BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, bool preparedWrite, bool responseNeeded, int offset, byte[] value)
         {
-            var uuid = descriptor.Uuid.ToString();
             DescriptorWriteRequestSubject?.OnNext(new Tuple<BluetoothDevice, int, BluetoothGattDescriptor, bool, bool, int, byte[]>(device, requestId, descriptor, preparedWrite, responseNeeded, offset, value));
         }
 

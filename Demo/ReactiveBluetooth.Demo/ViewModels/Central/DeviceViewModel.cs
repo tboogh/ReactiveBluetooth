@@ -181,6 +181,11 @@ namespace Demo.ViewModels.Central
                     });
         }
 
+		public void OnNavigatingTo(NavigationParameters parameters)
+		{
+
+		}
+
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
         }
@@ -196,6 +201,8 @@ namespace Demo.ViewModels.Central
 				var task = Connect();
             }
         }
+
+
 
         public void OnAppearing(Page page)
         {
@@ -223,5 +230,5 @@ namespace Demo.ViewModels.Central
                 await _pageDialogService.DisplayAlertAsync("Error", $"Failed to set connection priority to {Enum.GetName(typeof(ConnectionPriority), connectionPriority.Value)}", "Ok");
             }
         }
-    }
+	}
 }

@@ -49,7 +49,12 @@ namespace Demo.ViewModels.Central
                 }
         }
 
-        public string LocalName
+		public void OnNavigatingTo(NavigationParameters parameters)
+		{
+			
+		}
+
+		public string LocalName
         {
             get { return _localName; }
             set { SetProperty(ref _localName, value); }

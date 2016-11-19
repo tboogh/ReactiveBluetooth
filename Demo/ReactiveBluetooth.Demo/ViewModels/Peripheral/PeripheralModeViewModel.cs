@@ -269,6 +269,11 @@ namespace Demo.ViewModels.Peripheral
             Advertising = false;
         }
 
+		public void OnNavigatingTo(NavigationParameters parameters)
+		{
+
+		}
+
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
             StopAdvertise();
