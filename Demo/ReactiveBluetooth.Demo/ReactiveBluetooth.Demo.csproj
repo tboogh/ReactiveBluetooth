@@ -133,7 +133,12 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
+      <Project>{b116403f-f667-4792-b7fc-a06b9b35e89c}</Project>
+      <Name>ReactiveBluetooth.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="App.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
