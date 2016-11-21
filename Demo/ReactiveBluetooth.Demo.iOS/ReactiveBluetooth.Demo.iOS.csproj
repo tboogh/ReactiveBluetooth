@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -35,7 +35,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\iPhone\Release</OutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
@@ -52,7 +53,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
@@ -86,6 +88,14 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ReactiveBluetooth.Core, Version=1.0.6169.17840, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\Xamarin.iOS1.0\ReactiveBluetooth.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ReactiveBluetooth.iOS, Version=1.0.6169.17842, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\Xamarin.iOS1.0\ReactiveBluetooth.iOS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -131,8 +141,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Contents.json">
+      <InProject>false</InProject>
+    </ImageAsset>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -153,14 +167,6 @@
     <ProjectReference Include="..\ReactiveBluetooth.Demo\ReactiveBluetooth.Demo.csproj">
       <Project>{7FF15B8B-D7F9-4BA0-B6F7-9E5EAD911FFF}</Project>
       <Name>ReactiveBluetooth.Demo</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{B116403F-F667-4792-B7FC-A06B9B35E89C}</Project>
-      <Name>ReactiveBluetooth.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ReactiveBluetooth.iOS\ReactiveBluetooth.iOS.csproj">
-      <Project>{09A0EDDD-CBA6-4373-B73A-CB54195FBED1}</Project>
-      <Name>ReactiveBluetooth.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

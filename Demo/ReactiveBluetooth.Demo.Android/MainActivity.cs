@@ -1,24 +1,15 @@
-﻿using System;
-
-using Android.App;
-using Android.Bluetooth;
-using Android.Content;
+﻿using Android.App;
 using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 using Android.OS;
-using Demo.Views;
+using Demo;
 using Microsoft.Practices.Unity;
-using Plugin.CurrentActivity;
 using Prism.Unity;
 using ReactiveBluetooth.Android.Central;
-using ReactiveBluetooth.Android.Common;
 using ReactiveBluetooth.Android.Peripheral;
 using ReactiveBluetooth.Core.Central;
 using ReactiveBluetooth.Core.Peripheral;
 
-namespace Demo.Droid
+namespace ReactiveBluetooth.Demo.Android
 {
     [Activity(Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity

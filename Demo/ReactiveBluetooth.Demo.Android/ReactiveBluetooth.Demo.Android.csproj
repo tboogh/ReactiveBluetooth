@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -16,7 +16,8 @@
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
-    <AndroidTlsProvider></AndroidTlsProvider>
+    <AndroidTlsProvider>
+    </AndroidTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +41,14 @@
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ReactiveBluetooth.Android, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\MonoAndroid1.0\ReactiveBluetooth.Android.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ReactiveBluetooth.Core, Version=1.0.6169.17840, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\MonoAndroid1.0\ReactiveBluetooth.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -139,14 +148,6 @@
     <ProjectReference Include="..\ReactiveBluetooth.Demo\ReactiveBluetooth.Demo.csproj">
       <Project>{7FF15B8B-D7F9-4BA0-B6F7-9E5EAD911FFF}</Project>
       <Name>ReactiveBluetooth.Demo</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ReactiveBluetooth.Android\ReactiveBluetooth.Android.csproj">
-      <Project>{787E422E-FE7E-4321-8883-D1BA9ABEA5B8}</Project>
-      <Name>ReactiveBluetooth.Android</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
-      <Project>{B116403F-F667-4792-B7FC-A06B9B35E89C}</Project>
-      <Name>ReactiveBluetooth.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

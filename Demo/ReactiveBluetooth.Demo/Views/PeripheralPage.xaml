@@ -3,17 +3,17 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
-             xmlns:behaviors1="clr-namespace:Demo.Common.Behaviors;assembly=Demo"
-             xmlns:valueConverters="clr-namespace:Demo.Common.ValueConverters;assembly=Demo"
+             xmlns:behaviors="clr-namespace:Demo.Common.Behaviors;assembly=ReactiveBluetooth.Demo"
+             xmlns:valueConverters1="clr-namespace:Demo.Common.ValueConverters;assembly=ReactiveBluetooth.Demo"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="Demo.Views.PeripheralPage">
     <ContentPage.Behaviors>
-        <behaviors1:PageAppearingBehavior />
+        <behaviors:PageAppearingBehavior />
     </ContentPage.Behaviors>
     <ContentPage.Resources>
         <ResourceDictionary>
-            <valueConverters:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
-            <valueConverters:CharactersticPropertiesToStringConverter x:Key="CharactersticPropertiesToStringConverter" />
+            <valueConverters1:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
+            <valueConverters1:CharactersticPropertiesToStringConverter x:Key="CharactersticPropertiesToStringConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 

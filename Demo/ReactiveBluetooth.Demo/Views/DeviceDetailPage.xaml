@@ -3,8 +3,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
-             xmlns:valueConverters1="clr-namespace:Demo.Common.ValueConverters;assembly=Demo"
-             xmlns:behaviors1="clr-namespace:Demo.Common.Behaviors;assembly=Demo"
+             xmlns:valueConverters1="clr-namespace:Demo.Common.ValueConverters;assembly=ReactiveBluetooth.Demo"
+             xmlns:behaviors1="clr-namespace:Demo.Common.Behaviors;assembly=ReactiveBluetooth.Demo"
              xmlns:types="clr-namespace:ReactiveBluetooth.Core.Types;assembly=ReactiveBluetooth.Core"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="Demo.Views.DeviceDetailPage">
