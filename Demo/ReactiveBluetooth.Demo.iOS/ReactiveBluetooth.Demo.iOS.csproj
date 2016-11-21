@@ -88,14 +88,6 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ReactiveBluetooth.Core, Version=1.0.6169.17840, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\Xamarin.iOS1.0\ReactiveBluetooth.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ReactiveBluetooth.iOS, Version=1.0.6169.17842, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\Xamarin.iOS1.0\ReactiveBluetooth.iOS.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -164,6 +156,16 @@
     <Compile Include="AppDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
+      <Project>{b116403f-f667-4792-b7fc-a06b9b35e89c}</Project>
+      <Name>ReactiveBluetooth.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ReactiveBluetooth.iOS\ReactiveBluetooth.iOS.csproj">
+      <Project>{09a0eddd-cba6-4373-b73a-cb54195fbed1}</Project>
+      <Name>ReactiveBluetooth.iOS</Name>
+      <IsAppExtension>false</IsAppExtension>
+      <IsWatchApp>false</IsWatchApp>
+    </ProjectReference>
     <ProjectReference Include="..\ReactiveBluetooth.Demo\ReactiveBluetooth.Demo.csproj">
       <Project>{7FF15B8B-D7F9-4BA0-B6F7-9E5EAD911FFF}</Project>
       <Name>ReactiveBluetooth.Demo</Name>

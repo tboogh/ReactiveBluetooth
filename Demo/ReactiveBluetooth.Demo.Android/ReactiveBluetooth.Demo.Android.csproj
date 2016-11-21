@@ -41,14 +41,6 @@
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ReactiveBluetooth.Android, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\MonoAndroid1.0\ReactiveBluetooth.Android.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ReactiveBluetooth.Core, Version=1.0.6169.17840, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\MonoAndroid1.0\ReactiveBluetooth.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -145,6 +137,14 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\icon.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveBluetooth.Android\ReactiveBluetooth.Android.csproj">
+      <Project>{787e422e-fe7e-4321-8883-d1ba9abea5b8}</Project>
+      <Name>ReactiveBluetooth.Android</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ReactiveBluetooth.Core\ReactiveBluetooth.Core.csproj">
+      <Project>{b116403f-f667-4792-b7fc-a06b9b35e89c}</Project>
+      <Name>ReactiveBluetooth.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ReactiveBluetooth.Demo\ReactiveBluetooth.Demo.csproj">
       <Project>{7FF15B8B-D7F9-4BA0-B6F7-9E5EAD911FFF}</Project>
       <Name>ReactiveBluetooth.Demo</Name>

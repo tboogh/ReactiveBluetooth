@@ -70,10 +70,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="ReactiveBluetooth.Core, Version=1.0.6169.17840, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ReactiveBluetooth.1.0.0-pre1\lib\portable-net45+netcore45+wpa81\ReactiveBluetooth.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Reactive.Interfaces">
       <HintPath>..\..\packages\System.Reactive.Interfaces.3.0.0\lib\netstandard1.0\System.Reactive.Interfaces.dll</HintPath>
     </Reference>
