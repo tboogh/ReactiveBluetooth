@@ -16,6 +16,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
             this.NativeCentral = nativeCentral;
         }
 
-        public Guid Uuid => NativeCentral.UUID.Uuid.ToGuid();
+        public Guid Uuid => NativeCentral.Identifier.ToString()
+            .ToGuid();
     }
 }
