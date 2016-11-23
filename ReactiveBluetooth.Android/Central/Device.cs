@@ -194,7 +194,7 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
 
-            IObservable<byte[]> notificationObservable = Observable.Create<byte[]>(async action =>
+            IObservable<byte[]> notificationObservable = Observable.Create<byte[]>(async observer =>
             {
                 IList<byte> enableNotificationValue = null;
                 if (characteristic.Properties.HasFlag(CharacteristicProperty.Notify))
@@ -206,27 +206,38 @@ namespace ReactiveBluetooth.Android.Central
                 }
                 if (enableNotificationValue == null)
                 {
-                    throw new NotificationException("Characteristic does not support notifications");
+                    observer.OnError(new NotificationException("Characteristic does not support notifications"));
+                    return Disposable.Empty;
                 }
 
                 var uuid = "2902".ToGuid();
 
                 var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
                 if (characteristicConfigDescriptor == null)
-                    throw new NotificationException("Missing client configuration descriptor");
+                {
+                    observer.OnError(new NotificationException("Missing client configuration descriptor"));
+                    return Disposable.Empty;
+                }
 
                 try
                 {
                     CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                    await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
+                    var writeResult = await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
+                    if (!writeResult)
+                    {
+                        observer.OnError(new NotificationException("Failed to write descriptor"));
+                        return Disposable.Empty;
+                    }
                 }
                 catch (Exception exception)
                 {
-                    throw new NotificationException("Failed to write descriptor", exception);
+                    observer.OnError(new NotificationException("Failed to write descriptor", exception));
+                    return Disposable.Empty;
                 }
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
                 {
-                    throw new NotificationException("SetCharacteristicNotification enable failed");
+                    observer.OnError(new NotificationException("SetCharacteristicNotification enable failed"));
+                    return Disposable.Empty;
                 }
 
                 return Disposable.Create(async () =>

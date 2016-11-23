@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:behaviors1="clr-namespace:Demo.Common.Behaviors;assembly=ReactiveBluetooth.Demo"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="Demo.Views.CentralPage"
+             x:Name="ThisPage">
+    <ContentPage.Behaviors>
+        <behaviors1:PageAppearingBehavior />
+    </ContentPage.Behaviors>
+    <StackLayout>
+        <Label Text="{Binding State}" />
+        <Button Text="Toggle Scan" Command="{Binding ToggleScanCommand}" />
+        <Button Text="Toggle Service Scan" Command="{Binding ToggleServiceScanCommand}" />
+        <ListView x:Name="ListView" ItemsSource="{Binding Devices}">
+            <ListView.Behaviors>
+                <behaviors1:ListViewItemSelectedBehaviour ItemSelectedCommand="{Binding DeviceSelectedCommand}"
+                                                         BindingContext="{Binding .}" />
+            </ListView.Behaviors>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Name}" Detail="{Binding Rssi}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

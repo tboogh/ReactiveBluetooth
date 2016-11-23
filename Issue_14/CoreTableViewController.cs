@@ -69,7 +69,7 @@ namespace Issue_14
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             _connectDisp?.Dispose();
-            _connectDisp = _centralManager.ConnectToDevice(_devices[indexPath.Row]).SubscribeOn(SynchronizationContext.Current).Subscribe(state =>
+            _connectDisp = _centralManager.Connect(_devices[indexPath.Row]).SubscribeOn(SynchronizationContext.Current).Subscribe(state =>
             {
                 Debug.WriteLine(state.ToString());
                 //UIAlertController controller = UIAlertController.Create("Connection changed", state.ToString(), UIAlertControllerStyle.Alert);
@@ -81,6 +81,9 @@ namespace Issue_14
                 //{
 
                 //});
+
+                _connectDisp?.Dispose();
+                var task = _centralManager.Disconnect(_devices[indexPath.Row], CancellationToken.None);
             });
         }
     }

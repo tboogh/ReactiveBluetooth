@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:behaviors="clr-namespace:Demo.Common.Behaviors;assembly=ReactiveBluetooth.Demo"
+             xmlns:valueConverters1="clr-namespace:Demo.Common.ValueConverters;assembly=ReactiveBluetooth.Demo"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="Demo.Views.PeripheralPage">
+    <ContentPage.Behaviors>
+        <behaviors:PageAppearingBehavior />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <valueConverters1:GuidToStringValueConverter x:Key="GuidToStringValueConverter" />
+            <valueConverters1:CharactersticPropertiesToStringConverter x:Key="CharactersticPropertiesToStringConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ListView Header="{Binding .}"
+              ItemsSource="{Binding Services}"
+              IsGroupingEnabled="True"
+              GroupDisplayBinding="{Binding Key}"
+              HasUnevenRows="True">
+        <ListView.HeaderTemplate>
+            <DataTemplate>
+                <StackLayout>
+                    <Label Text="Peripheral Mode" FontSize="Large" />
+                    <Label Text="State" />
+                    <Label Text="{Binding State}" />
+                    <Label Text="Not Advertising">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding Advertising}" Value="True">
+                                <Setter Property="Text" Value="Advertising" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Button Text="Start Advertising" Command="{Binding AdvertiseCommand}" />
+                    <Button Text="Stop Advertising" Command="{Binding StopAdvertiseCommand}" />
+                </StackLayout>
+            </DataTemplate>
+        </ListView.HeaderTemplate>
+        <ListView.GroupHeaderTemplate>
+            <DataTemplate>
+                <TextCell Text="{Binding Key.Uuid, Converter={StaticResource GuidToStringValueConverter}}"
+                          TextColor="Blue" />
+            </DataTemplate>
+        </ListView.GroupHeaderTemplate>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <StackLayout Padding="0, 5, 0, 5" Spacing="2">
+                        <Label Text="{Binding Uuid, Converter={StaticResource GuidToStringValueConverter}}" />
+                        <Label
+                            Text="{Binding Properties, Converter={StaticResource CharactersticPropertiesToStringConverter}}" />
+                        <Label Text="{Binding Value}" />
+                    </StackLayout>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</ContentPage>

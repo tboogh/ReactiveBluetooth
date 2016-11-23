@@ -45,6 +45,11 @@ namespace ReactiveBluetooth.iOS.Peripheral
                 foreach (var service in services)
                 {
                     var nativeService = (Service) service;
+                    foreach (var includeService in nativeService.IncludeServices)
+                    {
+                        var nativeIncludeService = (Service) includeService;
+                        _peripheralManager.AddService(nativeIncludeService.MutableService);
+                    }
                     _peripheralManager.AddService(nativeService.MutableService);
                 }
 
