@@ -150,18 +150,28 @@ namespace Demo.ViewModels.Central
             try
             {
                 IList<IService> services = await _device.DiscoverServices(_cancellationTokenSource.Token);
-                foreach (var service in services)
-                {
-                    ServiceViewModel serviceViewModel = new ServiceViewModel(service);
-                    await serviceViewModel.DiscoverCharacteristics(_cancellationTokenSource.Token);
-
-                    var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel,
-                        serviceViewModel.Characteristics);
-                    Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
-                }
+                await AddService(services);
             }
             catch (TaskCanceledException)
             {
+            }
+        }
+
+        private async Task AddService(IList<IService> services)
+        {
+            foreach (var service in services)
+            {
+                ServiceViewModel serviceViewModel = new ServiceViewModel(service);
+                await serviceViewModel.DiscoverCharacteristics(_cancellationTokenSource.Token);
+
+                var grouping = new Grouping<ServiceViewModel, CharacteristicViewModel>(serviceViewModel, serviceViewModel.Characteristics);
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(() => { Services.Add(grouping); });
+
+                var includeServices = await service.DiscoverIncludedServices(_cancellationTokenSource.Token);
+                if (includeServices != null && includeServices.Count > 0)
+                {
+                    await AddService(includeServices);
+                }
             }
         }
 

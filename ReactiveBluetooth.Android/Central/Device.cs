@@ -231,7 +231,7 @@ namespace ReactiveBluetooth.Android.Central
                 }
                 catch (Exception exception)
                 {
-                    observer.OnError(new NotificationException("Failed to write descriptor"));
+                    observer.OnError(new NotificationException("Failed to write descriptor", exception));
                     return Disposable.Empty;
                 }
                 if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
