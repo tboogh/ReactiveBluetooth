@@ -36,8 +36,7 @@ namespace ReactiveBluetooth.Android.Central
             var callbackRssi = GattCallback.ReadRemoteRssiSubject.Select(x => x.Item2);
             Rssi = currentRssi.Merge(callbackRssi);
 
-            _connectionStateDisposable = GattCallback.ConnectionStateChange.Subscribe(state =>
-            { State = (ConnectionState) state; });
+            _connectionStateDisposable = GattCallback.ConnectionStateChange.Subscribe(state => { State = (ConnectionState) state; });
         }
 
         public BluetoothDevice NativeDevice { get; }
@@ -61,7 +60,6 @@ namespace ReactiveBluetooth.Android.Central
         }
 
         public ConnectionState State { get; private set; }
-
         public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
@@ -69,7 +67,10 @@ namespace ReactiveBluetooth.Android.Central
         {
             return Observable.Create<IList<IService>>(observer =>
             {
-                Gatt.DiscoverServices();
+                if (!Gatt.DiscoverServices())
+                {
+                    observer.OnError(new Exception("Discover services failed"));
+                }
                 return Disposable.Empty;
             })
                 .Merge(GattCallback.ServicesDiscovered.Select(x =>
@@ -92,7 +93,7 @@ namespace ReactiveBluetooth.Android.Central
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
             var observable = GattCallback.CharacteristicReadSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                 .Select(x => x.Item2.GetValue());
-            
+
             return Observable.Create<byte[]>(observer =>
             {
                 bool read = Gatt.ReadCharacteristic(gattCharacteristic);
@@ -108,7 +109,7 @@ namespace ReactiveBluetooth.Android.Central
 
         public Task<byte[]> ReadValue(IDescriptor descriptor, CancellationToken cancellationToken)
         {
-            BluetoothGattDescriptor nativeDescriptor = ((Descriptor)descriptor).NativeDescriptor;
+            BluetoothGattDescriptor nativeDescriptor = ((Descriptor) descriptor).NativeDescriptor;
             var observable = GattCallback.DescriptorReadSubject.FirstAsync(x => x.Item2 == nativeDescriptor)
                 .Select(x => x.Item2.GetValue());
 
@@ -142,16 +143,16 @@ namespace ReactiveBluetooth.Android.Central
             });
 
             return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
-                    .Select(x =>
+                .Select(x =>
+                {
+                    if (x.Item3 != GattStatus.Success)
                     {
-                        if (x.Item3 != GattStatus.Success)
-                        {
-                            throw new Exception($"Failed to write characteristic: {x.Item3.ToString()}");
-                        }
-                        return true;
-                    }))
-                    .Take(1)
-                    .ToTask(cancellationToken);
+                        throw new Exception($"Failed to write characteristic: {x.Item3.ToString()}");
+                    }
+                    return true;
+                }))
+                .Take(1)
+                .ToTask(cancellationToken);
         }
 
         public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
@@ -192,74 +193,72 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<byte[]> Notifications(ICharacteristic characteristic)
         {
-            BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
+            BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
+            return GattCallback.CharacteristicChangedSubject.Where(x => x.Item2.Uuid == nativeCharacteristic.Uuid)
+                .Select(x => x.Item2.GetValue());
+        }
 
-            IObservable<byte[]> notificationObservable = Observable.Create<byte[]>(async observer =>
+        public async Task<bool> StartNotifications(ICharacteristic characteristic, CancellationToken cancellationToken)
+        {
+            BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
+
+            IList<byte> enableNotificationValue = null;
+            if (characteristic.Properties.HasFlag(CharacteristicProperty.Notify))
             {
-                IList<byte> enableNotificationValue = null;
-                if (characteristic.Properties.HasFlag(CharacteristicProperty.Notify))
-                {
-                    enableNotificationValue = BluetoothGattDescriptor.EnableNotificationValue;
-                } else if (characteristic.Properties.HasFlag(CharacteristicProperty.Indicate))
-                {
-                    enableNotificationValue = BluetoothGattDescriptor.EnableIndicationValue;
-                }
-                if (enableNotificationValue == null)
-                {
-                    observer.OnError(new NotificationException("Characteristic does not support notifications"));
-                    return Disposable.Empty;
-                }
+                enableNotificationValue = BluetoothGattDescriptor.EnableNotificationValue;
+            }
+            else if (characteristic.Properties.HasFlag(CharacteristicProperty.Indicate))
+            {
+                enableNotificationValue = BluetoothGattDescriptor.EnableIndicationValue;
+            }
 
-                var uuid = "2902".ToGuid();
+            var uuid = "2902".ToGuid();
 
-                var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
-                if (characteristicConfigDescriptor == null)
-                {
-                    observer.OnError(new NotificationException("Missing client configuration descriptor"));
-                    return Disposable.Empty;
-                }
+            var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
+            if (enableNotificationValue == null || characteristicConfigDescriptor == null)
+            {
+                throw new NotificationException("Characteristic does not support notifications");
+            }
 
-                try
-                {
-                    CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                    var writeResult = await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), timeoutSource.Token);
-                    if (!writeResult)
-                    {
-                        observer.OnError(new NotificationException("Failed to write descriptor"));
-                        return Disposable.Empty;
-                    }
-                }
-                catch (Exception exception)
-                {
-                    observer.OnError(new NotificationException("Failed to write descriptor", exception));
-                    return Disposable.Empty;
-                }
-                if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
-                {
-                    observer.OnError(new NotificationException("SetCharacteristicNotification enable failed"));
-                    return Disposable.Empty;
-                }
+            if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, true))
+            {
+                return false;
+            }
 
-                return Disposable.Create(async () =>
-                {
-                    try
-                    {
-                        CancellationTokenSource timeoutSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                        await WriteValue(characteristicConfigDescriptor, BluetoothGattDescriptor.DisableNotificationValue.ToArray(), timeoutSource.Token);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        throw new NotificationException("Failed to write descriptor");
-                    }
-                    if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
-                    {
-                        throw new NotificationException("SetCharacteristicNotification disable failed");
-                    }
-                });
-            });
+            var writeResult = await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), cancellationToken);
+            if (!writeResult)
+            {
+                //observer.OnError(new NotificationException("Failed to write descriptor"));
+                return false;
+            }
+            return true;
+        }
 
+        public async Task<bool> StopNotifiations(ICharacteristic characteristic, CancellationToken cancellationToken)
+        {
+            BluetoothGattCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
+            var uuid = "2902".ToGuid();
 
-            return notificationObservable.Publish().RefCount().Merge(GattCallback.CharacteristicChangedSubject.Select(x => x.Item2.GetValue()));
+            var characteristicConfigDescriptor = characteristic.Descriptors.FirstOrDefault(x => x.Uuid == uuid);
+            if (characteristicConfigDescriptor == null)
+            {
+                throw new NotificationException("Characteristic does not support notifications");
+            }
+
+            if (!Gatt.SetCharacteristicNotification(nativeCharacteristic, false))
+            {
+                return false;
+            }
+
+            IList<byte> disableNotificationValue = BluetoothGattDescriptor.DisableNotificationValue;
+
+            var writeResult = await WriteValue(characteristicConfigDescriptor, disableNotificationValue.ToArray(), cancellationToken);
+            if (!writeResult)
+            {
+                //observer.OnError(new NotificationException("Failed to write descriptor"));
+                return false;
+            }
+            return true;
         }
 
         public bool RequestConnectionPriority(ConnectionPriority priority)

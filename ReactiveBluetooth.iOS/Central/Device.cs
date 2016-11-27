@@ -170,27 +170,52 @@ namespace ReactiveBluetooth.iOS.Central
 
         public IObservable<byte[]> Notifications(ICharacteristic characteristic)
         {
+            var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Select(x => x.Item2.Value.ToArray());
+            return valueUpdatedObservable;
+        }
+
+        public Task<bool> StartNotifications(ICharacteristic characteristic, CancellationToken cancellationToken)
+        {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            Subject<byte[]> s = new Subject<byte[]>();
-            IObservable<byte[]> enableNotificationObservable = Observable.Create<byte[]>(observer =>
+            IObservable<bool> enableNotificationObservable = Observable.Create<bool>(observer =>
             {
                 Peripheral.SetNotifyValue(true, nativeCharacteristic);
-                return Disposable.Create(() => { Peripheral.SetNotifyValue(false, nativeCharacteristic); });
+                return Disposable.Empty;
             })
                 .Publish()
                 .RefCount();
-
-            var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Select(x => x.Item2.Value.ToArray());
             var stateUpdatedObservable = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Select(x =>
             {
                 if (x.Item3 != null)
                 {
-                    throw new NotificationException(x.Item3.LocalizedDescription);
+                    return false;
                 }
-                return x.Item2.Value?.ToArray();
+                return true;
             });
-            return enableNotificationObservable.Merge(valueUpdatedObservable)
-                .Merge(stateUpdatedObservable);
+            return enableNotificationObservable.Merge(stateUpdatedObservable)
+                .ToTask(cancellationToken);
+        }
+
+        public Task<bool> StopNotifiations(ICharacteristic characteristic, CancellationToken cancellationToken)
+        {
+            CBCharacteristic nativeCharacteristic = ((Characteristic)characteristic).NativeCharacteristic;
+            IObservable<bool> enableNotificationObservable = Observable.Create<bool>(observer =>
+            {
+                Peripheral.SetNotifyValue(false, nativeCharacteristic);
+                return Disposable.Empty;
+            })
+                .Publish()
+                .RefCount();
+            var stateUpdatedObservable = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Select(x =>
+            {
+                if (x.Item3 != null)
+                {
+                    return false;
+                }
+                return true;
+            });
+            return enableNotificationObservable.Merge(stateUpdatedObservable)
+                .ToTask(cancellationToken);
         }
 
         public bool RequestConnectionPriority(ConnectionPriority priority)

@@ -30,6 +30,9 @@ namespace ReactiveBluetooth.Core.Central
         Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken);
 
         IObservable<byte[]> Notifications(ICharacteristic characteristic);
+        Task<bool> StartNotifications(ICharacteristic characteristic, CancellationToken cancellationToken);
+        Task<bool> StopNotifiations(ICharacteristic characteristic, CancellationToken cancellationToken);
+
         /// <summary>
         /// Request a connection parameter update.
         /// This is only implemented on android and will always return true on iOS

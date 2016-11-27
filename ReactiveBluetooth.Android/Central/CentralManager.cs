@@ -68,7 +68,15 @@ namespace ReactiveBluetooth.Android.Central
                         {
                             var scanSettings = new ScanSettings.Builder().Build();
 
-                            _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
+                            try
+                            {
+                                _bluetoothAdapter.BluetoothLeScanner.StartScan(scanFilters, scanSettings, scanCallback);
+                            }
+                            catch (Exception e)
+                            {
+                                observer.OnError(e);
+                            }
+                            
                         }
                         else
                         {
@@ -82,8 +90,15 @@ namespace ReactiveBluetooth.Android.Central
                     })
                     .Publish()
                     .RefCount()
-                    .Merge(scanCallback.ScanResultSubject.Select(x => new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord))))
-                    .Merge(scanCallback.FailureSubject.Select(failure => default(Device)));
+                    .Merge(scanCallback.ScanResultSubject.Select(x =>
+                    {
+                        return new Device(x.Item2.Device, x.Item2.Rssi, new AdvertisementData(x.Item2.ScanRecord));
+                        
+                    }))
+                    .Merge(scanCallback.FailureSubject.Select(failure =>
+                    {
+                        return default(Device);
+                    }));
             }
 
             return _discoverObservable;
@@ -111,20 +126,20 @@ namespace ReactiveBluetooth.Android.Central
         {
             var androidDevice = (Device)device;
 
-            cancellationToken.Register(() =>
-            {
-                androidDevice.Gatt?.Close();
-                androidDevice.Gatt = null;
-            });
-
             if (androidDevice.Gatt == null)
                 return;
 
             androidDevice.Gatt?.Disconnect();
-
-            await androidDevice.GattCallback.ConnectionStateChange.FirstAsync(x => x == ProfileState.Disconnected).ToTask(cancellationToken);
-            androidDevice.Gatt?.Close();
-            androidDevice.Gatt = null;
+            try
+            {
+                await androidDevice.GattCallback.ConnectionStateChange.FirstAsync(x => x == ProfileState.Disconnected)
+                    .ToTask(cancellationToken);
+            }
+            finally
+            {
+                androidDevice.Gatt?.Close();
+                androidDevice.Gatt = null;
+            }
         }
     }
 }
