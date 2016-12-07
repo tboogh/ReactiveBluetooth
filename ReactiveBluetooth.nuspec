@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>ReactiveBluetooth</id>
-    <version>1.0.0-pre1</version>
+    <version>1.0.0-beta1</version>
     <authors>Tobias Boogh</authors>
     <owners>Tobias Boogh</owners>
     <licenseUrl>https://github.com/tboogh/ReactiveBluetooth/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/tboogh/ReactiveBluetooth</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Wrappers for BluetoothLE in Xamarain.iOS and Xamarin.Android using Reactive Extensions</description>
-    <releaseNotes>Prerelase</releaseNotes>
+    <releaseNotes>Prerelease beta</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>bluetoothle ble bluetooth xamarin xamarin.forms</tags>
     <dependencies>

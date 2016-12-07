@@ -7,13 +7,13 @@ using ReactiveBluetooth.Core.Types;
 
 namespace ReactiveBluetooth.Core.Central
 {
-    public interface IDevice: IDisposable
+    public interface IDevice
     {
         string Name { get;  }
 
         Guid Uuid { get; }
 
-        ConnectionState State { get; }
+        IObservable<ConnectionState> ConnectionState { get; }
 
         IAdvertisementData AdvertisementData { get; }
 

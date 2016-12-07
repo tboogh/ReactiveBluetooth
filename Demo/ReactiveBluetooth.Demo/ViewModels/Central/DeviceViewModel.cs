@@ -45,6 +45,7 @@ namespace Demo.ViewModels.Central
         private ConnectionState _connectionState;
         private CancellationTokenSource _cancellationTokenSource;
         private IObservable<ConnectionState> _connectObservable;
+        private IDisposable _deviceConnectionStateDisposable;
 
         public DeviceViewModel(ICentralManager centralManager)
         {
@@ -59,17 +60,13 @@ namespace Demo.ViewModels.Central
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
-        
-
-        public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService,
-            IPageDialogService pageDialogService) : this(centralManager)
+        public DeviceViewModel(ICentralManager centralManager, INavigationService navigationService, IPageDialogService pageDialogService) : this(centralManager)
         {
             _navigationService = navigationService;
             _pageDialogService = pageDialogService;
         }
 
         public DelegateCommand<CharacteristicViewModel> ItemSelectedCommand { get; }
-
         public DelegateCommand<ConnectionPriority?> SetConnectionParameterCommand { get; }
 
         public Guid Uuid
@@ -127,7 +124,6 @@ namespace Demo.ViewModels.Central
             {
                 _connectionStateDisposable = _connectObservable.Subscribe(async state =>
                 {
-                    ConnectionState = state;
                     if (state == ConnectionState.Connected)
                     {
                         await DiscoverServices();
@@ -182,19 +178,12 @@ namespace Demo.ViewModels.Central
             if (ConnectionState != ConnectionState.Connected)
                 return;
 
-            await _navigationService.NavigateAsync(nameof(CharacteristicDetailPage),
-                    new NavigationParameters()
-                    {
-                        {nameof(ICharacteristic), characteristicViewModel.Characteristic},
-                        {nameof(IDevice), Device},
-                        {"ConnectionObservable", _connectObservable}
-                    });
+            await _navigationService.NavigateAsync(nameof(CharacteristicDetailPage), new NavigationParameters() {{nameof(ICharacteristic), characteristicViewModel.Characteristic}, {nameof(IDevice), Device}, {"ConnectionObservable", _connectObservable}});
         }
 
-		public void OnNavigatingTo(NavigationParameters parameters)
-		{
-
-		}
+        public void OnNavigatingTo(NavigationParameters parameters)
+        {
+        }
 
         public void OnNavigatedFrom(NavigationParameters parameters)
         {
@@ -206,13 +195,12 @@ namespace Demo.ViewModels.Central
             {
                 IDevice device = (IDevice) parameters[nameof(IDevice)];
                 Device = device;
-                ConnectionState = Device.State;
+                _deviceConnectionStateDisposable = Device.ConnectionState.SubscribeOn(SynchronizationContext.Current)
+                    .Subscribe(state => { ConnectionState = state; });
 
-				var task = Connect();
+                var task = Connect();
             }
         }
-
-
 
         public void OnAppearing(Page page)
         {
@@ -220,7 +208,6 @@ namespace Demo.ViewModels.Central
 
         public void OnDisappearing(Page page)
         {
-            
         }
 
         public void PagePopped()
@@ -228,6 +215,7 @@ namespace Demo.ViewModels.Central
             var disconnectTask = _centralManager.Disconnect(Device, CancellationToken.None);
             _cancellationTokenSource?.Cancel();
             _connectionStateDisposable?.Dispose();
+            _deviceConnectionStateDisposable?.Dispose();
         }
 
         private async Task SetConnectionPriority(ConnectionPriority? connectionPriority)
@@ -240,5 +228,5 @@ namespace Demo.ViewModels.Central
                 await _pageDialogService.DisplayAlertAsync("Error", $"Failed to set connection priority to {Enum.GetName(typeof(ConnectionPriority), connectionPriority.Value)}", "Ok");
             }
         }
-	}
+    }
 }

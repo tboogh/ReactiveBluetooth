@@ -22,7 +22,7 @@ namespace ReactiveBluetooth.iOS.Central
     {
         private readonly PeripheralDelegate.PeripheralDelegate _cbPeripheralDelegate;
 
-        public Device(CBPeripheral peripheral, int rssi, IAdvertisementData advertisementData)
+        public Device(CBPeripheral peripheral, int rssi, IAdvertisementData advertisementData, IObservable<ConnectionState> connectionState)
         {
             AdvertisementData = advertisementData;
             Peripheral = peripheral;
@@ -31,12 +31,13 @@ namespace ReactiveBluetooth.iOS.Central
             IObservable<int> currentRssi = Observable.Return(rssi);
             IObservable<int> delegateRssi = _cbPeripheralDelegate.RssiUpdatedSubject.Select(x => x.Item1.RSSI.Int32Value);
             Rssi = currentRssi.Merge(delegateRssi);
+            ConnectionState = connectionState;
         }
 
         public CBPeripheral Peripheral { get; }
         public Guid Uuid => Guid.Parse(Peripheral.Identifier.ToString());
         public string Name => Peripheral.Name;
-        public ConnectionState State => (ConnectionState) Peripheral.State;
+        public IObservable<ConnectionState> ConnectionState { get; }
         public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
