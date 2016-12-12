@@ -171,30 +171,33 @@ namespace ReactiveBluetooth.iOS.Central
 
         public IObservable<byte[]> Notifications(ICharacteristic characteristic)
         {
-            var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Select(x => x.Item2.Value.ToArray());
+	        CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
+			var valueUpdatedObservable = _cbPeripheralDelegate.UpdatedCharacterteristicValueSubject.Where(x => {
+					return Equals(x.Item2.UUID, nativeCharacteristic.UUID);
+				}).Select(x => x.Item2.Value.ToArray());
             return valueUpdatedObservable;
         }
 
         public Task<bool> StartNotifications(ICharacteristic characteristic, CancellationToken cancellationToken)
         {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            IObservable<bool> enableNotificationObservable = Observable.Create<bool>(observer =>
-            {
-                Peripheral.SetNotifyValue(true, nativeCharacteristic);
-                return Disposable.Empty;
-            })
-                .Publish()
-                .RefCount();
-            var stateUpdatedObservable = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Select(x =>
-            {
-                if (x.Item3 != null)
-                {
-                    return false;
-                }
-                return true;
-            });
-            return enableNotificationObservable.Merge(stateUpdatedObservable)
-                .ToTask(cancellationToken);
+            IObservable<bool> enableNotificationObservable = Observable.Create<bool>(observer => {
+            	var disp = _cbPeripheralDelegate.UpdatedNotificationStateSubject.Where((arg) => {
+				return Equals(arg.Item2.UUID, nativeCharacteristic.UUID);
+				}).Subscribe(x =>
+	            {
+	                if (x.Item3 != null)
+	                {
+						observer.OnNext(false);
+	                }
+	                observer.OnNext(true);
+					observer.OnCompleted();
+	            });
+            
+				Peripheral.SetNotifyValue(true, nativeCharacteristic);
+				return disp;
+			});
+			return enableNotificationObservable.ToTask(cancellationToken);
         }
 
         public Task<bool> StopNotifiations(ICharacteristic characteristic, CancellationToken cancellationToken)
