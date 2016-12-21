@@ -118,29 +118,36 @@ namespace ReactiveBluetooth.iOS.Central
         public Task<bool> WriteValue(ICharacteristic characteristic, byte[] value, WriteType writeType, CancellationToken cancellationToken)
         {
             CBCharacteristic nativeCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
-            return Observable.Create<bool>(observer =>
-            {
-                var wroteDisposabel = _cbPeripheralDelegate.WroteCharacteristicValueSubject.FirstAsync(x =>
-                {
-                    bool perphEqual = x.Item1.Identifier.ToString()
-                        .Equals(Peripheral.Identifier.ToString());
-                    bool chgarEqual = x.Item2.UUID.Uuid.Equals(nativeCharacteristic.UUID.Uuid);
-                    return perphEqual && chgarEqual;
-                })
-                    .Subscribe(x =>
-                    {
-                        if (x.Item3 != null)
-                        {
-                            observer.OnError(new Exception(x.Item3.LocalizedDescription));
-                        }
-                        observer.OnNext(true);
-                        observer.OnCompleted();
-                    });
+            
+            if (writeType == WriteType.WithResponse){
+	            Task<bool> observable = Observable.Create<bool>(observer =>
+	            {
+	                var wroteDisposabel = _cbPeripheralDelegate.WroteCharacteristicValueSubject.FirstAsync(x =>
+	                {
+	                    bool perphEqual = x.Item1.Identifier.ToString()
+	                        .Equals(Peripheral.Identifier.ToString());
+	                    bool chgarEqual = x.Item2.UUID.Uuid.Equals(nativeCharacteristic.UUID.Uuid);
+	                    return perphEqual && chgarEqual;
+	                })
+	                    .Subscribe(x =>
+	                    {
+	                        if (x.Item3 != null)
+	                        {
+	                            observer.OnError(new Exception(x.Item3.LocalizedDescription));
+	                        }
+	                        observer.OnNext(true);
+	                        observer.OnCompleted();
+	                    });
+	
+	                Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType());
+	                return Disposable.Create(() => { wroteDisposabel?.Dispose(); });
+	            }).ToTask(cancellationToken);
 
-                Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType());
-                return Disposable.Create(() => { wroteDisposabel?.Dispose(); });
-            })
-                .ToTask(cancellationToken);
+				return observable;
+			}
+			
+			Peripheral.WriteValue(NSData.FromArray(value), nativeCharacteristic, writeType.ToCharacteristicWriteType());
+			return Task.FromResult(true);
         }
 
         public Task<bool> WriteValue(IDescriptor descriptor, byte[] value, CancellationToken cancellationToken)
