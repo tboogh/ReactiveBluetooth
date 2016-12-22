@@ -25,8 +25,6 @@ namespace ReactiveBluetooth.Android.Central
 {
     public class Device : IDevice
     {
-        private IDisposable _connectionStateDisposable;
-
         public Device(BluetoothDevice device, int rssi, AdvertisementData advertisementData)
         {
             AdvertisementData = advertisementData;
@@ -35,8 +33,7 @@ namespace ReactiveBluetooth.Android.Central
             var currentRssi = Observable.Return(rssi);
             var callbackRssi = GattCallback.ReadRemoteRssiSubject.Select(x => x.Item2);
             Rssi = currentRssi.Merge(callbackRssi);
-
-            _connectionStateDisposable = GattCallback.ConnectionStateChange.Subscribe(state => { State = (ConnectionState) state; });
+            ConnectionState = GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x);
         }
 
         public BluetoothDevice NativeDevice { get; }
@@ -59,7 +56,7 @@ namespace ReactiveBluetooth.Android.Central
             }
         }
 
-        public ConnectionState State { get; private set; }
+        public IObservable<ConnectionState> ConnectionState { get; private set; }
         public IAdvertisementData AdvertisementData { get; }
         public IObservable<int> Rssi { get; }
 
@@ -263,11 +260,6 @@ namespace ReactiveBluetooth.Android.Central
         public bool RequestConnectionPriority(ConnectionPriority priority)
         {
             return Gatt.RequestConnectionPriority(priority.ToConnectionPriority());
-        }
-
-        public void Dispose()
-        {
-            _connectionStateDisposable?.Dispose();
         }
     }
 }

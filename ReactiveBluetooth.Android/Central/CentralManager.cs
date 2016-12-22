@@ -109,17 +109,17 @@ namespace ReactiveBluetooth.Android.Central
             var androidDevice = (Device) device;
             var nativeDevice = androidDevice.NativeDevice;
             var context = Application.Context;
+            var connectionObservable = Observable.Create<ConnectionState>(observer =>
+            {
+                var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
+                androidDevice.Gatt = gatt;
 
-            return Observable.Create<ConnectionState>(observer =>
-                {
-                    var gatt = nativeDevice.ConnectGatt(context, false, androidDevice.GattCallback);
-                    androidDevice.Gatt = gatt;
-
-                    return Disposable.Empty;
-                })
-                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState) x))
+                return Disposable.Empty;
+            })
+                .Merge(androidDevice.GattCallback.ConnectionStateChange.Select(x => (ConnectionState)x))
                 .Publish()
                 .RefCount();
+            return connectionObservable;
         }
 
         public async Task Disconnect(IDevice device, CancellationToken cancellationToken)

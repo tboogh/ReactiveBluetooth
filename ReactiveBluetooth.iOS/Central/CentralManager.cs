@@ -46,7 +46,7 @@ namespace ReactiveBluetooth.iOS.Central
                 .RefCount();
             return scanObservable.Merge(_centralManagerDelegate.DiscoveredPeriperhalSubject.Select(x =>
             {
-                Device device = new Device(x.Item2, x.Item4.Int32Value, new AdvertisementData(x.Item3));
+                Device device = new Device(x.Item2, x.Item4.Int32Value, new AdvertisementData(x.Item3), _centralManagerDelegate.ConnectedPeripheralSubject.Where(y => y.Equals(x.Item2.Identifier)).Select(y => (ConnectionState)y.Item2.State));
                 return device;
             }));
         }
