@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>ReactiveBluetooth</id>
-    <version>1.0.0-beta6</version>
+    <version>1.0.0-beta7</version>
     <authors>Tobias Boogh</authors>
     <owners>Tobias Boogh</owners>
     <licenseUrl>https://github.com/tboogh/ReactiveBluetooth/blob/master/LICENSE</licenseUrl>
