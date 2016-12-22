@@ -228,7 +228,6 @@ namespace ReactiveBluetooth.Android.Central
             var writeResult = await WriteValue(characteristicConfigDescriptor, enableNotificationValue.ToArray(), cancellationToken);
             if (!writeResult)
             {
-                //observer.OnError(new NotificationException("Failed to write descriptor"));
                 return false;
             }
             return true;
