@@ -45,7 +45,21 @@ namespace ReactiveBluetooth.Android.Central
 
         public IObservable<ManagerState> State()
         {
-            return _broadcastListener.StateUpdatedSubject;
+            return _broadcastListener.StateUpdatedSubject.Select(x =>
+            {
+                if (x != ManagerState.PoweredOn)
+                    return x;
+
+                if (_bluetoothAdapter?.BluetoothLeAdvertiser == null)
+                {
+                    return ManagerState.Unsupported;
+                }
+                if (!_bluetoothAdapter.IsMultipleAdvertisementSupported)
+                {
+                    return ManagerState.PartialSupport; 
+                }
+                return x;
+            }).AsObservable();
         }
 
         public IObservable<IDevice> ScanForDevices(IList<Guid> serviceUuids = null)

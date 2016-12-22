@@ -68,7 +68,10 @@ namespace ReactiveBluetooth.Android.Central
                 {
                     observer.OnError(new Exception("Discover services failed"));
                 }
-                return Disposable.Empty;
+                return Disposable.Create(() =>
+                {
+                    
+                });
             })
                 .Merge(GattCallback.ServicesDiscovered.Select(x =>
                 {

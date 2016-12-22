@@ -55,7 +55,21 @@ namespace ReactiveBluetooth.Android.Peripheral
         }
 
         public IBluetoothAbstractFactory Factory { get; }
-        public IObservable<ManagerState> State() => _broadcastListener.StateUpdatedSubject;
+        public IObservable<ManagerState> State() => _broadcastListener.StateUpdatedSubject.Select(x =>
+        {
+            if (x != ManagerState.PoweredOn)
+                return x;
+
+            if (_bluetoothAdapter?.BluetoothLeAdvertiser == null)
+            {
+                return ManagerState.Unsupported;
+            }
+            if (!(_bluetoothAdapter.IsOffloadedFilteringSupported && _bluetoothAdapter.IsOffloadedScanBatchingSupported))
+            {
+                return ManagerState.PartialSupport;
+            }
+            return x;
+        }).AsObservable();
 
         public void Dispose()
         {
