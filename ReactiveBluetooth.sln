@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{DAA78C8E-178F-45E3-B015-FF564FDDBA3E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegartionTests", "IntegartionTests", "{BAF8C038-7CBF-4B02-BFEC-62FC70ACCA58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Shared.IntegrationsTests", "IntegrationsTests\ReactiveBluetooth.Shared.IntegrationsTests\ReactiveBluetooth.Shared.IntegrationsTests.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
@@ -38,6 +36,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Demo.Android", "Demo\ReactiveBluetooth.Demo.Android\ReactiveBluetooth.Demo.Android.csproj", "{9E91053E-E4C0-48AA-85F5-6FB13E189452}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveBluetooth.Demo.iOS", "Demo\ReactiveBluetooth.Demo.iOS\ReactiveBluetooth.Demo.iOS.csproj", "{E5148330-7941-4688-95F8-E6AF04F16C8D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{89AAD7FE-7D65-4556-A910-47F83513C4FC}"
+	ProjectSection(SolutionItems) = preProject
+		build.bat = build.bat
+		build.fsx = build.fsx
+		ReactiveBluetooth.nuspec = ReactiveBluetooth.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
