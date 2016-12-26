@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>ReactiveBluetooth</id>
-    <version>1.0.0-beta6</version>
+    <id>@project@</id>
+    <version>@build.number@</version>
     <authors>Tobias Boogh</authors>
     <owners>Tobias Boogh</owners>
     <licenseUrl>https://github.com/tboogh/ReactiveBluetooth/blob/master/LICENSE</licenseUrl>
@@ -25,9 +25,5 @@
       </group>
     </dependencies>
   </metadata>
-  <files>
-		<file src="ReactiveBluetooth.Core\bin\Release\ReactiveBluetooth.*" target="lib\portable-net45+netcore45+wpa81\" exclude="**\*.pdb" />
-		<file src="ReactiveBluetooth.iOS\bin\Release\ReactiveBluetooth.*" target="lib\Xamarin.iOS1.0\" exclude="**\*.pdb" />
-		<file src="ReactiveBluetooth.Android\bin\Release\ReactiveBluetooth.*" target="lib\MonoAndroid1.0\" exclude="**\*.pdb" />
-	</files>
+  @files@
 </package>
