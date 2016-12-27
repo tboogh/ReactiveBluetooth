@@ -40,6 +40,7 @@ Target "AssemblyInfo" (fun _ ->
 )
 
 Target "CreateNugetPackages" (fun _ -> 
+    CreateDir artifactsDir
     CopyFiles packagingDir !! (buildDir + "/ReactiveBluetooth.*.dll")
     NuGet (fun p -> 
         {p with

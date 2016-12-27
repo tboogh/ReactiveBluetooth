@@ -1,0 +1,2 @@
+/Library/Frameworks/Mono.framework/Commands/mono nuget/nuget.exe install Fake -OutputDirectory tools -ExcludeVersion
+/Library/Frameworks/Mono.framework/Commands/mono tools/FAKE/tools/FAKE.exe build.fsx 
