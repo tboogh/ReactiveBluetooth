@@ -39,7 +39,8 @@ namespace ReactiveBluetooth.Android.Peripheral
         private readonly IServerCallback _serverCallback;
         private BluetoothGattServer _gattServer;
         private IObservable<bool> _startAdvertisingObservable;
-
+        private ManagerState _lastState;
+        
         public PeripheralManager() : this(null, null)
         {
         }
@@ -60,15 +61,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             if (x != ManagerState.PoweredOn)
                 return x;
 
-            if (_bluetoothAdapter?.BluetoothLeAdvertiser == null)
-            {
-                return ManagerState.Unsupported;
-            }
-            if (!(_bluetoothAdapter.IsOffloadedFilteringSupported && _bluetoothAdapter.IsOffloadedScanBatchingSupported))
-            {
-                return ManagerState.PartialSupport;
-            }
-            return x;
+            return _bluetoothAdapter?.BluetoothLeAdvertiser == null ? ManagerState.Unsupported : x;
         }).AsObservable();
 
         public void Dispose()
