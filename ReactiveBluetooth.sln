@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{89AAD7FE
 		build.bat = build.bat
 		build.fsx = build.fsx
 		ReactiveBluetooth.nuspec = ReactiveBluetooth.nuspec
+		ReleaseNotes.md = ReleaseNotes.md
 	EndProjectSection
 EndProject
 Global
