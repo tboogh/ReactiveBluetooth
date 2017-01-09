@@ -90,19 +90,12 @@ namespace ReactiveBluetooth.Android.Peripheral
 
             if (_bluetoothLeAdvertiser == null)
             {
-                throw new Exception("No support for advertising");
+                throw new AdvertisingNotSupportedException();
             }
 
             if (advertisingOptions.LocalName != null)
             {
                 _bluetoothAdapter.SetName(advertisingOptions.LocalName);
-            }
-
-            _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
-
-            if (_bluetoothLeAdvertiser == null)
-            {
-                throw new AdvertisingNotSupportedException();
             }
 
             var settings = CreateAdvertiseSettings(advertisingOptions);
