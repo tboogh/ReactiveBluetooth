@@ -35,8 +35,11 @@ namespace Demo.ViewModels
                             break;
                         case ManagerState.Resetting:
                             break;
+                        case ManagerState.PartialSupport:
+                            await _pageDialogService.DisplayAlertAsync("Partial supportd", "This device has partial support, some things might not work as expected", "I understand");
+                            break;
                         case ManagerState.Unsupported:
-                            await _pageDialogService.DisplayAlertAsync("Not suppored", "BLE is not supported on this device", "I understand");
+                            await _pageDialogService.DisplayAlertAsync("Not support", "BLE is not supported on this device", "I understand");
                             break;
                         case ManagerState.Unauthorized:
                             await _pageDialogService.DisplayAlertAsync("Bluetooth error", "Not authorized to use bluetooth", "Ok");
