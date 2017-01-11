@@ -127,22 +127,21 @@ namespace ReactiveBluetooth.Android.Central
         {
             BluetoothGattCharacteristic gattCharacteristic = ((Characteristic) characteristic).NativeCharacteristic;
 
-            var writeObservable = Observable.Create<bool>(observer =>
-            {
-                gattCharacteristic.WriteType = writeType.ToGattWriteType();
+            gattCharacteristic.WriteType = writeType.ToGattWriteType();
 
-                var setValueResult = gattCharacteristic.SetValue(value);
-                if (!setValueResult)
-                    observer.OnError(new Exception("Failed to set value"));
+            var setValueResult = gattCharacteristic.SetValue(value);
+            if (!setValueResult)
+                throw new Exception("Failed to set value");
 
-                var result = Gatt.WriteCharacteristic(gattCharacteristic);
-                if (!result)
-                    observer.OnError(new Exception("Failed to write characteristic"));
+            var result = Gatt.WriteCharacteristic(gattCharacteristic);
+            if (!result)
+                throw new Exception("Failed to write characteristic");
 
-                return Disposable.Empty;
-            });
+            if (writeType == WriteType.WithoutRespoonse)
+                return Task.FromResult(true);
 
-            return writeObservable.Merge<bool>(GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
+
+            return GattCallback.CharacteristicWriteSubject.FirstAsync(x => x.Item2 == gattCharacteristic)
                 .Select(x =>
                 {
                     if (x.Item3 != GattStatus.Success)
@@ -150,7 +149,7 @@ namespace ReactiveBluetooth.Android.Central
                         throw new Exception($"Failed to write characteristic: {x.Item3.ToString()}");
                     }
                     return true;
-                }))
+                })
                 .Take(1)
                 .ToTask(cancellationToken);
         }
