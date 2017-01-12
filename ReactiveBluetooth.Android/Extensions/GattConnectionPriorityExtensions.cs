@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Android.App;
+using Android.App;  
 using Android.Bluetooth;
 using Android.Content;
 using Android.OS;
@@ -18,7 +18,17 @@ namespace ReactiveBluetooth.Android.Extensions
     {
         public static GattConnectionPriority ToConnectionPriority(this ConnectionPriority priority)
         {
-            return (GattConnectionPriority) priority;
+            switch (priority)
+            {
+                case ConnectionPriority.Balanced:
+                    return GattConnectionPriority.Balanced;
+                case ConnectionPriority.Low:
+                    return GattConnectionPriority.LowPower;
+                case ConnectionPriority.HighPower:
+                    return GattConnectionPriority.High;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(priority), priority, null);
+            }
         }
     }
 }

@@ -1,3 +1,11 @@
+## New in 1.0.1-beta
+ * Altered versioning
+ * Write without response on android in main thread
+
+## New in 1.0.1-beta
+ * Altered versioning
+ * Write without response on android returns directely
+
 ## New in 1.0.0-beta9
  * Removed dual check for advertising on android
 
