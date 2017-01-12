@@ -114,10 +114,14 @@ namespace ReactiveBluetooth.Android.Peripheral
 
                 var successDisposable = callback.StartSuccessSubject.Subscribe(advertiseSettings => { observer.OnNext(true); });
 
-                foreach (var service in services)
+                if (services != null)
                 {
-                    AddService(service);
+                    foreach (var service in services)
+                    {
+                        AddService(service);
+                    }
                 }
+                
 
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
                 return Disposable.Create(() =>
