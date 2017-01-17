@@ -1,6 +1,9 @@
-## New in 1.0.1-beta
- * Altered versioning
+## New in 1.0.3-beta
+ * Added null check to advertising start on android
+
+## New in 1.0.2-beta
  * Write without response on android in main thread
+ * Write without response on android reverted
 
 ## New in 1.0.1-beta
  * Altered versioning
