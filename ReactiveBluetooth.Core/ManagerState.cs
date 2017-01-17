@@ -21,10 +21,6 @@ namespace ReactiveBluetooth.Core
         /// </summary>
         Unsupported,
         /// <summary>
-        /// The requested mode is only partially supported
-        /// </summary>
-        PartialSupport,
-        /// <summary>
         /// Not authorized to use bluetooth on the device
         /// </summary>
         Unauthorized,
@@ -35,6 +31,10 @@ namespace ReactiveBluetooth.Core
         /// <summary>
         /// Bluetooth is enabled on the device
         /// </summary>
-        PoweredOn
+        PoweredOn,
+        /// <summary>
+        /// The requested mode is only partially supported
+        /// </summary>
+        PartialSupport
     }
 }

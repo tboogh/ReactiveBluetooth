@@ -1,3 +1,6 @@
+## New in 1.0.4-beta
+ * Fixed incorrect ManagerState on iOS 
+ 
 ## New in 1.0.3-beta
  * Added null check to advertising start on android
 
