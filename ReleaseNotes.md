@@ -1,3 +1,6 @@
+## New in 1.0.2-beta
+ * Fixed incorrect ManagerState on iOS 
+ 
 ## New in 1.0.1-beta
  * Altered versioning
  * Write without response on android in main thread
