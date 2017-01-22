@@ -2,12 +2,12 @@
 using System.Reflection;
 
 [assembly: AssemblyProductAttribute("ReactiveBluetooth")]
-[assembly: AssemblyVersionAttribute("1.0.3")]
-[assembly: AssemblyFileVersionAttribute("1.0.3")]
+[assembly: AssemblyVersionAttribute("1.0.4")]
+[assembly: AssemblyFileVersionAttribute("1.0.4")]
 namespace System {
     internal static class AssemblyVersionInformation {
         internal const System.String AssemblyProduct = "ReactiveBluetooth";
-        internal const System.String AssemblyVersion = "1.0.3";
-        internal const System.String AssemblyFileVersion = "1.0.3";
+        internal const System.String AssemblyVersion = "1.0.4";
+        internal const System.String AssemblyFileVersion = "1.0.4";
     }
 }
