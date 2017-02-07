@@ -1,5 +1,5 @@
 # New in 1.0.6-beta
- * Altered android advertise pattern
+ * Altered advertising on iOS and Android
 
 ## New in 1.0.5-beta
  * Changed dispose pattern in BroadcastListener
