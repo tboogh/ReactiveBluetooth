@@ -1,4 +1,4 @@
-# New in 1.0.6-beta
+## New in 1.0.6-beta
  * Altered advertising on iOS and Android
 
 ## New in 1.0.5-beta
