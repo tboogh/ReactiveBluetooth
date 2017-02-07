@@ -154,13 +154,32 @@ namespace Demo.ViewModels.Central
 
         public async Task ToggleNotifications()
         {
-        	if (_notifyDisposable != null){
+        	if (_notifyDisposable != null)
+	        {
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(30000);
+	            bool stop = await Device.StopNotifiations(Characteristic, cancellationTokenSource.Token);
         		_notifyDisposable?.Dispose();
 				_notifyDisposable = null;
 			} else {
 			    try
 			    {
-			        _notifyDisposable = Device.Notifications(Characteristic)
+                    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(30000);
+			        try
+			        {
+			            bool start = await Device.StartNotifications(Characteristic, cancellationTokenSource.Token);
+			            if (!start)
+			            {
+			                await _pageDialogService.DisplayAlertAsync("Error", "Failed to enable notifications", "OK");
+			                return;
+			            }
+			        }
+			        catch (Exception e)
+			        {
+                        await _pageDialogService.DisplayAlertAsync("Error", "Failed to enable notifications", "OK");
+                        return;
+                    }
+                    
+                    _notifyDisposable = Device.Notifications(Characteristic)
 			            .Subscribe(bytes =>
 			            {
 			                if (bytes != null)

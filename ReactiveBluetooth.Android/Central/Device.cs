@@ -181,10 +181,15 @@ namespace ReactiveBluetooth.Android.Central
                 var result = gattDescriptor.SetValue(value);
                 if (!result)
                     observer.OnError(new Exception("Failed to set value"));
-
-                var writeResult = Gatt.WriteDescriptor(gattDescriptor);
-                if (!writeResult)
-                    observer.OnError(new Exception("Failed to write descriptor"));
+                using (var handler = new Handler(Looper.MainLooper))
+                {
+                    handler.Post(() =>
+                    {
+                        bool writeResult = Gatt.WriteDescriptor(gattDescriptor);
+                        if (!writeResult)
+                            observer.OnError(new Exception("Failed to write descriptor"));
+                    });
+                }
 
                 return Disposable.Empty;
             });
