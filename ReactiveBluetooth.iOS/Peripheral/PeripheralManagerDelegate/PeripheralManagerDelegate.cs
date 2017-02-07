@@ -12,7 +12,7 @@ namespace ReactiveBluetooth.iOS.Peripheral.PeripheralManagerDelegate
         public PeripheralManagerDelegate()
         {
             StateUpdatedSubject = new BehaviorSubject<CBPeripheralManagerState>(CBPeripheralManagerState.Unknown);
-            AdvertisingStartedSubject = new Subject<bool>();
+            AdvertisingStartedSubject = new BehaviorSubject<bool>(false);
             CharacteristicSubscribedSubject = new Subject<CharacteristicSubscriptionChange>();
             CharacteristicUnsubscribedSubject = new Subject<CharacteristicSubscriptionChange>();
             ReadyToUpdateSubsciberSubject = new Subject<CBPeripheralManager>();
@@ -22,7 +22,7 @@ namespace ReactiveBluetooth.iOS.Peripheral.PeripheralManagerDelegate
         }
 
         public BehaviorSubject<CBPeripheralManagerState> StateUpdatedSubject { get; }
-        public Subject<bool> AdvertisingStartedSubject { get; }
+        public BehaviorSubject<bool> AdvertisingStartedSubject { get; }
         public Subject<CharacteristicSubscriptionChange> CharacteristicSubscribedSubject { get; }
         public Subject<CharacteristicSubscriptionChange> CharacteristicUnsubscribedSubject { get; }
         public Subject<ReadRequestReceived> ReadRequestReceivedSubject { get; }

@@ -1,3 +1,9 @@
+# New in 1.0.6-beta
+ * Altered advertising on iOS and Android
+
+## New in 1.0.5-beta
+ * Changed dispose pattern in BroadcastListener
+
 ## New in 1.0.4-beta
  * Fixed incorrect ManagerState on iOS 
  

@@ -45,10 +45,13 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
         [Test]
         public async Task StartAdvertising_StartsWithoutError()
         {
-            var result = await _manager.Advertise(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
-                .FirstAsync(b => b)
-                .Timeout(Timeout);
+			var task = new TaskCompletionSource<bool>();
+			var disposable = _manager.Advertise(new AdvertisingOptions { ServiceUuids = new List<Guid>() { Guid.NewGuid() } }, new List<IService>()).Subscribe(b => {
+				task.TrySetResult(b);
+			});
 
+			var result =  await task.Task;
+			disposable?.Dispose();
             Assert.IsTrue(result);
         }
 
@@ -64,16 +67,19 @@ namespace ReactiveBluetooth.Shared.IntegrationsTests
             bool threw = false;
             try
             {
-                var result2 = await _manager.Advertise(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
+                bool result2 = await _manager.Advertise(new AdvertisingOptions {ServiceUuids = new List<Guid>() {Guid.NewGuid()}}, new List<IService>())
                     .FirstAsync(b => b)
                     .Timeout(Timeout);
+                    
+                result.Dispose();
             }
             catch (Exception e)
             {
-                threw = true;
+            	if (!(e is TimeoutException)){
+	            	threw = true;
+				}
             }
             Assert.False(threw);
-            result.Dispose();
         }
 
         [Test]

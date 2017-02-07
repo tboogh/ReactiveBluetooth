@@ -22,6 +22,7 @@ namespace ReactiveBluetooth.iOS.Peripheral
     {
         private readonly CBPeripheralManager _peripheralManager;
         private readonly PeripheralManagerDelegate.PeripheralManagerDelegate _peripheralDelegate;
+        private IObservable<bool> _advertiseObservable;
 
         public PeripheralManager()
         {
@@ -39,6 +40,9 @@ namespace ReactiveBluetooth.iOS.Peripheral
 
         public IObservable<bool> Advertise(AdvertisingOptions advertisingOptions, IList<IService> services)
         {
+            if (_advertiseObservable != null)
+                return _advertiseObservable;
+
             var advertiseObservable = Observable.Create<bool>(observer =>
             {
                
@@ -59,11 +63,12 @@ namespace ReactiveBluetooth.iOS.Peripheral
                 {
                     _peripheralManager.StopAdvertising();
                     _peripheralManager.RemoveAllServices();
+                    _advertiseObservable = null;
                 });
-            })
-                .Publish()
-                .RefCount();
-            return advertiseObservable.Merge(_peripheralDelegate.AdvertisingStartedSubject);
+            }).Publish().RefCount().Merge(_peripheralDelegate.AdvertisingStartedSubject);
+
+			_advertiseObservable = advertiseObservable;
+            return _advertiseObservable;
         }
 
         public StartAdvertisingOptions CreateAdvertisementOptions(AdvertisingOptions advertisingOptions)
