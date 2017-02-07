@@ -65,12 +65,9 @@ namespace ReactiveBluetooth.iOS.Peripheral
                     _peripheralManager.RemoveAllServices();
                     _advertiseObservable = null;
                 });
-            })
-                .Publish()
-                .RefCount();
+            }).Publish().RefCount().Merge(_peripheralDelegate.AdvertisingStartedSubject);
 
-
-            _advertiseObservable = advertiseObservable.Merge(_peripheralDelegate.AdvertisingStartedSubject);
+			_advertiseObservable = advertiseObservable;
             return _advertiseObservable;
         }
 
