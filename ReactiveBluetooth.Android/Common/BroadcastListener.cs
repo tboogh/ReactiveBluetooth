@@ -11,7 +11,7 @@ namespace ReactiveBluetooth.Android.Common
 {
     public class BroadcastListener : BroadcastReceiver
     {
-        private readonly Activity _activity;
+        private Activity _activity;
 
         public BroadcastListener()
         {
@@ -19,7 +19,6 @@ namespace ReactiveBluetooth.Android.Common
             _activity.RegisterReceiver(this, new IntentFilter(BluetoothAdapter.ActionStateChanged));
             StateUpdatedSubject = new BehaviorSubject<ManagerState>(BluetoothAdapter.DefaultAdapter?.State.ToManagerState() ?? ManagerState.Unsupported);
         }
-
 
         public BehaviorSubject<ManagerState> StateUpdatedSubject { get; }
 
@@ -36,7 +35,11 @@ namespace ReactiveBluetooth.Android.Common
 
         protected override void Dispose(bool disposing)
         {
-            _activity.UnregisterReceiver(this);
+            if (disposing)
+            {
+                _activity?.UnregisterReceiver(this);
+                _activity = null;
+            }
             base.Dispose(disposing);
         }
     }

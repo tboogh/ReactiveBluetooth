@@ -78,41 +78,36 @@ namespace ReactiveBluetooth.Android.Peripheral
                 return _startAdvertisingObservable;
             }
 
-            var bluetoothManager = (BluetoothManager) Application.Context.GetSystemService(Context.BluetoothService);
-            _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback) _serverCallback);
-
-            if (_bluetoothAdapter.State.ToManagerState() == ManagerState.PoweredOff)
+            var advertiseObservable = Observable.Create<bool>(observer =>
             {
-                throw new Exception("Device is off");
-            }
+                var bluetoothManager = (BluetoothManager)Application.Context.GetSystemService(Context.BluetoothService);
+                _gattServer = bluetoothManager.OpenGattServer(CrossCurrentActivity.Current.Activity, (BluetoothGattServerCallback)_serverCallback);
 
-            _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
-
-            if (_bluetoothLeAdvertiser == null)
-            {
-                throw new AdvertisingNotSupportedException();
-            }
-
-            if (advertisingOptions.LocalName != null)
-            {
-                _bluetoothAdapter.SetName(advertisingOptions.LocalName);
-            }
-
-            var settings = CreateAdvertiseSettings(advertisingOptions);
-            var advertiseData = CreateAdvertiseData(advertisingOptions);
-
-            var startObservable = Observable.Create<bool>(observer =>
-            {
-                var callback = new StartAdvertiseCallback();
-                var errorDisposable = callback.StartFailureSubject.Subscribe(failure =>
+                if (_bluetoothAdapter.State.ToManagerState() == ManagerState.PoweredOff)
                 {
-                    if (failure != 0)
-                    {
-                        observer.OnError(new AdvertiseException(failure.ToString()));
-                    }
-                });
+                    observer.OnError(new Exception("Device is off"));
+                    return Disposable.Empty;
+                }
 
-                var successDisposable = callback.StartSuccessSubject.Subscribe(advertiseSettings => { observer.OnNext(true); });
+                _bluetoothLeAdvertiser = _bluetoothAdapter.BluetoothLeAdvertiser;
+
+                if (_bluetoothLeAdvertiser == null)
+                {
+                    observer.OnError(new AdvertisingNotSupportedException());
+                    return Disposable.Empty;
+                }
+
+                if (advertisingOptions.LocalName != null)
+                {
+                    _bluetoothAdapter.SetName(advertisingOptions.LocalName);
+                }
+
+                var settings = CreateAdvertiseSettings(advertisingOptions);
+                var advertiseData = CreateAdvertiseData(advertisingOptions);
+
+                var callback = new StartAdvertiseCallback();
+
+                var successDisposable = callback.AdvertiseSubject.Subscribe(advertiseSettings => { observer.OnNext(true); }, observer.OnError);
 
                 if (services != null)
                 {
@@ -121,12 +116,11 @@ namespace ReactiveBluetooth.Android.Peripheral
                         AddService(service);
                     }
                 }
-                
 
                 _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
+
                 return Disposable.Create(() =>
                 {
-                    errorDisposable?.Dispose();
                     successDisposable?.Dispose();
                     _gattServer?.Close();
                     _bluetoothLeAdvertiser?.StopAdvertising(callback);
@@ -135,7 +129,7 @@ namespace ReactiveBluetooth.Android.Peripheral
             })
                 .Publish()
                 .RefCount();
-            return startObservable;
+            return advertiseObservable;
         }
 
         public AdvertiseData CreateAdvertiseData(AdvertisingOptions advertisingOptions)
@@ -167,11 +161,12 @@ namespace ReactiveBluetooth.Android.Peripheral
         public IObservable<bool> AddService(IService service)
         {
             var androidService = ((Service) service);
-            foreach (var characteristic in androidService.Characteristics)
-            {
-                var androidCharacteristic = (Characteristic) characteristic;
-                androidCharacteristic.GattServer = _gattServer;
-            }
+            if (androidService.Characteristics != null)
+                foreach (var characteristic in androidService.Characteristics)
+                {
+                    var androidCharacteristic = (Characteristic) characteristic;
+                    androidCharacteristic.GattServer = _gattServer;
+                }
             var nativeService = androidService.GattService;
             var result = _gattServer?.AddService(nativeService);
             return Observable.Return(result ?? false);

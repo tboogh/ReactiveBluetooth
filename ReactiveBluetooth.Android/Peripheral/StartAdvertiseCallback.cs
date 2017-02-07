@@ -1,28 +1,26 @@
 using System;
 using System.Reactive.Subjects;
 using Android.Bluetooth.LE;
+using ReactiveBluetooth.Core.Exceptions;
 
 namespace ReactiveBluetooth.Android.Peripheral
 {
     public class StartAdvertiseCallback : AdvertiseCallback
     {
-        public ISubject<AdvertiseSettings> StartSuccessSubject { get; }
-        public ISubject<AdvertiseFailure> StartFailureSubject { get; }
-
+        public ISubject<AdvertiseSettings> AdvertiseSubject { get; }
         public StartAdvertiseCallback()
         {
-            StartSuccessSubject = new BehaviorSubject<AdvertiseSettings>(default(AdvertiseSettings));
-            StartFailureSubject = new BehaviorSubject<AdvertiseFailure>(0);
+            AdvertiseSubject = new BehaviorSubject<AdvertiseSettings>(default(AdvertiseSettings));
         }
 
         public override void OnStartFailure(AdvertiseFailure errorCode)
         {
-            StartFailureSubject?.OnNext(errorCode);
+            AdvertiseSubject?.OnError(new AdvertiseException(errorCode.ToString()));
         }
 
         public override void OnStartSuccess(AdvertiseSettings settingsInEffect)
         {
-            StartSuccessSubject?.OnNext(settingsInEffect);
+            AdvertiseSubject?.OnNext(settingsInEffect);
         }
     }
 }
