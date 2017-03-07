@@ -1,3 +1,6 @@
+## New in 1.0.7
+ * Added try-catch to start advertising on android
+
 ## New in 1.0.6-beta
  * Altered advertising on iOS and Android
 

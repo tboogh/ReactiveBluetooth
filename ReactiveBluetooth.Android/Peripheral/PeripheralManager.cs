@@ -116,8 +116,16 @@ namespace ReactiveBluetooth.Android.Peripheral
                         AddService(service);
                     }
                 }
-
-                _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
+                try
+                {
+                    _bluetoothLeAdvertiser.StartAdvertising(settings, advertiseData, callback);
+                }
+                catch (Exception e)
+                {
+                    observer.OnError(e);
+                    return Disposable.Empty;
+                }
+                
 
                 return Disposable.Create(() =>
                 {
