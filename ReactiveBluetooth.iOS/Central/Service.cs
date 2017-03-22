@@ -38,7 +38,7 @@ namespace ReactiveBluetooth.iOS.Central
             var discoverObservable = CreateDiscoverCharacteristicsObservable(cancellationToken);
 
             IObservable<IList<ICharacteristic>> delegateObservable = _cbPeripheralDelegate.DiscoveredCharacteristicsSubject
-                .Where(x => Equals(x.Item2.UUID.Uuid, _service.UUID.Uuid) && Equals(x.Item1.UUID.Uuid, _nativeDevice.UUID.Uuid))
+                .Where(x => Equals(x.Item2, _service) && Equals(x.Item1, _nativeDevice))
                 .Select(x => x.Item2.Characteristics.Select(y => new Characteristic(y))
                     .Cast<ICharacteristic>()
                     .ToList());
