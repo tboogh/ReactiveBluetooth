@@ -1,3 +1,6 @@
+## New in 1.0.8
+ * Fixed characteristics discovery on iOS
+
 ## New in 1.0.7
  * Added try-catch to start advertising on android
 

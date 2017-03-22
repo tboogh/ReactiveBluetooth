@@ -34,23 +34,22 @@ namespace ReactiveBluetooth.iOS.Central
 
         public Task<IList<ICharacteristic>> DiscoverCharacteristics(CancellationToken cancellationToken)
         {
-
             var discoverObservable = CreateDiscoverCharacteristicsObservable(cancellationToken);
 
-            IObservable<IList<ICharacteristic>> delegateObservable = _cbPeripheralDelegate.DiscoveredCharacteristicsSubject
-                                                                                          .Where(x =>
-                       
-            {
-                var serviceEqual = Equals(x.Item2.UUID.Uuid, _service.UUID.Uuid);
-                var deviceEqual = Equals(x.Item1.Identifier, _nativeDevice.Identifier);
-                return serviceEqual && deviceEqual;
-            })
+            IObservable<IList<ICharacteristic>> delegateObservable = _cbPeripheralDelegate.
+                DiscoveredCharacteristicsSubject
+                .Where(x =>
+                {
+                    var serviceEqual = Equals(x.Item2.UUID.Uuid, _service.UUID.Uuid);
+                    var deviceEqual = Equals(x.Item1.Identifier, _nativeDevice.Identifier);
+                    return serviceEqual && deviceEqual;
+                })
                 .Select(x => x.Item2.Characteristics.Select(y => new Characteristic(y))
                     .Cast<ICharacteristic>()
                     .ToList());
 
             return discoverObservable.Merge(delegateObservable)
-    			 .Take(1)
+                .Take(1)
                 .ToTask(cancellationToken);
         }
 
@@ -81,7 +80,7 @@ namespace ReactiveBluetooth.iOS.Central
                 await Task.Run(() =>
                 {
                     _nativeDevice.DiscoverCharacteristics(_service);
-					observer.OnCompleted();
+                    observer.OnCompleted();
                 }, cancellationToken);
                 return new CancellationDisposable(cancellationTokenSource);
             });
