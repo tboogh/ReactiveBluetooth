@@ -4,10 +4,10 @@ Wrapper with benifits around Bluetooth LE on Xamarin.iOS and Xamarin.Android. Th
 
 Available on nuget at: https://www.nuget.org/packages/ReactiveBluetooth/
 
-##Central Manager
+## Central Manager
 Handles everything related to central mode to communicate with peripherals.
 
-##Peripheral Manager
+## Peripheral Manager
 Handles everything related to peripheral mode so that the device can be made available to other centrals.
 
 
