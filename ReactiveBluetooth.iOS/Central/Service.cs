@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
@@ -27,25 +28,22 @@ namespace ReactiveBluetooth.iOS.Central
             _cbPeripheralDelegate = cbPeripheralDelegate;
         }
 
-        public Guid Uuid
-        {
-            get { return _service.UUID.Uuid.ToGuid(); }
-        }
+        public Guid Uuid => _service.UUID.Uuid.ToGuid();
 
         public ServiceType ServiceType => _service.Primary ? ServiceType.Primary : ServiceType.Secondary;
 
         public Task<IList<ICharacteristic>> DiscoverCharacteristics(CancellationToken cancellationToken)
         {
-            var observable = Observable.FromEvent<IList<ICharacteristic>>(action => { _nativeDevice.DiscoverCharacteristics(_service); }, _ => { });
+            
+            var discoverObservable = CreateDiscoverCharacteristicsObservable(cancellationToken);
 
             IObservable<IList<ICharacteristic>> delegateObservable = _cbPeripheralDelegate.DiscoveredCharacteristicsSubject
-                .Where(x => Equals(x.Item2, _service) && Equals(x.Item1, _nativeDevice))
+                .Where(x => Equals(x.Item2.UUID.Uuid, _service.UUID.Uuid) && Equals(x.Item1.UUID.Uuid, _nativeDevice.UUID.Uuid))
                 .Select(x => x.Item2.Characteristics.Select(y => new Characteristic(y))
                     .Cast<ICharacteristic>()
                     .ToList());
 
-            return observable.Merge(delegateObservable)
-                .Take(1)
+            return discoverObservable.Merge(delegateObservable)
                 .ToTask(cancellationToken);
         }
 
@@ -66,6 +64,20 @@ namespace ReactiveBluetooth.iOS.Central
             return observable.Merge(delegateObservable)
                 .Take(1)
                 .ToTask(cancellationToken);
+        }
+
+        private IObservable<IList<ICharacteristic>> CreateDiscoverCharacteristicsObservable(CancellationToken cancellationToken)
+        {
+            return Observable.Create<IList<ICharacteristic>>(async observer =>
+            {
+                CancellationTokenSource cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                await Task.Run(() =>
+                {
+                    _nativeDevice.DiscoverCharacteristics(_service);
+                }, cancellationToken);
+                observer.OnCompleted();
+                return new CancellationDisposable(cancellationTokenSource);
+            });
         }
     }
 }
